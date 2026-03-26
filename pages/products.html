@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Browse all curated digital products on Vesna — courses, ebooks, tools, and templates recommended by Ebenezer Victory.">
+  <meta name="author" content="Ebenezer Victory">
+  <meta name="theme-color" content="#0e0e0e">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="All Products — Vesna">
+  <meta property="og:description" content="Browse all curated digital products.">
+  <meta property="og:type" content="website">
+
+  <title>All Products — Vesna</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body data-page="products">
+
+  <!-- Skip Link -->
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav__inner">
+        <a href="../index.html" class="nav__logo"><span><img src="../img/logo.png" alt="Vesna" class="nav__logo-img"></span></a>
+
+        <ul class="nav__links">
+          <li><a href="../index.html" class="nav__link">Home</a></li>
+          <li><a href="products.html" class="nav__link nav__link--active">Products</a></li>
+          <li><a href="about.html" class="nav__link">About</a></li>
+        </ul>
+
+        <a href="#" class="btn btn--primary btn--sm nav__cta">Browse Picks</a>
+
+        <button class="nav__menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main id="main">
+
+    <!-- Page Header -->
+    <section class="category-hero">
+      <div class="container">
+        <h1 class="category-hero__title">All Products</h1>
+        <p class="category-hero__count" id="product-count">Loading products...</p>
+      </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+
+        <!-- Filter Bar -->
+        <div id="filter-bar">
+          <!-- Filter chips loaded via JavaScript -->
+        </div>
+
+        <!-- Products Grid -->
+        <div id="products-grid" class="product-grid">
+          <!-- Products loaded via JavaScript -->
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__inner">
+        <div class="footer__brand">
+          <p class="footer__logo">Vesna<span>.</span></p>
+          <p class="footer__tagline">Curated digital product recommendations from Ebenezer Victory.</p>
+        </div>
+
+        <div>
+          <p class="footer__links-title">Explore</p>
+          <nav class="footer__links">
+            <a href="../index.html" class="footer__link">Home</a>
+            <a href="products.html" class="footer__link">All Products</a>
+            <a href="about.html" class="footer__link">About</a>
+          </nav>
+        </div>
+
+        <div>
+          <p class="footer__links-title">Categories</p>
+          <nav class="footer__links" id="footer-categories">
+            <!-- Categories loaded via JavaScript -->
+          </nav>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <p class="footer__copy">© 2026 Vesna. All rights reserved.</p>
+        <p class="footer__disclosure">Affiliate disclosure: Some links may earn me a commission at no extra cost to you.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="../js/api.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/app.js"></script>
+
+  <!-- Update product count -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const countEl = document.getElementById('product-count');
+
+      setTimeout(() => {
+        if (window.App && window.App.products && countEl) {
+          const count = window.App.products.length;
+          countEl.textContent = `${count} product${count !== 1 ? 's' : ''}`;
+        }
+      }, 1000);
+
+      // Footer categories
+      setTimeout(() => {
+        const footerCategories = document.getElementById('footer-categories');
+        if (footerCategories && window.App && window.App.categories) {
+          footerCategories.innerHTML = window.App.categories
+            .map(cat => `<a href="category.html?name=${encodeURIComponent(cat.name)}" class="footer__link">${cat.name}</a>`)
+            .join('');
+        }
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

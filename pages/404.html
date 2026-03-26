@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Page not found">
+  <meta name="theme-color" content="#0e0e0e">
+
+  <title>404 — Page Not Found — Vesna</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../css/styles.css">
+
+  <style>
+    .error-page {
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--space-8);
+    }
+
+    .error-page__content {
+      max-width: 480px;
+    }
+
+    .error-page__code {
+      font-family: var(--font-display);
+      font-size: clamp(6rem, 20vw, 12rem);
+      font-weight: 700;
+      line-height: 1;
+      color: var(--color-border);
+      margin-bottom: var(--space-4);
+    }
+
+    .error-page__title {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: var(--space-4);
+    }
+
+    .error-page__text {
+      font-family: var(--font-ui);
+      font-size: var(--text-md);
+      font-weight: 300;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-8);
+      line-height: var(--leading-loose);
+    }
+
+    .error-page__links {
+      display: flex;
+      gap: var(--space-4);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body data-page="error">
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container">
+      <div class="nav__inner">
+        <a href="../index.html" class="nav__logo"><span><img src="../img/logo.png" alt="Vesna" class="nav__logo-img"></span></a>
+
+        <ul class="nav__links">
+          <li><a href="../index.html" class="nav__link">Home</a></li>
+          <li><a href="products.html" class="nav__link">Products</a></li>
+          <li><a href="about.html" class="nav__link">About</a></li>
+        </ul>
+
+        <a href="products.html" class="btn btn--primary btn--sm nav__cta">Browse Picks</a>
+
+        <button class="nav__menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="error-page">
+    <div class="error-page__content">
+      <p class="error-page__code">404</p>
+      <h1 class="error-page__title">Page not found</h1>
+      <p class="error-page__text">
+        Looks like this page wandered off. Maybe it was deleted, or maybe it never existed. Either way, let's get you back on track.
+      </p>
+      <div class="error-page__links">
+        <a href="../index.html" class="btn btn--primary">Go Home</a>
+        <a href="products.html" class="btn btn--secondary">Browse Products</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__bottom">
+        <p class="footer__copy">© 2026 Vesna. All rights reserved.</p>
+        <p class="footer__disclosure">Affiliate disclosure: Some links may earn me a commission at no extra cost to you.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
