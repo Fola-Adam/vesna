@@ -13,6 +13,20 @@
   <body data-page="home">
     <a href="#main" class="skip-link">Skip to main content</a>
 
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loading-screen__content">
+        <img src="img/mask.png" alt="" class="loading-screen__mask" />
+        <p class="loading-screen__welcome">Welcome to Vesna</p>
+        <img src="img/vesna_card.png" alt="" class="loading-screen__card" />
+        <div class="loading-screen__sheen"></div>
+        <img src="img/logo.png" alt="Vesna" class="loading-screen__logo" />
+        <h1 class="loading-screen__text">
+          <span>V</span><span>e</span><span>s</span><span>n</span><span>a</span>
+        </h1>
+      </div>
+    </div>
+
     <!-- Navigation -->
     <nav class="nav" role="navigation" aria-label="Main navigation">
       <div class="container nav__inner">
@@ -25,12 +39,40 @@
             <a href="index.html" class="nav__link nav__link--active">Home</a>
           </li>
           <li><a href="pages/products.html" class="nav__link">Products</a></li>
+          <li><a href="pages/guide.html" class="nav__link">Guide</a></li>
+          <li><a href="pages/compare.html" class="nav__link">Compare</a></li>
           <li><a href="pages/about.html" class="nav__link">About</a></li>
         </ul>
 
         <a href="pages/products.html" class="btn btn--primary nav__cta"
           >Browse Picks</a
         >
+
+        <button
+          id="dark-mode-toggle"
+          class="nav__theme-toggle"
+          aria-label="Toggle dark mode"
+          title="Toggle theme"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
 
         <button
           class="nav__menu-toggle"
@@ -182,7 +224,13 @@
       aria-hidden="true"
     >
       <div class="chat-header">
-        <h3 id="chat-title" class="chat-title">Chat with Vesna AI</h3>
+        <div class="chat-header__avatar">
+          <img src="img/mask.png" alt="Vesna" class="chat-avatar-img" />
+        </div>
+        <div class="chat-header__info">
+          <h3 id="chat-title" class="chat-title">Ask Vesna</h3>
+          <p class="chat-status">AI Product Assistant</p>
+        </div>
         <button id="chat-close" class="chat-close" aria-label="Close chat">
           <svg
             width="18"
@@ -210,7 +258,7 @@
           <span></span>
           <span></span>
         </div>
-        Vesna AI is typing...
+        <span>Thinking...</span>
       </div>
       <div class="chat-input-container">
         <input
@@ -291,10 +339,12 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="js/loading.js"></script>
     <script src="js/api.js"></script>
     <script src="js/components.js"></script>
     <script src="js/features.js"></script>
     <script src="js/chat.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/onboarding.js"></script>
   </body>
 </html>

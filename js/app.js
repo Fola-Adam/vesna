@@ -786,46 +786,23 @@ const App = {
    * Setup dark mode toggle button
    */
   setupDarkModeToggle() {
-    // Add theme toggle to nav
-    const nav = document.querySelector('.nav__inner');
-    if (!nav) return;
-
-    if (document.getElementById('theme-toggle')) return; // already exists
-
-    const toggle = document.createElement('button');
-    toggle.id = 'theme-toggle';
-    toggle.className = 'btn-icon btn-icon--theme';
-    toggle.setAttribute('aria-label', 'Toggle dark mode');
-    toggle.innerHTML = `
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-sun">
-        <circle cx="12" cy="12" r="5"/>
-        <line x1="12" y1="1" x2="12" y2="3"/>
-        <line x1="12" y1="21" x2="12" y2="23"/>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-        <line x1="1" y1="12" x2="3" y2="12"/>
-        <line x1="21" y1="12" x2="23" y2="12"/>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-      </svg>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-moon" style="display:none;">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-      </svg>
-    `;
+    const toggle = document.getElementById('dark-mode-toggle');
+    if (!toggle) return;
 
     toggle.addEventListener('click', () => {
       Features.toggleDarkMode();
-      const isDark = Features.getCurrentTheme() === 'dark';
-      toggle.querySelector('.icon-sun').style.display = isDark ? 'none' : 'block';
-      toggle.querySelector('.icon-moon').style.display = isDark ? 'block' : 'none';
+
+      // Close mobile menu when toggling dark mode
+      const navLinks = document.querySelector('.nav__links');
+      const menuToggle = document.querySelector('.nav__menu-toggle');
+      if (navLinks && navLinks.classList.contains('nav__links--open')) {
+        navLinks.classList.remove('nav__links--open');
+        if (menuToggle) {
+          menuToggle.setAttribute('aria-expanded', 'false');
+          menuToggle.classList.remove('nav__menu-toggle--active');
+        }
+      }
     });
-
-    // Set initial state
-    const isDark = Features.getCurrentTheme() === 'dark';
-    toggle.querySelector('.icon-sun').style.display = isDark ? 'none' : 'block';
-    toggle.querySelector('.icon-moon').style.display = isDark ? 'block' : 'none';
-
-    nav.appendChild(toggle);
   },
 
   /**
