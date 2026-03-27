@@ -34,8 +34,8 @@ const API = {
       }
 
       const data = await response.json();
-
-      return data.products || [];
+      this.lastSource = data.source || 'unknown';
+      return data.products ? data.products.map(p => ({ ...p, source: this.lastSource })) : [];
     } catch (error) {
       console.error('Failed to fetch products:', error);
       throw error;

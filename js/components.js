@@ -45,14 +45,24 @@ const Components = {
       ? `<img src="${image}" alt="${name}" class="card__image" loading="lazy">`
       : `<div class="card__image-placeholder">No Image</div>`;
 
+    // Determine correct product detail path for routing context
+    const productUrl = window.location.pathname.startsWith('/pages/')
+      ? `product.html?id=${encodeURIComponent(id)}`
+      : `/pages/product.html?id=${encodeURIComponent(id)}`;
+
+    const sourceLabel = product.source === 'mock' ? 'Demo' : product.source === 'airtable' ? 'Live' : 'Fallback';
+
     return `
-      <article class="card fade-in">
+      <article class="card fade-in fade-in--visible">
         <div class="card__image-wrap">
           ${imageHtml}
           ${badgesHtml}
         </div>
         <div class="card__body">
-          <p class="card__category">${category || 'Product'}</p>
+          <div class="card__meta">
+            <p class="card__category">${category || 'Product'}</p>
+            <span class="card__source">${sourceLabel}</span>
+          </div>
           <h3 class="card__title">${name}</h3>
           ${description ? `<p class="card__description">${description}</p>` : ''}
           <div class="card__price-wrap">
@@ -60,16 +70,13 @@ const Components = {
           </div>
         </div>
         <div class="card__footer">
-          <a href="/pages/product.html?id=${id}" class="btn btn--primary" onclick="event.stopPropagation()">
-            Get It Now
-            <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/>
-              <line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
+          <a href="${productUrl}" class="btn btn--primary" onclick="event.stopPropagation()">
+            View Details
           </a>
+          ${product.affiliateLink ? `<a href="${product.affiliateLink}" class="btn btn--secondary" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">
+            Buy Now
+          </a>` : ''}
         </div>
-        <a href="/pages/product.html?id=${id}" class="card-link" aria-label="View ${name}"></a>
       </article>
     `;
   },

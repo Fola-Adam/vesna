@@ -43,6 +43,7 @@ const App = {
 
       // Setup common functionality
       this.setupNavigation();
+      this.initOnboarding();
 
       // Populate shared UI that all pages need
       this.populateFooterCategories();
@@ -385,6 +386,107 @@ const App = {
   },
 
   /**
+   * Initialize new-user onboarding modal
+   */
+  initOnboarding() {
+    if (localStorage.getItem('vesna_onboarding_completed') === 'true') {
+      return;
+    }
+
+    const steps = [
+      {
+        title: 'Welcome to Vesna!',
+        text: 'Get curated digital products and real reviews in one place. Let us show you around.',
+      },
+      {
+        title: 'Explore Categories',
+        text: 'Use the category filter to quickly find Courses, Ebooks, Tools, and more.',
+      },
+      {
+        title: 'Try Product Details',
+        text: 'Click any card to see full details and get your affiliate link. The entire app is built mobile-first.',
+      },
+      {
+        title: 'Ready to Start',
+        text: 'You can close this anytime and dive in. Enjoy the journey!',
+      },
+    ];
+
+    let currentStep = 0;
+
+    const modal = document.createElement('div');
+    modal.id = 'onboarding-modal';
+    modal.className = 'onboarding-overlay';
+    const featherSvg = `
+      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9.2 3.55c1.1-1.07 2.76-1.07 3.87 0l6.06 5.91c1.07 1.04 1.07 2.7 0 3.74l-9.16 8.93a.723.723 0 0 1-1.03 0 .764.764 0 0 1 0-1.08l8.1-7.88-4.3-4.20-.6-.6-2.59 2.5a.74.74 0 0 1-1.04 0 .75.75 0 0 1 0-1.06l2.23-2.14-.5-.5a.748.748 0 0 1 0-1.06l.01-.01z" fill="currentColor"/>
+      </svg>
+    `;
+
+    modal.innerHTML = `
+      <div class="onboarding-card" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+        <div class="onboarding-mascot">${featherSvg}</div>
+        <h2 id="onboarding-title">${steps[0].title}</h2>
+        <p id="onboarding-text">${steps[0].text}</p>
+        <div class="onboarding-controls">
+          <button id="onboarding-prev" class="btn btn--secondary" disabled>Back</button>
+          <button id="onboarding-next" class="btn btn--primary">Next</button>
+          <button id="onboarding-skip" class="btn btn--ghost">Skip</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const titleEl = modal.querySelector('#onboarding-title');
+    const textEl = modal.querySelector('#onboarding-text');
+    const prevBtn = modal.querySelector('#onboarding-prev');
+    const nextBtn = modal.querySelector('#onboarding-next');
+    const skipBtn = modal.querySelector('#onboarding-skip');
+
+    const closeOnboarding = () => {
+      localStorage.setItem('vesna_onboarding_completed', 'true');
+      modal.remove();
+    };
+
+    const updateStep = () => {
+      const step = steps[currentStep];
+      titleEl.textContent = step.title;
+      textEl.textContent = step.text;
+
+      prevBtn.disabled = currentStep === 0;
+      nextBtn.textContent = currentStep === steps.length - 1 ? 'Finish' : 'Next';
+    };
+
+    prevBtn.addEventListener('click', () => {
+      if (currentStep > 0) {
+        currentStep -= 1;
+        updateStep();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentStep < steps.length - 1) {
+        currentStep += 1;
+        updateStep();
+      } else {
+        closeOnboarding();
+      }
+    });
+
+    skipBtn.addEventListener('click', closeOnboarding);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeOnboarding();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeOnboarding();
+    });
+
+    updateStep();
+  },
+
+  /**
    * Setup navigation functionality
    */
   setupNavigation() {
@@ -417,6 +519,25 @@ const App = {
         menuToggle.classList.toggle('nav__menu-toggle--active', isOpen);
       });
 
+      // Keyboard support
+      menuToggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const isOpen = navLinksContainer.classList.toggle('nav__links--open');
+          menuToggle.setAttribute('aria-expanded', isOpen);
+          menuToggle.classList.toggle('nav__menu-toggle--active', isOpen);
+        }
+      });
+
+      // Close on Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navLinksContainer.classList.contains('nav__links--open')) {
+          navLinksContainer.classList.remove('nav__links--open');
+          menuToggle.setAttribute('aria-expanded', 'false');
+          menuToggle.classList.remove('nav__menu-toggle--active');
+        }
+      });
+
       // Close mobile menu when a link is clicked
       navLinksContainer.querySelectorAll('.nav__link').forEach(link => {
         link.addEventListener('click', () => {
@@ -431,6 +552,7 @@ const App = {
         if (!menuToggle.contains(e.target) && !navLinksContainer.contains(e.target)) {
           navLinksContainer.classList.remove('nav__links--open');
           menuToggle.setAttribute('aria-expanded', 'false');
+          menuToggle.classList.remove('nav__menu-toggle--active');
         }
       });
     }
