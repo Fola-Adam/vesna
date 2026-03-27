@@ -209,6 +209,8 @@ const App = {
    * @param {Array} products - Products to render
    */
   renderProducts(grid, products) {
+    if (!grid) return; // Safety check
+
     if (products.length === 0) {
       grid.innerHTML = Components.emptyState(
         'No products found',
@@ -596,7 +598,12 @@ const App = {
     const container = document.getElementById('search-container');
     if (!container) return;
 
-    container.innerHTML = Components.searchBar();
+    try {
+      container.innerHTML = Components.searchBar();
+    } catch (e) {
+      console.error('Error rendering search bar:', e);
+      return;
+    }
 
     const searchInput = document.getElementById('product-search');
     const clearBtn = document.getElementById('search-clear');
@@ -611,26 +618,29 @@ const App = {
       clearBtn.style.display = query ? 'block' : 'none';
 
       debounceTimer = setTimeout(() => {
-        if (document.body.dataset.page === 'products') {
+        const page = document.body.dataset.page;
+        if (page === 'products') {
           const grid = document.getElementById('products-grid');
-          const results = Features.fuzzySearch(this.products, query);
-          this.renderProducts(grid, results);
-        } else if (document.body.dataset.page === 'category') {
+          if (grid) {
+            const results = Features.fuzzySearch(this.products, query);
+            this.renderProducts(grid, results);
+          }
+        } else if (page === 'category') {
           const grid = document.getElementById('category-products');
-          const results = Features.fuzzySearch(this.products, query);
-          this.renderProducts(grid, results);
+          if (grid) {
+            const results = Features.fuzzySearch(this.products, query);
+            this.renderProducts(grid, results);
+          }
         }
-      }, 300); // debounce
+      }, 300);
     });
 
     clearBtn?.addEventListener('click', () => {
       searchInput.value = '';
       clearBtn.style.display = 'none';
-      if (document.body.dataset.page === 'products') {
-        this.renderProducts(
-          document.getElementById('products-grid'),
-          this.products
-        );
+      const grid = document.getElementById('products-grid');
+      if (grid && document.body.dataset.page === 'products') {
+        this.renderProducts(grid, this.products);
       }
     });
 
