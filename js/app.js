@@ -52,6 +52,7 @@ const App = {
       this.setupComparisonButtons();
       this.setupDarkModeToggle();
       this.initOnboarding();
+      this.initChat();
 
       // Populate shared UI that all pages need
       this.populateFooterCategories();
@@ -407,93 +408,222 @@ const App = {
       {
         title: 'Welcome to Vesna!',
         text: 'Get curated digital products and real reviews in one place. Let us show you around.',
+        target: null,
+        position: 'center'
       },
       {
-        title: 'Explore Categories',
-        text: 'Use the category filter to quickly find Courses, Ebooks, Tools, and more.',
+        title: 'Search & Discover',
+        text: 'Use the search bar to find exactly what you need. Try "marketing" or "tools".',
+        target: '#search-container',
+        position: 'bottom'
       },
       {
-        title: 'Try Product Details',
-        text: 'Click any card to see full details and get your affiliate link. The entire app is built mobile-first.',
+        title: 'Browse Categories',
+        text: 'Filter by category to find Courses, Ebooks, Tools, and Templates.',
+        target: '#categories',
+        position: 'top'
       },
       {
-        title: 'Ready to Start',
-        text: 'You can close this anytime and dive in. Enjoy the journey!',
+        title: 'Product Cards',
+        text: 'Each card shows ratings, wishlist ♥️, and comparison options.',
+        target: '#featured-products .card:first-child',
+        position: 'right'
+      },
+      {
+        title: 'Ready to Explore!',
+        text: 'Click any product to see details, or browse all products. Enjoy discovering!',
+        target: null,
+        position: 'center'
       },
     ];
 
     let currentStep = 0;
+    let overlay = null;
+    let tooltip = null;
 
-    const modal = document.createElement('div');
-    modal.id = 'onboarding-modal';
-    modal.className = 'onboarding-overlay';
-    const featherSvg = `
-      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9.2 3.55c1.1-1.07 2.76-1.07 3.87 0l6.06 5.91c1.07 1.04 1.07 2.7 0 3.74l-9.16 8.93a.723.723 0 0 1-1.03 0 .764.764 0 0 1 0-1.08l8.1-7.88-4.3-4.20-.6-.6-2.59 2.5a.74.74 0 0 1-1.04 0 .75.75 0 0 1 0-1.06l2.23-2.14-.5-.5a.748.748 0 0 1 0-1.06l.01-.01z" fill="currentColor"/>
-      </svg>
-    `;
+    const createOverlay = () => {
+      overlay = document.createElement('div');
+      overlay.className = 'onboarding-overlay';
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      `;
+      document.body.appendChild(overlay);
+    };
 
-    modal.innerHTML = `
-      <div class="onboarding-card" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
-        <div class="onboarding-mascot">${featherSvg}</div>
-        <h2 id="onboarding-title">${steps[0].title}</h2>
-        <p id="onboarding-text">${steps[0].text}</p>
-        <div class="onboarding-controls">
-          <button id="onboarding-prev" class="btn btn--secondary" disabled>Back</button>
-          <button id="onboarding-next" class="btn btn--primary">Next</button>
-          <button id="onboarding-skip" class="btn btn--ghost">Skip</button>
+    const createTooltip = () => {
+      tooltip = document.createElement('div');
+      tooltip.className = 'onboarding-tooltip';
+      tooltip.style.cssText = `
+        position: absolute;
+        background: var(--color-surface);
+        border: 2px solid var(--color-gold);
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
+        max-width: 320px;
+        box-shadow: var(--shadow-lg);
+        z-index: 10000;
+        pointer-events: auto;
+        opacity: 0;
+        transform: scale(0.9);
+        transition: all 0.3s ease;
+      `;
+      document.body.appendChild(tooltip);
+    };
+
+    const positionTooltip = (step) => {
+      if (!tooltip) return;
+
+      const target = step.target ? document.querySelector(step.target) : null;
+      const rect = target ? target.getBoundingClientRect() : null;
+
+      if (!target || !rect) {
+        // Center position for intro/outro
+        tooltip.style.top = '50%';
+        tooltip.style.left = '50%';
+        tooltip.style.transform = 'translate(-50%, -50%) scale(1)';
+        return;
+      }
+
+      // Position based on target element
+      let top, left, transform = 'scale(1)';
+
+      switch (step.position) {
+        case 'top':
+          top = rect.top - 10;
+          left = rect.left + rect.width / 2;
+          transform = `translate(-50%, -100%) scale(1)`;
+          break;
+        case 'bottom':
+          top = rect.bottom + 10;
+          left = rect.left + rect.width / 2;
+          transform = `translate(-50%, 0) scale(1)`;
+          break;
+        case 'left':
+          top = rect.top + rect.height / 2;
+          left = rect.left - 10;
+          transform = `translate(-100%, -50%) scale(1)`;
+          break;
+        case 'right':
+          top = rect.top + rect.height / 2;
+          left = rect.right + 10;
+          transform = `translate(0, -50%) scale(1)`;
+          break;
+        default:
+          top = rect.top + rect.height / 2;
+          left = rect.left + rect.width / 2;
+          transform = `translate(-50%, -50%) scale(1)`;
+      }
+
+      tooltip.style.top = `${top}px`;
+      tooltip.style.left = `${left}px`;
+      tooltip.style.transform = transform;
+    };
+
+    const updateTooltip = (step) => {
+      if (!tooltip) return;
+
+      tooltip.innerHTML = `
+        <div class="onboarding-mascot">${currentStep === 0 ? '🪶' : currentStep === steps.length - 1 ? '✨' : '👆'}</div>
+        <h3 style="margin: 0 0 var(--space-3) 0; color: var(--color-text); font-size: var(--text-lg);">${step.title}</h3>
+        <p style="margin: 0 0 var(--space-5) 0; color: var(--color-text-muted); line-height: 1.5;">${step.text}</p>
+        <div style="display: flex; gap: var(--space-3); justify-content: space-between; align-items: center;">
+          <div style="font-size: var(--text-sm); color: var(--color-text-faint);">
+            ${currentStep + 1} of ${steps.length}
+          </div>
+          <div style="display: flex; gap: var(--space-2);">
+            <button class="btn btn--ghost" id="onboarding-prev" ${currentStep === 0 ? 'disabled' : ''}>Back</button>
+            <button class="btn btn--primary" id="onboarding-next">${currentStep === steps.length - 1 ? 'Finish' : 'Next'}</button>
+            <button class="btn btn--ghost" id="onboarding-skip">Skip</button>
+          </div>
         </div>
-      </div>
-    `;
+      `;
 
-    document.body.appendChild(modal);
+      // Highlight target element
+      if (step.target) {
+        const target = document.querySelector(step.target);
+        if (target) {
+          target.style.boxShadow = '0 0 0 3px var(--color-gold), var(--shadow-lg)';
+          target.style.zIndex = '10001';
+          target.style.position = 'relative';
+        }
+      }
 
-    const titleEl = modal.querySelector('#onboarding-title');
-    const textEl = modal.querySelector('#onboarding-text');
-    const prevBtn = modal.querySelector('#onboarding-prev');
-    const nextBtn = modal.querySelector('#onboarding-next');
-    const skipBtn = modal.querySelector('#onboarding-skip');
+      // Add event listeners
+      tooltip.querySelector('#onboarding-prev')?.addEventListener('click', () => {
+        if (currentStep > 0) {
+          clearHighlight();
+          currentStep--;
+          updateTooltip(steps[currentStep]);
+          positionTooltip(steps[currentStep]);
+        }
+      });
+
+      tooltip.querySelector('#onboarding-next')?.addEventListener('click', () => {
+        if (currentStep < steps.length - 1) {
+          clearHighlight();
+          currentStep++;
+          updateTooltip(steps[currentStep]);
+          positionTooltip(steps[currentStep]);
+        } else {
+          closeOnboarding();
+        }
+      });
+
+      tooltip.querySelector('#onboarding-skip')?.addEventListener('click', closeOnboarding);
+
+      // Show tooltip with animation
+      setTimeout(() => {
+        tooltip.style.opacity = '1';
+        tooltip.style.transform = tooltip.style.transform.replace('scale(0.9)', 'scale(1)');
+      }, 100);
+    };
+
+    const clearHighlight = () => {
+      const highlighted = document.querySelector('[style*="box-shadow: 0 0 0 3px"]');
+      if (highlighted) {
+        highlighted.style.boxShadow = '';
+        highlighted.style.zIndex = '';
+        highlighted.style.position = '';
+      }
+    };
 
     const closeOnboarding = () => {
       localStorage.setItem('vesna_onboarding_completed', 'true');
-      modal.remove();
+      if (overlay) overlay.remove();
+      if (tooltip) tooltip.remove();
+      clearHighlight();
     };
 
-    const updateStep = () => {
-      const step = steps[currentStep];
-      titleEl.textContent = step.title;
-      textEl.textContent = step.text;
+    // Initialize
+    createOverlay();
+    createTooltip();
+    updateTooltip(steps[0]);
+    positionTooltip(steps[0]);
 
-      prevBtn.disabled = currentStep === 0;
-      nextBtn.textContent = currentStep === steps.length - 1 ? 'Finish' : 'Next';
-    };
-
-    prevBtn.addEventListener('click', () => {
-      if (currentStep > 0) {
-        currentStep -= 1;
-        updateStep();
-      }
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      positionTooltip(steps[currentStep]);
     });
 
-    nextBtn.addEventListener('click', () => {
-      if (currentStep < steps.length - 1) {
-        currentStep += 1;
-        updateStep();
-      } else {
-        closeOnboarding();
-      }
-    });
-
-    skipBtn.addEventListener('click', closeOnboarding);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeOnboarding();
-    });
-
+    // Handle escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeOnboarding();
     });
+  },
 
-    updateStep();
+  /**
+   * Initialize chat widget
+   */
+  initChat() {
+    Chat.init();
   },
 
   /**
