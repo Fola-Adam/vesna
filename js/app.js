@@ -7,6 +7,27 @@ const App = {
   // Store products in memory for reuse
   products: [],
   categories: [],
+  // Callbacks registered before App finishes loading
+  _readyCallbacks: [],
+
+  /**
+   * Register a function to run once App has loaded products.
+   * Safe to call before or after init() completes.
+   * Replaces all the setTimeout(fn, 1000) hacks in the HTML pages.
+   */
+  onReady(fn) {
+    if (this._ready) {
+      fn(this);
+    } else {
+      this._readyCallbacks.push(fn);
+    }
+  },
+
+  _resolveReady() {
+    this._ready = true;
+    this._readyCallbacks.forEach(fn => fn(this));
+    this._readyCallbacks = [];
+  },
 
   /**
    * Initialize the application
@@ -22,10 +43,43 @@ const App = {
 
       // Setup common functionality
       this.setupNavigation();
+
+      // Populate shared UI that all pages need
+      this.populateFooterCategories();
+      this.populateProductCount();
+
+      // Fire any onReady callbacks (replaces setTimeout hacks in HTML files)
+      this._resolveReady();
+
     } catch (error) {
       console.error('Failed to initialize app:', error);
       Components.toast('Failed to load products. Please refresh the page.', 'error');
+      this._resolveReady(); // still resolve so pages don't hang forever
     }
+  },
+
+  /**
+   * Populate footer category links on any page that has #footer-categories
+   */
+  populateFooterCategories() {
+    const footerCats = document.getElementById('footer-categories');
+    if (!footerCats) return;
+    footerCats.innerHTML = this.categories
+      .map(cat => `<a href="/pages/category.html?name=${encodeURIComponent(cat.name)}" class="footer__link">${cat.name}</a>`)
+      .join('');
+  },
+
+  /**
+   * Populate product count on pages that have #product-count
+   */
+  populateProductCount() {
+    const countEl = document.getElementById('product-count');
+    if (!countEl) return;
+    const page = document.body.dataset.page;
+    // On category page the count is set by initCategoryPage — skip here
+    if (page === 'category') return;
+    const count = this.products.length;
+    countEl.textContent = `${count} product${count !== 1 ? 's' : ''}`;
   },
 
   /**
@@ -91,7 +145,7 @@ const App = {
 
     if (categoriesGrid) {
       categoriesGrid.innerHTML = this.categories
-        .map(cat => Components.categoryCard(cat, `pages/category.html?name=${encodeURIComponent(cat.name)}`))
+        .map(cat => Components.categoryCard(cat, `/pages/category.html?name=${encodeURIComponent(cat.name)}`))
         .join('');
     }
   },
@@ -334,26 +388,73 @@ const App = {
    * Setup navigation functionality
    */
   setupNavigation() {
-    // Set active nav link based on current page
+    // Active nav link — match by filename
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav__link');
 
     navLinks.forEach(link => {
-      const href = link.getAttribute('href');
-      if (currentPath.includes(href) && href !== '/') {
-        link.classList.add('nav__link--active');
-      } else if (href === '/' && currentPath === '/') {
+      link.classList.remove('nav__link--active');
+      const href = link.getAttribute('href') || '';
+      const linkFile = href.split('/').pop().split('?')[0];
+      const currentFile = currentPath.split('/').pop().split('?')[0] || 'index.html';
+
+      if (
+        linkFile === currentFile ||
+        (currentFile === '' && linkFile === 'index.html')
+      ) {
         link.classList.add('nav__link--active');
       }
     });
 
-    // Mobile menu toggle (basic implementation)
+    // Mobile menu toggle
     const menuToggle = document.querySelector('.nav__menu-toggle');
     const navLinksContainer = document.querySelector('.nav__links');
 
     if (menuToggle && navLinksContainer) {
       menuToggle.addEventListener('click', () => {
-        navLinksContainer.classList.toggle('nav__links--open');
+        const isOpen = navLinksContainer.classList.toggle('nav__links--open');
+        menuToggle.setAttribute('aria-expanded', isOpen);
+        menuToggle.classList.toggle('nav__menu-toggle--active', isOpen);
+      });
+
+      // Close mobile menu when a link is clicked
+      navLinksContainer.querySelectorAll('.nav__link').forEach(link => {
+        link.addEventListener('click', () => {
+          navLinksContainer.classList.remove('nav__links--open');
+          menuToggle.setAttribute('aria-expanded', 'false');
+          menuToggle.classList.remove('nav__menu-toggle--active');
+        });
+      });
+
+      // Close menu on outside click
+      document.addEventListener('click', (e) => {
+        if (!menuToggle.contains(e.target) && !navLinksContainer.contains(e.target)) {
+          navLinksContainer.classList.remove('nav__links--open');
+          menuToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    // Scroll-triggered fade-in (replaces CSS-only animation)
+    // Elements with .fade-in animate when they enter the viewport
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('fade-in--visible');
+              observer.unobserve(entry.target); // only animate once
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+      );
+
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    } else {
+      // Fallback for browsers without IntersectionObserver
+      document.querySelectorAll('.fade-in').forEach(el => {
+        el.classList.add('fade-in--visible');
       });
     }
   }
@@ -367,86 +468,4 @@ document.addEventListener('DOMContentLoaded', () => {
 // Export for use in other modules
 window.App = App;
 
-// Submit a review
-async function submitReview(productId, rating, review) {
-  try {
-    const response = await fetch('/.netlify/functions/submit-review', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productId, rating, review })
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to submit review');
-    }
-
-    Components.toast('Thank you for your review!', 'success');
-    // Refresh the page or show success message
-  } catch (error) {
-    Components.toast('Something went wrong. Try again later.', 'error');
-  }
-}
-
-// Star rating interaction
-document.querySelectorAll('.star').forEach(star => {
-  star.addEventListener('click', () => {
-    const rating = parseInt(star.dataset.rating);
-    document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
-    for (let i = 1; i <= rating; i++) {
-      document.querySelector(`.star[data-rating="${i}"]`).classList.add('active');
-    }
-  });
-});
-
-// Submit review
-document.getElementById('submit-review')?.addEventListener('click', () => {
-  const productId = new URLSearchParams(window.location.search).get('id');
-  const rating = Array.from(document.querySelectorAll('.star.active')).length;
-  const review = document.querySelector('.review-textarea').value;
-
-  if (!rating || !review) {
-    Components.toast('Please rate and leave a review.', 'error');
-    return;
-  }
-
-  submitReview(productId, rating, review);
-});
-
-// Save to local storage
-function saveToWishlist(productId) {
-  let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-  if (!wishlist.includes(productId)) {
-    wishlist.push(productId);
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-    Components.toast('Saved to wishlist!', 'success');
-  } else {
-    Components.toast('Already saved!', 'info');
-  }
-}
-
-// Render “Save to Wishlist” button
-function renderWishlistButton() {
-  const saveBtn = document.getElementById('save-to-wishlist');
-  if (saveBtn) {
-    const productId = new URLSearchParams(window.location.search).get('id');
-    if (!productId) return;
-
-    const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-    if (wishlist.includes(productId)) {
-      saveBtn.innerHTML = `
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-          <path d="M12 2l-2 6-6 2 6 2 2 6 6-2-6-2z"></path>
-        </svg>
-        Saved to Wishlist
-      `;
-    } else {
-      saveBtn.innerHTML = `
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-        </svg>
-        Save to Wishlist
-      `;
-    }
-  }
-}
+// Future features (reviews, wishlist) will be added here when needed

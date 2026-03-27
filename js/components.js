@@ -60,7 +60,7 @@ const Components = {
           </div>
         </div>
         <div class="card__footer">
-          <a href="pages/product.html?id=${id}" class="btn btn--primary" onclick="event.stopPropagation()">
+          <a href="/pages/product.html?id=${id}" class="btn btn--primary" onclick="event.stopPropagation()">
             Get It Now
             <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
@@ -69,7 +69,7 @@ const Components = {
             </svg>
           </a>
         </div>
-        <a href="pages/product.html?id=${id}" class="card-link" aria-label="View ${name}"></a>
+        <a href="/pages/product.html?id=${id}" class="card-link" aria-label="View ${name}"></a>
       </article>
     `;
   },

@@ -17,10 +17,7 @@
     <title>Product — Vesna</title>
 
     <!-- Favicon -->
-    <link
-      rel="icon"
-      <link rel="icon" type="image/png" <img src="../img/logo.png" alt="Vesna" class="nav__logo-img">
-    />
+    <link rel="icon" type="image/png" href="../img/logo.png" />
 
     <!-- Styles -->
     <link rel="stylesheet" href="../css/styles.css" />
@@ -202,21 +199,6 @@
     <script src="../js/components.js"></script>
     <script src="../js/app.js"></script>
 
-    <!-- Footer categories -->
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        setTimeout(() => {
-          const footerCategories = document.getElementById("footer-categories");
-          if (footerCategories && window.App && window.App.categories) {
-            footerCategories.innerHTML = window.App.categories
-              .map(
-                (cat) =>
-                  `<a href="category.html?name=${encodeURIComponent(cat.name)}" class="footer__link">${cat.name}</a>`,
-              )
-              .join("");
-          }
-        }, 1000);
-      });
-    </script>
+    <!-- footer-categories and product-count populated by App.init() via populateFooterCategories() -->
   </body>
 </html>

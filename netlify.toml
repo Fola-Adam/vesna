@@ -2,8 +2,8 @@
   # Build command (empty for static site)
   command = ""
 
-  # Publish directory
-  publish = ""
+  # Publish directory — "." serves from repo root
+  publish = "."
 
   # Functions directory
   functions = "functions"
