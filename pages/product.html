@@ -1,175 +1,223 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="View product details and get your affiliate link.">
-  <meta name="author" content="Ebenezer Victory">
-  <meta name="theme-color" content="#0e0e0e">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="View product details and get your affiliate link."
+    />
+    <meta name="author" content="Ebenezer Victory" />
+    <meta name="theme-color" content="#0e0e0e" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Product — Vesna">
-  <meta property="og:type" content="product">
+    <!-- Open Graph -->
+    <meta property="og:title" content="Product — Vesna" />
+    <meta property="og:type" content="product" />
 
-  <title>Product — Vesna</title>
+    <title>Product — Vesna</title>
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+    <!-- Favicon -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>"
+    />
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="../css/styles.css">
-</head>
-<body data-page="product-detail">
+    <!-- Styles -->
+    <link rel="stylesheet" href="../css/styles.css" />
+  </head>
+  <body data-page="product-detail">
+    <!-- Skip Link -->
+    <a href="#main" class="skip-link">Skip to main content</a>
 
-  <!-- Skip Link -->
-  <a href="#main" class="skip-link">Skip to main content</a>
-
-  <!-- Navigation -->
-  <nav class="nav">
-    <div class="container">
-      <div class="nav__inner">
-        <a href="../index.html" class="nav__logo"><span><img src="../img/logo.png" alt="Vesna" class="nav__logo-img"></span></a>
-
-        <ul class="nav__links">
-          <li><a href="../index.html" class="nav__link">Home</a></li>
-          <li><a href="products.html" class="nav__link nav__link--active">Products</a></li>
-          <li><a href="about.html" class="nav__link">About</a></li>
-        </ul>
-
-        <a href="products.html" class="btn btn--primary btn--sm nav__cta">Browse Picks</a>
-
-        <button class="nav__menu-toggle" aria-label="Toggle menu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Main Content -->
-  <main id="main">
-
-    <!-- Breadcrumb -->
-    <div class="container" style="padding-top: var(--space-6);">
-      <nav aria-label="Breadcrumb" style="margin-bottom: var(--space-4);">
-        <a href="products.html" class="btn btn--ghost btn--sm" style="padding-left: 0;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="15 18 9 12 15 6"/>
-          </svg>
-          Back to Products
-        </a>
-      </nav>
-    </div>
-
-    <!-- Product Detail -->
-    <section class="product-detail">
+    <!-- Navigation -->
+    <nav class="nav">
       <div class="container">
-        <div class="product-detail__grid">
+        <div class="nav__inner">
+          <a href="../index.html" class="nav__logo"
+            ><span
+              ><img
+                src="../img/logo.png"
+                alt="Vesna"
+                class="nav__logo-img" /></span
+          ></a>
 
-          <!-- Product Image -->
-          <div class="product-detail__image-wrap">
-            <!-- Image loaded via JavaScript -->
-          </div>
+          <ul class="nav__links">
+            <li><a href="../index.html" class="nav__link">Home</a></li>
+            <li>
+              <a href="products.html" class="nav__link nav__link--active"
+                >Products</a
+              >
+            </li>
+            <li><a href="about.html" class="nav__link">About</a></li>
+          </ul>
 
-          <!-- Product Info -->
-          <div class="product-detail__info">
-            <p class="product-detail__category">Loading...</p>
+          <a href="products.html" class="btn btn--primary btn--sm nav__cta"
+            >Browse Picks</a
+          >
 
-            <h1 class="product-detail__title">Loading product...</h1>
+          <button class="nav__menu-toggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </nav>
 
-            <div class="product-detail__price-wrap">
-              <!-- Price loaded via JavaScript -->
+    <!-- Main Content -->
+    <main id="main">
+      <!-- Breadcrumb -->
+      <div class="container" style="padding-top: var(--space-6)">
+        <nav aria-label="Breadcrumb" style="margin-bottom: var(--space-4)">
+          <a
+            href="products.html"
+            class="btn btn--ghost btn--sm"
+            style="padding-left: 0"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            Back to Products
+          </a>
+        </nav>
+      </div>
+
+      <!-- Product Detail -->
+      <section class="product-detail">
+        <div class="container">
+          <div class="product-detail__grid">
+            <!-- Product Image -->
+            <div class="product-detail__image-wrap">
+              <!-- Image loaded via JavaScript -->
             </div>
 
-            <div class="gold-line"></div>
+            <!-- Product Info -->
+            <div class="product-detail__info">
+              <p class="product-detail__category">Loading...</p>
 
-            <p class="product-detail__description">
-              <!-- Description loaded via JavaScript -->
-            </p>
+              <h1 class="product-detail__title">Loading product...</h1>
 
-            <div class="product-detail__cta">
-              <a href="#" class="btn btn--primary btn--lg" target="_blank" rel="noopener noreferrer">
-                Get It Now
-                <svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                  <polyline points="15 3 21 3 21 9"/>
-                  <line x1="10" y1="14" x2="21" y2="3"/>
-                </svg>
-              </a>
+              <div class="product-detail__price-wrap">
+                <!-- Price loaded via JavaScript -->
+              </div>
+
+              <div class="gold-line"></div>
+
+              <p class="product-detail__description">
+                <!-- Description loaded via JavaScript -->
+              </p>
+
+              <div class="product-detail__cta">
+                <a
+                  href="#"
+                  class="btn btn--primary btn--lg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Get It Now
+                  <svg
+                    class="external-icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                    />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </div>
+
+              <p class="product-detail__disclaimer">
+                Affiliate link: I may earn a commission if you purchase through
+                this link, at no extra cost to you. I only recommend products
+                I've personally used and believe in.
+              </p>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <p class="product-detail__disclaimer">
-              Affiliate link: I may earn a commission if you purchase through this link, at no extra cost to you. I only recommend products I've personally used and believe in.
+      <!-- Related Products -->
+      <section class="related-products">
+        <div class="container" id="related-products">
+          <!-- Related products loaded via JavaScript -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__inner">
+          <div class="footer__brand">
+            <p class="footer__logo">Vesna<span>.</span></p>
+            <p class="footer__tagline">
+              Curated digital product recommendations from Ebenezer Victory.
             </p>
           </div>
 
-        </div>
-      </div>
-    </section>
+          <div>
+            <p class="footer__links-title">Explore</p>
+            <nav class="footer__links">
+              <a href="../index.html" class="footer__link">Home</a>
+              <a href="products.html" class="footer__link">All Products</a>
+              <a href="about.html" class="footer__link">About</a>
+            </nav>
+          </div>
 
-    <!-- Related Products -->
-    <section class="related-products">
-      <div class="container" id="related-products">
-        <!-- Related products loaded via JavaScript -->
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer__inner">
-        <div class="footer__brand">
-          <p class="footer__logo">Vesna<span>.</span></p>
-          <p class="footer__tagline">Curated digital product recommendations from Ebenezer Victory.</p>
+          <div>
+            <p class="footer__links-title">Categories</p>
+            <nav class="footer__links" id="footer-categories">
+              <!-- Categories loaded via JavaScript -->
+            </nav>
+          </div>
         </div>
 
-        <div>
-          <p class="footer__links-title">Explore</p>
-          <nav class="footer__links">
-            <a href="../index.html" class="footer__link">Home</a>
-            <a href="products.html" class="footer__link">All Products</a>
-            <a href="about.html" class="footer__link">About</a>
-          </nav>
-        </div>
-
-        <div>
-          <p class="footer__links-title">Categories</p>
-          <nav class="footer__links" id="footer-categories">
-            <!-- Categories loaded via JavaScript -->
-          </nav>
+        <div class="footer__bottom">
+          <p class="footer__copy">© 2026 Vesna. All rights reserved.</p>
+          <p class="footer__disclosure">
+            Affiliate disclosure: Some links may earn me a commission at no
+            extra cost to you.
+          </p>
         </div>
       </div>
+    </footer>
 
-      <div class="footer__bottom">
-        <p class="footer__copy">© 2026 Vesna. All rights reserved.</p>
-        <p class="footer__disclosure">Affiliate disclosure: Some links may earn me a commission at no extra cost to you.</p>
-      </div>
-    </div>
-  </footer>
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
 
-  <!-- Toast Container -->
-  <div id="toast-container" class="toast-container"></div>
+    <!-- Scripts -->
+    <script src="../js/api.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/app.js"></script>
 
-  <!-- Scripts -->
-  <script src="../js/api.js"></script>
-  <script src="../js/components.js"></script>
-  <script src="../js/app.js"></script>
-
-  <!-- Footer categories -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        const footerCategories = document.getElementById('footer-categories');
-        if (footerCategories && window.App && window.App.categories) {
-          footerCategories.innerHTML = window.App.categories
-            .map(cat => `<a href="category.html?name=${encodeURIComponent(cat.name)}" class="footer__link">${cat.name}</a>`)
-            .join('');
-        }
-      }, 1000);
-    });
-  </script>
-</body>
+    <!-- Footer categories -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+          const footerCategories = document.getElementById("footer-categories");
+          if (footerCategories && window.App && window.App.categories) {
+            footerCategories.innerHTML = window.App.categories
+              .map(
+                (cat) =>
+                  `<a href="category.html?name=${encodeURIComponent(cat.name)}" class="footer__link">${cat.name}</a>`,
+              )
+              .join("");
+          }
+        }, 1000);
+      });
+    </script>
+  </body>
 </html>

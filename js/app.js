@@ -366,3 +366,87 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for use in other modules
 window.App = App;
+
+// Submit a review
+async function submitReview(productId, rating, review) {
+  try {
+    const response = await fetch('/.netlify/functions/submit-review', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId, rating, review })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit review');
+    }
+
+    Components.toast('Thank you for your review!', 'success');
+    // Refresh the page or show success message
+  } catch (error) {
+    Components.toast('Something went wrong. Try again later.', 'error');
+  }
+}
+
+// Star rating interaction
+document.querySelectorAll('.star').forEach(star => {
+  star.addEventListener('click', () => {
+    const rating = parseInt(star.dataset.rating);
+    document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+    for (let i = 1; i <= rating; i++) {
+      document.querySelector(`.star[data-rating="${i}"]`).classList.add('active');
+    }
+  });
+});
+
+// Submit review
+document.getElementById('submit-review')?.addEventListener('click', () => {
+  const productId = new URLSearchParams(window.location.search).get('id');
+  const rating = Array.from(document.querySelectorAll('.star.active')).length;
+  const review = document.querySelector('.review-textarea').value;
+
+  if (!rating || !review) {
+    Components.toast('Please rate and leave a review.', 'error');
+    return;
+  }
+
+  submitReview(productId, rating, review);
+});
+
+// Save to local storage
+function saveToWishlist(productId) {
+  let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+  if (!wishlist.includes(productId)) {
+    wishlist.push(productId);
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    Components.toast('Saved to wishlist!', 'success');
+  } else {
+    Components.toast('Already saved!', 'info');
+  }
+}
+
+// Render “Save to Wishlist” button
+function renderWishlistButton() {
+  const saveBtn = document.getElementById('save-to-wishlist');
+  if (saveBtn) {
+    const productId = new URLSearchParams(window.location.search).get('id');
+    if (!productId) return;
+
+    const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    if (wishlist.includes(productId)) {
+      saveBtn.innerHTML = `
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+          <path d="M12 2l-2 6-6 2 6 2 2 6 6-2-6-2z"></path>
+        </svg>
+        Saved to Wishlist
+      `;
+    } else {
+      saveBtn.innerHTML = `
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+        </svg>
+        Save to Wishlist
+      `;
+    }
+  }
+}
