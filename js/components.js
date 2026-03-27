@@ -51,12 +51,16 @@ const Components = {
       : `/pages/product.html?id=${encodeURIComponent(id)}`;
 
     const sourceLabel = product.source === 'mock' ? 'Demo' : product.source === 'airtable' ? 'Live' : 'Fallback';
+    const avgRating = Features.getAverageRating(id);
+    const reviewCount = Features.getProductReviews(id).length;
 
     return `
       <article class="card fade-in fade-in--visible">
         <div class="card__image-wrap">
           ${imageHtml}
           ${badgesHtml}
+          ${this.wishlistButton(id)}
+          ${this.comparisonButton(id)}
         </div>
         <div class="card__body">
           <div class="card__meta">
@@ -64,6 +68,7 @@ const Components = {
             <span class="card__source">${sourceLabel}</span>
           </div>
           <h3 class="card__title">${name}</h3>
+          ${reviewCount > 0 ? this.starRating(avgRating, reviewCount) : ''}
           ${description ? `<p class="card__description">${description}</p>` : ''}
           <div class="card__price-wrap">
             ${priceHtml}
@@ -268,6 +273,196 @@ const Components = {
         <span class="heading-sm">${title}</span>
       </div>
     `;
+  },
+
+  /**
+   * Render search bar
+   * @param {string} placeholder - Input placeholder
+   * @returns {string} HTML string
+   */
+  searchBar(placeholder = 'Search products...') {
+    return `
+      <div class="search-bar">
+        <input
+          type="search"
+          id="product-search"
+          class="search-bar__input"
+          placeholder="${placeholder}"
+          aria-label="Search products"
+        />
+        <svg class="search-bar__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <button class="search-bar__clear" id="search-clear" aria-label="Clear search" style="display:none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    `;
+  },
+
+  /**
+   * Render star rating
+   * @param {number} rating - Rating 0-5
+   * @param {number} count - Number of reviews
+   * @returns {string} HTML string
+   */
+  starRating(rating = 0, count = 0) {
+    const fullStars = Math.floor(rating);
+    const hasHalf = rating % 1 >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+
+    let stars = '';
+    for (let i = 0; i < fullStars; i++) {
+      stars += '<span class="star star--full">★</span>';
+    }
+    if (hasHalf) {
+      stars += '<span class="star star--half">★</span>';
+    }
+    for (let i = 0; i < emptyStars; i++) {
+      stars += '<span class="star star--empty">★</span>';
+    }
+
+    return `
+      <div class="rating">
+        <div class="rating__stars">${stars}</div>
+        ${count > 0 ? `<span class="rating__count">${rating.toFixed(1)} (${count})</span>` : ''}
+      </div>
+    `;
+  },
+
+  /**
+   * Render review item
+   * @param {Object} review - Review data
+   * @returns {string} HTML string
+   */
+  reviewItem(review) {
+    const { rating, text, date } = review;
+    const dateObj = new Date(date);
+    const timeAgo = this.getTimeAgo(dateObj);
+
+    return `
+      <div class="review">
+        <div class="review__header">
+          ${this.starRating(rating)}
+          <span class="review__date">${timeAgo}</span>
+        </div>
+        <p class="review__text">${text}</p>
+      </div>
+    `;
+  },
+
+  /**
+   * Render reviews section
+   * @param {string} productId - Product ID
+   * @returns {string} HTML string
+   */
+  reviewsSection(productId) {
+    const reviews = Features.getProductReviews(productId);
+    const avgRating = Features.getAverageRating(productId);
+
+    const reviewsHtml = reviews.slice(0, 3).map(r => this.reviewItem(r)).join('');
+    const moreCount = reviews.length > 3 ? reviews.length - 3 : 0;
+
+    return `
+      <section class="reviews-section">
+        <div class="reviews-section__header">
+          <h3>Reviews from Users</h3>
+          ${this.starRating(avgRating, reviews.length)}
+        </div>
+        ${reviews.length > 0 ? `
+          <div class="reviews-list">
+            ${reviewsHtml}
+            ${moreCount > 0 ? `<p class="reviews-more">+ ${moreCount} more reviews</p>` : ''}
+          </div>
+        ` : `<p class="reviews-empty">No reviews yet. Be the first!</p>`}
+        <form class="review-form" id="review-form">
+          <div class="form-group">
+            <label for="review-rating">Rating:</label>
+            <select id="review-rating" class="form-control" required>
+              <option value="">Select rating...</option>
+              <option value="5">★★★★★ Excellent</option>
+              <option value="4">★★★★☆ Good</option>
+              <option value="3">★★★☆☆ Average</option>
+              <option value="2">★★☆☆☆ Poor</option>
+              <option value="1">★☆☆☆☆ Terrible</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="review-text">Your review:</label>
+            <textarea id="review-text" class="form-control" placeholder="Share your thoughts..." maxlength="500"></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary">Submit Review</button>
+        </form>
+      </section>
+    `;
+  },
+
+  /**
+   * Render wishlist button
+   * @param {string} productId - Product ID
+   * @returns {string} HTML string
+   */
+  wishlistButton(productId) {
+    const isInWishlist = Features.isInWishlist(productId);
+    return `
+      <button
+        class="btn-icon btn-icon--wishlist ${isInWishlist ? 'btn-icon--active' : ''}"
+        data-product-id="${productId}"
+        aria-label="Add to wishlist"
+        title="Add to wishlist"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="${isInWishlist ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </button>
+    `;
+  },
+
+  /**
+   * Render comparison button
+   * @param {string} productId - Product ID
+   * @returns {string} HTML string
+   */
+  comparisonButton(productId) {
+    const isInComparison = Features.isInComparison(productId);
+    const comparisonCount = Features.getComparison().length;
+    return `
+      <button
+        class="btn-icon btn-icon--compare ${isInComparison ? 'btn-icon--active' : ''}"
+        data-product-id="${productId}"
+        aria-label="Add to comparison"
+        title="Compare products (max 4)"
+        ${comparisonCount >= 4 && !isInComparison ? 'disabled' : ''}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 3v18M3 9h18M3 15h18"/>
+        </svg>
+      </button>
+    `;
+  },
+
+  /**
+   * Helper: Get time ago string
+   * @param {Date} date - Date object
+   * @returns {string} e.g., "2 days ago"
+   */
+  getTimeAgo(date) {
+    const ms = Date.now() - date.getTime();
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    const months = Math.floor(days / 30);
+
+    if (seconds < 60) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 30) return `${days}d ago`;
+    return `${months}mo ago`;
   }
 };
 
