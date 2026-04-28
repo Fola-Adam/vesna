@@ -1,0 +1,93 @@
+<!-- Mobile Bottom Navigation - Appears on all pages -->
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <a href="{{root}}index.html" data-nav="home">
+    <span class="material-symbols-outlined">home</span>
+    <span>Home</span>
+  </a>
+  <a href="{{root}}pages/picks.html" data-nav="picks">
+    <span class="material-symbols-outlined">explore</span>
+    <span>Picks</span>
+  </a>
+  <a href="{{root}}pages/archive.html" data-nav="archive">
+    <span class="material-symbols-outlined">inventory_2</span>
+    <span>Archive</span>
+  </a>
+  <a href="#" data-nav="bag">
+    <span class="material-symbols-outlined">shopping_bag</span>
+    <span>Bag</span>
+  </a>
+</nav>
+
+<style>
+  /* Mobile Bottom Navigation */
+  @media (max-width: 1023px) {
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(19, 19, 19, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(42, 42, 42, 0.8);
+      z-index: 50;
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+    }
+    .mobile-nav a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #9a9490;
+      transition: color 0.2s ease;
+      text-decoration: none;
+    }
+    .mobile-nav a.active,
+    .mobile-nav a:hover {
+      color: #e6c364;
+    }
+    .mobile-nav .material-symbols-outlined {
+      font-size: 24px;
+    }
+    .mobile-nav span:last-child {
+      font-size: 10px;
+      font-family: "Tenor Sans", sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    body {
+      padding-bottom: 70px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .mobile-nav {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  (function () {
+    // Highlight active bottom nav item
+    const path = window.location.pathname;
+    const page = path.split("/").pop().replace(".html", "") || "index";
+    const navMap = {
+      index: "home",
+      picks: "picks",
+      archive: "archive",
+      product: "picks",
+      guide: "picks",
+      about: "picks",
+      journal: "picks",
+    };
+    const activeNav = navMap[page];
+    if (activeNav) {
+      document
+        .querySelectorAll('.mobile-nav a[data-nav="' + activeNav + '"]')
+        .forEach((link) => {
+          link.classList.add("active");
+        });
+    }
+  })();
+</script>

@@ -1,0 +1,87 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        // Base
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+        
+        // Surface Colors
+        surface: "var(--surface)",
+        "surface-dim": "var(--surface-dim)",
+        "surface-container": "var(--surface-container)",
+        "surface-container-high": "var(--surface-container-high)",
+        "surface-container-low": "var(--surface-container-low)",
+        
+        // Primary - Gold
+        primary: "var(--primary)",
+        "primary-foreground": "var(--primary-foreground)",
+        "primary-container": "var(--primary-container)",
+        "on-primary-container": "var(--on-primary-container)",
+        "primary-fixed": "var(--primary-fixed)",
+        "primary-fixed-dim": "var(--primary-fixed-dim)",
+        "on-primary-fixed": "var(--on-primary-fixed)",
+        "on-primary-fixed-variant": "var(--on-primary-fixed-variant)",
+        
+        // Secondary - Teal
+        secondary: "var(--secondary)",
+        "secondary-foreground": "var(--secondary-foreground)",
+        "secondary-container": "var(--secondary-container)",
+        "on-secondary-container": "var(--on-secondary-container)",
+        
+        // Tertiary - Silver
+        tertiary: "var(--tertiary)",
+        "tertiary-foreground": "var(--tertiary-foreground)",
+        "tertiary-container": "var(--tertiary-container)",
+        "on-tertiary-container": "var(--on-tertiary-container)",
+        
+        // Surface Text Colors
+        "on-surface": "var(--on-surface)",
+        "on-surface-variant": "var(--on-surface-variant)",
+        "inverse-surface": "var(--inverse-surface)",
+        "inverse-on-surface": "var(--inverse-on-surface)",
+        "inverse-primary": "var(--inverse-primary)",
+        
+        // Outline
+        outline: "var(--outline)",
+        "outline-variant": "var(--outline-variant)",
+        
+        // Status
+        error: "var(--error)",
+        "on-error": "var(--on-error)",
+        
+        // Shadcn overrides
+        card: "var(--card)",
+        "card-foreground": "var(--card-foreground)",
+        popover: "var(--popover)",
+        "popover-foreground": "var(--popover-foreground)",
+        muted: "var(--muted)",
+        "muted-foreground": "var(--muted-foreground)",
+        destructive: "var(--destructive)",
+        "destructive-foreground": "var(--destructive-foreground)",
+        border: "var(--border)",
+        input: "var(--input)",
+        ring: "var(--ring)",
+        radius: "var(--radius)",
+      },
+      fontFamily: {
+        audiowide: ["Audiowide", "cursive"],
+        "display-hero": ["DM Serif Display", "serif"],
+        "body-main": ["DM Sans", "sans-serif"],
+        "button-label": ["Tenor Sans", "sans-serif"],
+        "section-header": ["Tenor Sans", "sans-serif"],
+        "cormorant": ["Cormorant Garamond", "serif"],
+        "exo-2": ["Exo 2", "sans-serif"],
+      },
+    },
+  },
+  plugins: [],
+};
+export default config;

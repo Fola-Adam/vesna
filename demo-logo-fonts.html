@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>VESNΛ Logo Font Options</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Tesla/Space-style fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;700&family=Exo+2:wght@300;400;500;600&family=Syncopate:wght@400;700&family=Chakra+Petch:wght@300;400;500;600&family=Teko:wght@300;400;500;600&family=Audiowide&family=Electrolize&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        background-color: #0a0a0a;
+        color: #e5e2e1;
+      }
+      .logo-option {
+        border: 1px solid #242424;
+        transition: border-color 0.3s;
+      }
+      .logo-option:hover {
+        border-color: #c9a84c;
+      }
+      /* Lambda character styling */
+      .lambda {
+        display: inline-block;
+      }
+      /* Font classes */
+      .font-orbitron {
+        font-family: "Orbitron", sans-serif;
+      }
+      .font-rajdhani {
+        font-family: "Rajdhani", sans-serif;
+      }
+      .font-space-grotesk {
+        font-family: "Space Grotesk", sans-serif;
+      }
+      .font-exo-2 {
+        font-family: "Exo 2", sans-serif;
+      }
+      .font-syncopate {
+        font-family: "Syncopate", sans-serif;
+      }
+      .font-chakra-petch {
+        font-family: "Chakra Petch", sans-serif;
+      }
+      .font-teko {
+        font-family: "Teko", sans-serif;
+      }
+      .font-audiowide {
+        font-family: "Audiowide", cursive;
+      }
+      .font-electrolize {
+        font-family: "Electrolize", sans-serif;
+      }
+
+      /* Exo 2 lambda for Audiowide combo */
+      .lambda-exo2 {
+        font-family: "Exo 2", sans-serif;
+        font-weight: 400;
+        display: inline-block;
+      }
+
+      ::selection {
+        background-color: #c9a84c;
+        color: #000;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen py-16 px-8">
+    <div class="max-w-6xl mx-auto">
+      <h1
+        class="text-3xl font-light tracking-widest uppercase mb-4 text-center"
+        style="font-family: &quot;Space Grotesk&quot;, sans-serif"
+      >
+        VESN<span class="lambda">Λ</span> Logo Font Options
+      </h1>
+      <p class="text-center text-stone-500 mb-12 text-sm tracking-wide">
+        Review these Tesla-inspired fonts. Click on any logo to select it.
+      </p>
+
+      <!-- Orbitron -->
+      <div
+        class="logo-option p-8 mb-6 cursor-pointer"
+        onclick="selectFont('Orbitron')"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs uppercase tracking-widest text-stone-500"
+            >Orbitron</span
+          >
+          <span
+            class="text-xs text-c9a84c"
+            id="check-Orbitron"
+            style="color: #c9a84c; opacity: 0"
+            >✓ SELECTED</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-4">
+          <div class="font-orbitron text-6xl tracking-[0.3em] text-white">
+            VESN<span class="lambda" style="transform: scaleX(0.9)">Λ</span>
+          </div>
+          <div class="font-orbitron text-3xl tracking-[0.25em] text-white">
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div class="font-orbitron text-xl tracking-[0.2em] text-white">
+            VESN<span class="lambda">Λ</span>
+          </div>
+        </div>
+        <p class="text-center text-stone-600 text-xs mt-4 max-w-lg mx-auto">
+          Geometric sans-serif, very Tesla-like. Bold, futuristic, mechanical
+          feel. Excellent at large sizes.
+        </p>
+      </div>
+
+      <!-- Rajdhani -->
+      <div
+        class="logo-option p-8 mb-6 cursor-pointer"
+        onclick="selectFont('Rajdhani')"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs uppercase tracking-widest text-stone-500"
+            >Rajdhani</span
+          >
+          <span
+            class="text-xs text-c9a84c"
+            id="check-Rajdhani"
+            style="color: #c9a84c; opacity: 0"
+            >✓ SELECTED</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-4">
+          <div
+            class="font-rajdhani text-6xl font-semibold tracking-[0.25em] text-white"
+            style="font-weight: 600"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-rajdhani text-3xl font-semibold tracking-[0.2em] text-white"
+            style="font-weight: 600"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-rajdhani text-xl font-medium tracking-[0.15em] text-white"
+            style="font-weight: 500"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+        </div>
+        <p class="text-center text-stone-600 text-xs mt-4 max-w-lg mx-auto">
+          Tech/industrial Indian font. Clean, modern, slightly condensed. Very
+          legible at all sizes.
+        </p>
+      </div>
+
+      <!-- Space Grotesk -->
+      <div
+        class="logo-option p-8 mb-6 cursor-pointer"
+        onclick="selectFont('Space Grotesk')"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs uppercase tracking-widest text-stone-500"
+            >Space Grotesk</span
+          >
+          <span
+            class="text-xs text-c9a84c"
+            id="check-Space Grotesk"
+            style="color: #c9a84c; opacity: 0"
+            >✓ SELECTED</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-4">
+          <div
+            class="font-space-grotesk text-6xl font-medium tracking-[0.3em] text-white"
+            style="font-weight: 500"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-space-grotesk text-3xl font-medium tracking-[0.25em] text-white"
+            style="font-weight: 500"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-space-grotesk text-xl font-medium tracking-[0.2em] text-white"
+            style="font-weight: 500"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+        </div>
+        <p class="text-center text-stone-600 text-xs mt-4 max-w-lg mx-auto">
+          Modern geometric grotesque. Slightly friendlier but still technical.
+          Good balance of style and readability.
+        </p>
+      </div>
+
+      <!-- Exo 2 -->
+      <div
+        class="logo-option p-8 mb-6 cursor-pointer"
+        onclick="selectFont('Exo 2')"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs uppercase tracking-widest text-stone-500"
+            >Exo 2</span
+          >
+          <span
+            class="text-xs text-c9a84c"
+            id="check-Exo 2"
+            style="color: #c9a84c; opacity: 0"
+            >✓ SELECTED</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-4">
+          <div
+            class="font-exo-2 text-6xl font-medium tracking-[0.3em] text-white"
+            style="font-weight: 500"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-exo-2 text-3xl font-medium tracking-[0.25em] text-white"
+            style="font-weight: 500"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-exo-2 text-xl font-normal tracking-[0.2em] text-white"
+            style="font-weight: 400"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+        </div>
+        <p class="text-center text-stone-600 text-xs mt-4 max-w-lg mx-auto">
+          Futuristic but elegant. Geometric with subtle curves. Very versatile,
+          works well at all weights.
+        </p>
+      </div>
+
+      <!-- Syncopate -->
+      <div
+        class="logo-option p-8 mb-6 cursor-pointer"
+        onclick="selectFont('Syncopate')"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs uppercase tracking-widest text-stone-500"
+            >Syncopate</span
+          >
+          <span
+            class="text-xs text-c9a84c"
+            id="check-Syncopate"
+            style="color: #c9a84c; opacity: 0"
+            >✓ SELECTED</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-4">
+          <div
+            class="font-syncopate text-5xl font-bold tracking-[0.2em] text-white"
+            style="font-weight: 700"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-syncopate text-2xl font-bold tracking-[0.15em] text-white"
+            style="font-weight: 700"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-syncopate text-lg font-normal tracking-[0.1em] text-white"
+            style="font-weight: 400"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+        </div>
+        <p class="text-center text-stone-600 text-xs mt-4 max-w-lg mx-auto">
+          Ultra-wide, high-tech feel. Very distinctive. May be too stylized for
+          some, but definitely makes a statement.
+        </p>
+      </div>
+
+      <!-- Chakra Petch -->
+      <div
+        class="logo-option p-8 mb-6 cursor-pointer"
+        onclick="selectFont('Chakra Petch')"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs uppercase tracking-widest text-stone-500"
+            >Chakra Petch</span
+          >
+          <span
+            class="text-xs text-c9a84c"
+            id="check-Chakra Petch"
+            style="color: #c9a84c; opacity: 0"
+            >✓ SELECTED</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-4">
+          <div
+            class="font-chakra-petch text-6xl font-semibold tracking-[0.25em] text-white"
+            style="font-weight: 600"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-chakra-petch text-3xl font-semibold tracking-[0.2em] text-white"
+            style="font-weight: 600"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-chakra-petch text-xl font-medium tracking-[0.15em] text-white"
+            style="font-weight: 500"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+        </div>
+        <p class="text-center text-stone-600 text-xs mt-4 max-w-lg mx-auto">
+          Thai-inspired angular font. Mechanical, industrial aesthetic. Angular
+          cuts give it edge.
+        </p>
+      </div>
+
+      <!-- Teko -->
+      <div
+        class="logo-option p-8 mb-6 cursor-pointer"
+        onclick="selectFont('Teko')"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs uppercase tracking-widest text-stone-500"
+            >Teko</span
+          >
+          <span
+            class="text-xs text-c9a84c"
+            id="check-Teko"
+            style="color: #c9a84c; opacity: 0"
+            >✓ SELECTED</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-4">
+          <div
+            class="font-teko text-7xl font-medium tracking-[0.1em] text-white"
+            style="font-weight: 500"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-teko text-4xl font-medium tracking-[0.08em] text-white"
+            style="font-weight: 500"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div
+            class="font-teko text-2xl font-normal tracking-[0.05em] text-white"
+            style="font-weight: 400"
+          >
+            VESN<span class="lambda">Λ</span>
+          </div>
+        </div>
+        <p class="text-center text-stone-600 text-xs mt-4 max-w-lg mx-auto">
+          Condensed sans-serif. Tall, narrow, very industrial. Good for tight
+          spaces, strong vertical presence.
+        </p>
+      </div>
+
+      <!-- Audiowide + Exo 2 Lambda -->
+      <div
+        class="logo-option p-8 mb-6 cursor-pointer border-2 border-c9a84c"
+        onclick="selectFont('Audiowide')"
+        style="border-color: #c9a84c"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs uppercase tracking-widest text-stone-500"
+            >Audiowide + Exo 2 Λ</span
+          >
+          <span
+            class="text-xs"
+            id="check-Audiowide"
+            style="color: #c9a84c; opacity: 1"
+            >✓ SELECTED</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-4">
+          <div class="font-audiowide text-5xl tracking-[0.25em] text-white">
+            VESN<span class="lambda-exo2">Λ</span>
+          </div>
+          <div class="font-audiowide text-3xl tracking-[0.2em] text-white">
+            VESN<span class="lambda-exo2">Λ</span>
+          </div>
+          <div class="font-audiowide text-xl tracking-[0.15em] text-white">
+            VESN<span class="lambda-exo2">Λ</span>
+          </div>
+        </div>
+        <p class="text-center text-stone-600 text-xs mt-4 max-w-lg mx-auto">
+          Sci-fi display font with Exo 2 lambda. The straight, clean lambda
+          contrasts beautifully with Audiowide's curves.
+        </p>
+      </div>
+
+      <!-- Electrolize -->
+      <div
+        class="logo-option p-8 mb-12 cursor-pointer"
+        onclick="selectFont('Electrolize')"
+      >
+        <div class="flex justify-between items-center mb-4">
+          <span class="text-xs uppercase tracking-widest text-stone-500"
+            >Electrolize</span
+          >
+          <span
+            class="text-xs text-c9a84c"
+            id="check-Electrolize"
+            style="color: #c9a84c; opacity: 0"
+            >✓ SELECTED</span
+          >
+        </div>
+        <div class="flex flex-col items-center gap-4">
+          <div class="font-electrolize text-6xl tracking-[0.3em] text-white">
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div class="font-electrolize text-3xl tracking-[0.25em] text-white">
+            VESN<span class="lambda">Λ</span>
+          </div>
+          <div class="font-electrolize text-xl tracking-[0.2em] text-white">
+            VESN<span class="lambda">Λ</span>
+          </div>
+        </div>
+        <p class="text-center text-stone-600 text-xs mt-4 max-w-lg mx-auto">
+          Square, technical, industrial. Blocky letterforms with precise cuts.
+          Very machine-like aesthetic.
+        </p>
+      </div>
+
+      <div class="text-center border-t border-stone-800 pt-8">
+        <p class="text-stone-500 text-sm mb-4">
+          Selected font will be used for:
+        </p>
+        <ul class="text-stone-400 text-xs space-y-2 mb-8">
+          <li>• Main logo in header (all pages)</li>
+          <li>• Footer logo</li>
+          <li>• Consistent tracking/spacing across all instances</li>
+        </ul>
+        <p class="text-stone-600 text-xs">
+          Reply with your chosen font name to proceed with implementation.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      let selectedFont = null;
+
+      function selectFont(fontName) {
+        // Clear previous selection
+        document.querySelectorAll('[id^="check-"]').forEach((el) => {
+          el.style.opacity = "0";
+        });
+
+        // Mark new selection
+        const checkEl = document.getElementById("check-" + fontName);
+        if (checkEl) {
+          checkEl.style.opacity = "1";
+        }
+
+        selectedFont = fontName;
+        console.log("Selected font:", fontName);
+      }
+    </script>
+  </body>
+</html>

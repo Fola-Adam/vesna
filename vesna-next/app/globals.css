@@ -1,0 +1,196 @@
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&family=Exo+2:wght@400&family=Tenor+Sans&family=Spectral:ital,wght@0,200;0,300;0,400;1,200;1,300;1,400&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Vesna Color System */
+  --background: #131313;
+  --foreground: #e5e2e1;
+  --surface: #131313;
+  --surface-dim: #131313;
+  --surface-container: #201f1f;
+  --surface-container-high: #2a2a2a;
+  --surface-container-low: #1a1a1a;
+
+  /* Primary - Gold */
+  --primary: #e6c364;
+  --primary-foreground: #3d2e00;
+  --primary-container: #d4af37;
+  --on-primary-container: #1a1400;
+  --primary-fixed: #ffe088;
+  --primary-fixed-dim: #e9c349;
+  --on-primary-fixed: #2a1f00;
+  --on-primary-fixed-variant: #574500;
+
+  /* Secondary - Teal */
+  --secondary: #abcdcd;
+  --secondary-foreground: #143535;
+  --secondary-container: #2a4c4c;
+  --on-secondary-container: #c6e9e9;
+
+  /* Tertiary - Silver */
+  --tertiary: #cecece;
+  --tertiary-foreground: #1d1d1d;
+  --tertiary-container: #4a4a4a;
+  --on-tertiary-container: #e5e5e5;
+
+  /* Surface Colors */
+  --on-surface: #e5e2e1;
+  --on-surface-variant: #d0c5b2;
+  --inverse-surface: #e5e2e1;
+  --inverse-on-surface: #313030;
+  --inverse-primary: #735c00;
+
+  /* Outline */
+  --outline: #99907c;
+  --outline-variant: #4d4635;
+
+  /* Status */
+  --error: #ffb4ab;
+  --on-error: #690005;
+
+  /* Shadcn overrides */
+  --card: #131313;
+  --card-foreground: #e5e2e1;
+  --popover: #201f1f;
+  --popover-foreground: #e5e2e1;
+  --muted: #2a2a2a;
+  --muted-foreground: #99907c;
+  --destructive: #ffb4ab;
+  --destructive-foreground: #690005;
+  --border: #4d4635;
+  --input: #4d4635;
+  --ring: #e6c364;
+  --radius: 0.25rem;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: "DM Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Audiowide Logo Font */
+.font-audiowide {
+  font-family: "Audiowide", cursive;
+}
+
+/* Lambda symbol styling */
+.lambda-exo2 {
+  font-family: "Exo 2", sans-serif;
+  font-weight: 400;
+  display: inline-block;
+}
+
+/* Display/Hero Font */
+.font-display-hero {
+  font-family: "DM Serif Display", serif;
+}
+
+/* Body Font */
+.font-body-main {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 300;
+}
+
+/* Button Label Font */
+.font-button-label {
+  font-family: "Tenor Sans", sans-serif;
+}
+
+/* Section Header Font */
+.font-section-header {
+  font-family: "Tenor Sans", sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* Nav Underline Animation */
+.nav-underline-anim {
+  position: relative;
+}
+
+.nav-underline-anim::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -2px;
+  left: 50%;
+  background-color: #f2ca50;
+  transition: all 0.5s ease;
+  transform: translateX(-50%);
+}
+
+.nav-underline-anim:hover::after {
+  width: 100%;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--outline);
+}
+
+/* Selection */
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}

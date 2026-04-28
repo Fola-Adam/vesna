@@ -1,0 +1,59 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta http-equiv="refresh" content="0; url=archive.html" />
+    <title>Redirecting to Archive | Vesna</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#e5e2e1",
+              surface: "#131313",
+              primary: "#e6c364",
+              "on-primary": "#3d2e00",
+              background: "#0f0f0f",
+              "on-background": "#e5e2e1",
+            },
+            fontFamily: {
+              "button-label": ["Tenor Sans", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-background text-on-background min-h-screen flex items-center justify-center"
+  >
+    <div class="text-center px-4">
+      <p
+        class="font-button-label text-xs text-primary uppercase tracking-[0.3em] mb-4"
+      >
+        Atelier
+      </p>
+      <h1 class="font-button-label text-2xl md:text-3xl mb-4">Page Moved</h1>
+      <p class="text-on-surface-variant mb-6">
+        Atelier has been merged into the Archive.
+      </p>
+      <a
+        href="archive.html"
+        class="inline-block font-button-label text-xs uppercase tracking-[0.2em] px-8 py-3 transition-all text-on-primary"
+        style="background: linear-gradient(90deg, #e6c364, #95d4b3)"
+      >
+        Go to Archive
+      </a>
+      <p class="mt-8 text-xs text-on-surface-variant/50">
+        Redirecting automatically...
+      </p>
+    </div>
+  </body>
+</html>

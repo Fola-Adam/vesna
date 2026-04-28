@@ -1,0 +1,665 @@
+<!doctype html>
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Journal | Vesna</title>
+    <meta
+      name="description"
+      content="Stories, essays, and insights on intentional living, design philosophy, and the art of curation from Vesna."
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tenor+Sans&amp;family=Spectral:wght@200;300;400&amp;family=Cinzel:wght@400;700&amp;family=Caveat:wght@400;700&amp;family=DM+Serif+Display&amp;family=Playfair+Display:ital,wght@0,400;1,400&amp;family=Audiowide&amp;family=Exo+2:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface": "#e5e2e1",
+              "on-surface-variant": "#d0c5b2",
+              surface: "#131313",
+              "surface-dim": "#131313",
+              "surface-container": "#201f1f",
+              "surface-container-low": "#1c1b1b",
+              "surface-container-high": "#2a2a2a",
+              "surface-container-lowest": "#0e0e0e",
+              primary: "#e6c364",
+              "on-primary": "#3d2e00",
+              secondary: "#95d4b3",
+              "on-secondary": "#003824",
+              tertiary: "#cbc6bc",
+              outline: "#99907e",
+              background: "#131313",
+              "on-background": "#e5e2e1",
+            },
+            fontFamily: {
+              "section-header": ["Cinzel", "serif"],
+              "accent-italic": ["Playfair Display", "serif"],
+              "display-hero": ["DM Serif Display", "serif"],
+              "button-label": ["Tenor Sans", "sans-serif"],
+              "body-main": ["Spectral", "serif"],
+              logo: ["Tangerine", "cursive"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 300,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+
+      /* Logo Font - Audiowide with Exo 2 Lambda */
+      .font-audiowide {
+        font-family: "Audiowide", cursive;
+      }
+      .lambda-exo2 {
+        font-family: "Exo 2", sans-serif;
+        font-weight: 400;
+        display: inline-block;
+      }
+
+      /* Nav Underline Animation */
+      .nav-underline-anim {
+        position: relative;
+      }
+      .nav-underline-anim::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 1px;
+        bottom: -2px;
+        left: 50%;
+        background-color: #e6c364;
+        transition: all 0.5s ease;
+        transform: translateX(-50%);
+      }
+      .nav-underline-anim:hover::after {
+        width: 100%;
+      }
+
+      /* Article card hover */
+      .article-card {
+        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .article-card:hover {
+        transform: translateY(-8px);
+      }
+      .article-card img {
+        transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+      }
+      .article-card:hover img {
+        transform: scale(1.05);
+      }
+
+      /* Thin Green Border */
+      .border-green-subtle {
+        border: 1px solid rgba(149, 212, 179, 0.15);
+      }
+
+      /* Green Gradient Wash */
+      .bg-green-wash {
+        background: linear-gradient(
+          135deg,
+          rgba(149, 212, 179, 0.03),
+          transparent
+        );
+      }
+
+      /* Category filter active state */
+      .category-filter.active {
+        color: #e6c364;
+        border-color: #e6c364;
+      }
+
+      /* Gold selection */
+      ::selection {
+        background-color: #c9a84c;
+        color: #000;
+      }
+    </style>
+  </head>
+  <body class="bg-background text-on-background antialiased">
+    <!-- Scroll Progress -->
+    <div
+      id="scroll-progress"
+      class="fixed top-0 left-0 w-0 h-1 z-[60] transition-all duration-100"
+      style="background: linear-gradient(90deg, #e6c364, #95d4b3)"
+    ></div>
+
+    <!-- Universal Navbar -->
+    <div id="navbar-placeholder"></div>
+
+    <main>
+      <!-- Hero Section -->
+      <section
+        class="relative min-h-[60vh] flex items-center justify-center bg-surface-dim"
+      >
+        <div class="absolute inset-0 overflow-hidden">
+          <img
+            src="../vesna-imgs/editorial-luxurious-workspace.png"
+            alt="Journal"
+            class="w-full h-full object-cover opacity-40"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background"
+          ></div>
+        </div>
+        <div class="relative z-10 text-center px-5 max-w-4xl mx-auto pt-24">
+          <p
+            class="font-button-label text-xs text-secondary uppercase tracking-[0.3em] mb-4"
+          >
+            The Vesna Journal
+          </p>
+          <h1
+            class="font-display-hero text-4xl sm:text-5xl lg:text-6xl text-on-background mb-6"
+          >
+            Thoughts on<br />Intentional Living
+          </h1>
+          <p
+            class="font-body-main text-lg text-on-surface-variant max-w-2xl mx-auto"
+          >
+            Essays, stories, and reflections on design philosophy, the curator's
+            craft, and the objects that shape our lives.
+          </p>
+        </div>
+      </section>
+
+      <!-- Category Filters -->
+      <section
+        class="py-8 px-5 sm:px-8 lg:px-20 border-b border-surface-container"
+      >
+        <div class="max-w-screen-xl mx-auto">
+          <div class="flex flex-wrap gap-4 justify-center">
+            <button
+              class="category-filter active font-button-label text-xs uppercase tracking-[0.15em] px-4 py-2 border border-outline/30 text-on-surface-variant hover:text-primary hover:border-primary transition-all"
+              data-category="all"
+            >
+              All Stories
+            </button>
+            <button
+              class="category-filter font-button-label text-xs uppercase tracking-[0.15em] px-4 py-2 border border-outline/30 text-on-surface-variant hover:text-primary hover:border-primary transition-all"
+              data-category="philosophy"
+            >
+              Design Philosophy
+            </button>
+            <button
+              class="category-filter font-button-label text-xs uppercase tracking-[0.15em] px-4 py-2 border border-outline/30 text-on-surface-variant hover:text-primary hover:border-primary transition-all"
+              data-category="curator"
+            >
+              Curator's Notes
+            </button>
+            <button
+              class="category-filter font-button-label text-xs uppercase tracking-[0.15em] px-4 py-2 border border-outline/30 text-on-surface-variant hover:text-primary hover:border-primary transition-all"
+              data-category="objects"
+            >
+              Object Stories
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Article -->
+      <section class="py-16 lg:py-24 px-5 sm:px-8 lg:px-20">
+        <div class="max-w-screen-xl mx-auto">
+          <article
+            class="article-card group cursor-pointer"
+            data-category="philosophy"
+          >
+            <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+              <div
+                class="relative aspect-[4/3] overflow-hidden bg-surface-container"
+              >
+                <img
+                  src="../vesna-imgs/vintage-workdesk-darkgold.png"
+                  alt="The Weight of Quality"
+                  class="w-full h-full object-cover"
+                />
+                <div class="absolute top-4 left-4">
+                  <span
+                    class="font-button-label text-[10px] uppercase tracking-[0.2em] px-3 py-1 bg-primary text-on-primary"
+                  >
+                    Featured
+                  </span>
+                </div>
+              </div>
+              <div class="lg:py-8">
+                <p
+                  class="font-button-label text-xs text-secondary uppercase tracking-[0.2em] mb-3"
+                >
+                  Design Philosophy
+                </p>
+                <h2
+                  class="font-display-hero text-2xl sm:text-3xl lg:text-4xl text-on-background mb-4"
+                >
+                  The Weight of Quality
+                </h2>
+                <p
+                  class="font-body-main text-base text-on-surface-variant mb-6 leading-relaxed"
+                >
+                  In an age of disposable everything, we often forget the
+                  satisfying heft of a well-made object. The weight of quality
+                  isn't measured in grams—it's felt in the permanence of
+                  something built to last, to be repaired, to be passed down.
+                </p>
+                <div class="flex items-center gap-4 text-sm text-outline">
+                  <span class="font-button-label uppercase tracking-[0.1em]"
+                    >Ebenezer Victory</span
+                  >
+                  <span>|</span>
+                  <span class="font-body-main">8 min read</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Article Grid -->
+      <section
+        class="py-16 lg:py-24 px-5 sm:px-8 lg:px-20 bg-surface-container-lowest bg-green-wash"
+      >
+        <div class="max-w-screen-xl mx-auto">
+          <h2
+            class="font-section-header text-xs text-secondary uppercase tracking-[0.2em] mb-12 text-center"
+          >
+            Recent Essays
+          </h2>
+
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Article 1 -->
+            <article
+              class="article-card group cursor-pointer border-green-subtle"
+              data-category="curator"
+            >
+              <div
+                class="relative aspect-[4/3] overflow-hidden bg-surface-container mb-5"
+              >
+                <img
+                  src="../vesna-imgs/curated-novels.png"
+                  alt="Why We Choose Less"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <p
+                class="font-button-label text-[10px] text-secondary uppercase tracking-[0.2em] mb-2"
+              >
+                Curator's Notes
+              </p>
+              <h3
+                class="font-display-hero text-xl text-on-background mb-3 group-hover:text-primary transition-colors"
+              >
+                Why We Choose Less
+              </h3>
+              <p
+                class="font-body-main text-sm text-on-surface-variant mb-4 line-clamp-3"
+              >
+                Curation is an act of elimination. For every object we showcase,
+                dozens are set aside. The question isn't what to include—it's
+                what to leave out.
+              </p>
+              <div class="flex items-center gap-3 text-xs text-outline">
+                <span class="font-button-label uppercase tracking-[0.1em]"
+                  >Ebenezer Victory</span
+                >
+                <span>|</span>
+                <span class="font-body-main">5 min</span>
+              </div>
+            </article>
+
+            <!-- Article 2 -->
+            <article
+              class="article-card group cursor-pointer"
+              data-category="objects"
+            >
+              <div
+                class="relative aspect-[4/3] overflow-hidden bg-surface-container mb-5"
+              >
+                <img
+                  src="../vesna-imgs/premium-fountain-pen.png"
+                  alt="The Ritual of Writing"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <p
+                class="font-button-label text-[10px] text-secondary uppercase tracking-[0.2em] mb-2"
+              >
+                Object Stories
+              </p>
+              <h3
+                class="font-display-hero text-xl text-on-background mb-3 group-hover:text-primary transition-colors"
+              >
+                The Ritual of Writing
+              </h3>
+              <p
+                class="font-body-main text-sm text-on-surface-variant mb-4 line-clamp-3"
+              >
+                There's something sacred about the first stroke of ink on paper.
+                In our digital age, the fountain pen becomes not just a tool,
+                but a portal to intentionality.
+              </p>
+              <div class="flex items-center gap-3 text-xs text-outline">
+                <span class="font-button-label uppercase tracking-[0.1em]"
+                  >Ebenezer Victory</span
+                >
+                <span>|</span>
+                <span class="font-body-main">6 min</span>
+              </div>
+            </article>
+
+            <!-- Article 3 -->
+            <article
+              class="article-card group cursor-pointer"
+              data-category="philosophy"
+            >
+              <div
+                class="relative aspect-[4/3] overflow-hidden bg-surface-container mb-5"
+              >
+                <img
+                  src="../vesna-imgs/native-incense-platform.png"
+                  alt="Space as Sanctuary"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <p
+                class="font-button-label text-[10px] text-primary uppercase tracking-[0.2em] mb-2"
+              >
+                Design Philosophy
+              </p>
+              <h3
+                class="font-display-hero text-xl text-on-background mb-3 group-hover:text-primary transition-colors"
+              >
+                Space as Sanctuary
+              </h3>
+              <p
+                class="font-body-main text-sm text-on-surface-variant mb-4 line-clamp-3"
+              >
+                Our environments shape our thoughts. The minimalist isn't
+                denying themselves—they're making room for what matters.
+              </p>
+              <div class="flex items-center gap-3 text-xs text-outline">
+                <span class="font-button-label uppercase tracking-[0.1em]"
+                  >Ebenezer Victory</span
+                >
+                <span>|</span>
+                <span class="font-body-main">4 min</span>
+              </div>
+            </article>
+
+            <!-- Article 4 -->
+            <article
+              class="article-card group cursor-pointer"
+              data-category="objects"
+            >
+              <div
+                class="relative aspect-[4/3] overflow-hidden bg-surface-container mb-5"
+              >
+                <img
+                  src="../vesna-imgs/luxury-watch-on-book.png"
+                  alt="Time as Luxury"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <p
+                class="font-button-label text-[10px] text-secondary uppercase tracking-[0.2em] mb-2"
+              >
+                Object Stories
+              </p>
+              <h3
+                class="font-display-hero text-xl text-on-background mb-3 group-hover:text-primary transition-colors"
+              >
+                Time as Luxury
+              </h3>
+              <p
+                class="font-body-main text-sm text-on-surface-variant mb-4 line-clamp-3"
+              >
+                The mechanical watch is an anachronism that refuses to die. In a
+                world of digital precision, its imperfection becomes its charm.
+              </p>
+              <div class="flex items-center gap-3 text-xs text-outline">
+                <span class="font-button-label uppercase tracking-[0.1em]"
+                  >Ebenezer Victory</span
+                >
+                <span>|</span>
+                <span class="font-body-main">7 min</span>
+              </div>
+            </article>
+
+            <!-- Article 5 -->
+            <article
+              class="article-card group cursor-pointer border-green-subtle"
+              data-category="curator"
+            >
+              <div
+                class="relative aspect-[4/3] overflow-hidden bg-surface-container mb-5"
+              >
+                <img
+                  src="../vesna-imgs/cinematic-handbag.png"
+                  alt="The Art of Selection"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <p
+                class="font-button-label text-[10px] text-secondary uppercase tracking-[0.2em] mb-2"
+              >
+                Curator's Notes
+              </p>
+              <h3
+                class="font-display-hero text-xl text-on-background mb-3 group-hover:text-primary transition-colors"
+              >
+                The Art of Selection
+              </h3>
+              <p
+                class="font-body-main text-sm text-on-surface-variant mb-4 line-clamp-3"
+              >
+                Behind every curated collection lies a thousand rejected
+                options. The curator's eye is trained not just to see quality,
+                but to recognize the subtle signals of authenticity.
+              </p>
+              <div class="flex items-center gap-3 text-xs text-outline">
+                <span class="font-button-label uppercase tracking-[0.1em]"
+                  >Ebenezer Victory</span
+                >
+                <span>|</span>
+                <span class="font-body-main">5 min</span>
+              </div>
+            </article>
+
+            <!-- Article 6 -->
+            <article
+              class="article-card group cursor-pointer"
+              data-category="philosophy"
+            >
+              <div
+                class="relative aspect-[4/3] overflow-hidden bg-surface-container mb-5"
+              >
+                <img
+                  src="../vesna-imgs/hand-touching-cloth.png"
+                  alt="Tactile Memory"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <p
+                class="font-button-label text-[10px] text-primary uppercase tracking-[0.2em] mb-2"
+              >
+                Design Philosophy
+              </p>
+              <h3
+                class="font-display-hero text-xl text-on-background mb-3 group-hover:text-primary transition-colors"
+              >
+                Tactile Memory
+              </h3>
+              <p
+                class="font-body-main text-sm text-on-surface-variant mb-4 line-clamp-3"
+              >
+                We remember texture more vividly than sight. The grain of
+                leather, the weight of ceramic—our hands hold memories our eyes
+                cannot.
+              </p>
+              <div class="flex items-center gap-3 text-xs text-outline">
+                <span class="font-button-label uppercase tracking-[0.1em]"
+                  >Ebenezer Victory</span
+                >
+                <span>|</span>
+                <span class="font-body-main">4 min</span>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Newsletter CTA -->
+      <section class="py-20 lg:py-32 px-5 sm:px-8 lg:px-20">
+        <div class="max-w-3xl mx-auto text-center">
+          <span class="material-symbols-outlined text-4xl text-secondary mb-6"
+            >mail</span
+          >
+          <h2
+            class="font-display-hero text-2xl sm:text-3xl lg:text-4xl text-on-background mb-4"
+          >
+            Stories in Your Inbox
+          </h2>
+          <p class="font-body-main text-base text-on-surface-variant mb-8">
+            Receive new essays on intentional living, curation insights, and
+            early access to featured objects.
+          </p>
+          <form
+            id="newsletter-form"
+            class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto"
+          >
+            <input
+              type="email"
+              id="newsletter-email"
+              placeholder="Your email address"
+              class="flex-1 bg-surface-container border border-outline/30 px-4 py-3 text-on-background placeholder:text-outline/50 focus:outline-none focus:border-secondary font-body-main"
+              required
+            />
+            <button
+              type="submit"
+              class="font-button-label text-xs uppercase tracking-[0.2em] px-8 py-3 transition-all text-on-primary"
+              style="background: linear-gradient(90deg, #e6c364, #95d4b3)"
+            >
+              Subscribe
+            </button>
+          </form>
+          <p
+            id="newsletter-success"
+            class="hidden font-body-main text-sm text-secondary mt-4"
+          >
+            Welcome to the community of discerning readers.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="py-12 px-5 sm:px-8 lg:px-20 border-t border-surface-container"
+    >
+      <div
+        class="max-w-screen-xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6"
+      >
+        <p class="font-body-main text-sm text-outline">
+          &copy; 2026 Vesna. All rights reserved.
+        </p>
+        <p
+          class="font-button-label text-[9px] text-outline/50 uppercase tracking-widest"
+        >
+          Oracle:Atlas
+        </p>
+        <div class="flex gap-6">
+          <a
+            href="about.html"
+            class="font-button-label text-xs uppercase tracking-[0.1em] text-on-surface-variant hover:text-primary transition-colors"
+            >About</a
+          >
+          <a
+            href="journal.html"
+            class="font-button-label text-xs uppercase tracking-[0.1em] text-on-surface-variant hover:text-primary transition-colors"
+            >Journal</a
+          >
+          <a
+            href="picks.html"
+            class="font-button-label text-xs uppercase tracking-[0.1em] text-on-surface-variant hover:text-primary transition-colors"
+            >Picks</a
+          >
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../js/navbar-loader.js"></script>
+    <!-- Mobile Bottom Navigation Loader -->
+    <script src="../js/mobile-nav-loader.js"></script>
+    <script>
+      // Category filtering
+      const categoryButtons = document.querySelectorAll(".category-filter");
+      const articles = document.querySelectorAll("article[data-category]");
+
+      categoryButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const category = button.dataset.category;
+
+          // Update active state
+          categoryButtons.forEach((btn) => btn.classList.remove("active"));
+          button.classList.add("active");
+
+          // Filter articles
+          articles.forEach((article) => {
+            if (category === "all" || article.dataset.category === category) {
+              article.style.display = "";
+              setTimeout(() => {
+                article.style.opacity = "1";
+                article.style.transform = "translateY(0)";
+              }, 50);
+            } else {
+              article.style.opacity = "0";
+              article.style.transform = "translateY(20px)";
+              setTimeout(() => {
+                article.style.display = "none";
+              }, 300);
+            }
+          });
+        });
+      });
+
+      // Newsletter form
+      const newsletterForm = document.getElementById("newsletter-form");
+      const newsletterSuccess = document.getElementById("newsletter-success");
+
+      if (newsletterForm) {
+        newsletterForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          newsletterForm.style.display = "none";
+          newsletterSuccess.classList.remove("hidden");
+        });
+      }
+
+      // Scroll progress
+      const scrollProgress = document.getElementById("scroll-progress");
+      window.addEventListener(
+        "scroll",
+        () => {
+          const scrollY = window.scrollY;
+          const docHeight =
+            document.documentElement.scrollHeight - window.innerHeight;
+          const scrollPercent = (scrollY / docHeight) * 100;
+          scrollProgress.style.width = scrollPercent + "%";
+        },
+        { passive: true },
+      );
+    </script>
+  </body>
+</html>

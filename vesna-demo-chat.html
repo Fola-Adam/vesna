@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>VESNA Demo - Venus AI Chat Widget</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Spectral:ital,wght@0,200;0,300;0,400;1,200;1,300;1,400&family=Tenor+Sans&family=Cinzel&family=Audiowide&family=Exo+2:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#e6c364",
+              "on-primary": "#3d2e00",
+              secondary: "#95d4b3",
+              "on-secondary": "#003824",
+              background: "#131313",
+              "on-background": "#e5e2e1",
+              surface: "#131313",
+              "surface-dim": "#131313",
+              "surface-container": "#201f1f",
+              "surface-container-high": "#2a2a2a",
+              "on-surface": "#e5e2e1",
+              "on-surface-variant": "#d0c5b2",
+              outline: "#99907e",
+            },
+            fontFamily: {
+              "display-hero": ["DM Serif Display", "serif"],
+              "body-main": ["Spectral", "serif"],
+              "button-label": ["Tenor Sans", "sans-serif"],
+              "section-header": ["Cinzel", "serif"],
+              audiowide: ["Audiowide", "cursive"],
+              "exo-2": ["Exo 2", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 300,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      ::selection {
+        background-color: #c9a84c;
+        color: #000;
+      }
+      ::-webkit-scrollbar {
+        width: 2px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #131313;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #f7dc6f33;
+      }
+      .glass-panel {
+        background: rgba(47, 79, 79, 0.08);
+        backdrop-filter: blur(20px);
+      }
+      /* Chat Widget Animations */
+      @keyframes slideInRight {
+        0% {
+          transform: translateX(100%);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+      @keyframes slideOutRight {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+      @keyframes edgePeek {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        50% {
+          transform: translateX(-4px);
+        }
+      }
+      @keyframes typing {
+        0%,
+        60%,
+        100% {
+          opacity: 0.3;
+        }
+        30% {
+          opacity: 1;
+        }
+      }
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      .slide-in {
+        animation: slideInRight 0.3s ease-out forwards;
+      }
+      .slide-out {
+        animation: slideOutRight 0.25s ease-in forwards;
+      }
+      .edge-peek {
+        animation: edgePeek 3s ease-in-out infinite;
+      }
+      .chat-open {
+        animation: slideInRight 0.3s ease-out forwards;
+      }
+      .chat-close {
+        animation: slideOutRight 0.25s ease-in forwards;
+      }
+      .typing-dot {
+        animation: typing 1.2s ease-in-out infinite;
+      }
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
+      }
+      .font-venus-light {
+        font-family: "Spectral", serif !important;
+        font-weight: 200 !important;
+      }
+    </style>
+  </head>
+  <body class="bg-background text-on-background antialiased">
+    <!-- Main Content -->
+    <main>
+      <!-- Hero Section -->
+      <section
+        class="relative min-h-screen w-full flex items-center overflow-hidden bg-surface-dim"
+      >
+        <div class="absolute inset-0 w-full h-full z-0">
+          <div class="w-full h-full relative overflow-hidden">
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-neutral-950/70 via-neutral-950/40 to-transparent"
+            ></div>
+          </div>
+        </div>
+        <div class="relative z-20 w-full px-5 sm:px-8 lg:px-20 pt-24 lg:pt-0">
+          <div class="max-w-3xl">
+            <h1
+              class="font-display-hero text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-on-background mb-6 leading-[1.05]"
+            >
+              The Art of <span class="block">Intentional Living.</span>
+            </h1>
+            <p
+              class="font-body-main text-base sm:text-lg lg:text-xl text-on-surface-variant mb-10 lg:mb-12 max-w-lg leading-relaxed"
+            >
+              A curated monograph of objects and insights for the discerning
+              professional.
+            </p>
+            <a
+              href="#"
+              class="inline-block bg-primary text-on-primary font-button-label text-xs lg:text-sm px-8 lg:px-12 py-4 lg:py-5 uppercase tracking-[0.2em] transition-all hover:bg-white hover:text-black border border-primary shadow-[0_20px_50px_rgba(230,195,100,0.2)]"
+            >
+              Enter the Sanctuary
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Philosophy Section -->
+      <section
+        class="py-20 lg:py-32 px-5 sm:px-8 lg:px-20 max-w-screen-xl mx-auto border-b border-surface-container"
+      >
+        <div class="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div>
+            <h2
+              class="font-section-header text-xs lg:text-sm text-secondary uppercase mb-6 lg:mb-8 tracking-[0.2em]"
+            >
+              Philosophy
+            </h2>
+            <p
+              class="font-body-main text-base lg:text-lg text-on-surface-variant leading-relaxed mb-6 lg:mb-8"
+            >
+              Vesna was born from the belief that our surroundings dictate our
+              internal tempo. In an age of digital velocity, we advocate for the
+              slow, the tactile, and the enduring.
+            </p>
+            <p
+              class="font-body-main text-base lg:text-lg text-on-surface-variant leading-relaxed"
+            >
+              We don't just curate things; we curate moments of pause.
+            </p>
+          </div>
+          <div class="flex flex-col items-center md:items-start">
+            <span
+              class="text-4xl lg:text-6xl text-primary opacity-20 self-start"
+              >"</span
+            >
+            <blockquote
+              class="font-display-hero text-xl sm:text-2xl lg:text-3xl xl:text-4xl text-on-surface italic leading-snug -mt-6 lg:-mt-8 px-4 lg:px-8"
+            >
+              True luxury is the space between a thought and an action.
+            </blockquote>
+            <cite
+              class="mt-6 lg:mt-8 font-button-label text-xs lg:text-sm text-secondary uppercase tracking-widest"
+            >
+              — The Vesna Creed
+            </cite>
+          </div>
+        </div>
+      </section>
+
+      <!-- Trust Section -->
+      <section
+        class="py-16 lg:py-24 px-5 sm:px-8 lg:px-20 bg-surface-container"
+      >
+        <div class="max-w-screen-xl mx-auto">
+          <div
+            class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 mb-16 lg:mb-20"
+          >
+            <div class="text-center">
+              <p
+                class="font-display-hero text-3xl lg:text-5xl text-primary mb-2"
+              >
+                127
+              </p>
+              <p
+                class="font-button-label text-[10px] lg:text-xs text-on-surface-variant uppercase tracking-[0.2em]"
+              >
+                Curated Objects
+              </p>
+            </div>
+            <div class="text-center">
+              <p
+                class="font-display-hero text-3xl lg:text-5xl text-primary mb-2"
+              >
+                12
+              </p>
+              <p
+                class="font-button-label text-[10px] lg:text-xs text-on-surface-variant uppercase tracking-[0.2em]"
+              >
+                Categories
+              </p>
+            </div>
+            <div class="text-center">
+              <p
+                class="font-display-hero text-3xl lg:text-5xl text-primary mb-2"
+              >
+                4.9
+              </p>
+              <p
+                class="font-button-label text-[10px] lg:text-xs text-on-surface-variant uppercase tracking-[0.2em]"
+              >
+                Avg. Rating
+              </p>
+            </div>
+            <div class="text-center">
+              <p
+                class="font-display-hero text-3xl lg:text-5xl text-primary mb-2"
+              >
+                2.4K
+              </p>
+              <p
+                class="font-button-label text-[10px] lg:text-xs text-on-surface-variant uppercase tracking-[0.2em]"
+              >
+                Newsletter Subs
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Back to Top Button (Bottom-Left) -->
+    <button
+      id="back-to-top"
+      class="fixed bottom-6 left-6 w-12 h-12 bg-surface-container border border-outline/30 rounded-full flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 hover:border-primary hover:text-primary z-40"
+    >
+      <span class="material-symbols-outlined text-xl">arrow_upward</span>
+    </button>
+
+    <!-- Venus AI Chat Widget -->
+    <div id="venus-chat-widget" class="fixed top-0 right-0 h-full z-50">
+      <!-- Edge Trigger -->
+      <div
+        id="edge-trigger"
+        class="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-32 bg-secondary/20 hover:bg-secondary/40 cursor-pointer edge-peek transition-colors rounded-l-sm"
+        style="width: 6px"
+      ></div>
+
+      <!-- Slide-out Panel -->
+      <div
+        id="chat-panel"
+        class="hidden absolute top-0 right-0 h-full w-[400px] sm:w-[450px] md:w-[500px] lg:w-[600px] bg-stone-950/98 backdrop-blur-2xl border-l-[0.5px] border-secondary/20 shadow-2xl"
+      >
+        <!-- Header -->
+        <div
+          class="bg-stone-950/50 border-b-[0.5px] border-secondary/10 px-5 py-4 flex items-center justify-between"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="w-7 h-7 bg-secondary/10 flex items-center justify-center"
+            >
+              <span
+                class="material-symbols-outlined text-secondary text-base"
+                style="font-variation-settings: &quot;FILL&quot; 1"
+                >auto_awesome</span
+              >
+            </div>
+            <div>
+              <h3
+                class="font-button-label text-[10px] text-secondary uppercase tracking-[0.15em]"
+              >
+                Venus AI
+              </h3>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              id="fullscreen-toggle"
+              class="text-stone-600 hover:text-secondary transition-colors p-1"
+            >
+              <span class="material-symbols-outlined text-lg">fullscreen</span>
+            </button>
+            <button
+              id="chat-close"
+              class="text-stone-600 hover:text-secondary transition-colors p-1"
+            >
+              <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-5 space-y-5">
+          <!-- Welcome Message -->
+          <div class="flex flex-col gap-2 max-w-full animate-fade-in">
+            <div class="flex items-center gap-2">
+              <span class="w-0.5 h-0.5 bg-secondary rounded-full"></span>
+              <span
+                class="font-button-label text-[8px] text-secondary tracking-widest uppercase"
+                >Venus Intelligence</span
+              >
+            </div>
+            <div
+              class="glass-panel border-[0.5px] border-secondary/10 px-4 py-3 rounded-sm"
+            >
+              <p
+                class="font-venus-light text-base italic leading-relaxed text-on-surface"
+              >
+                Welcome to Vesna. I'm Venus, your AI assistant. How can I help
+                you discover exceptional objects today?
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="border-t-[0.5px] border-secondary/10 p-5">
+          <form id="chat-form" class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+              <button
+                type="button"
+                id="file-attach"
+                class="text-stone-600 hover:text-secondary transition-colors p-1"
+              >
+                <span class="material-symbols-outlined text-lg"
+                  >attach_file</span
+                >
+              </button>
+              <button
+                type="button"
+                id="audio-record"
+                class="text-stone-600 hover:text-secondary transition-colors p-1"
+              >
+                <span class="material-symbols-outlined text-lg">mic</span>
+              </button>
+            </div>
+            <input
+              type="text"
+              id="chat-input"
+              placeholder="Describe a mood or a silhouette..."
+              class="flex-1 bg-transparent border-none focus:ring-0 text-on-surface font-body-main placeholder:text-stone-600 text-sm font-light"
+            />
+            <button
+              type="submit"
+              class="flex items-center gap-2 text-secondary group"
+            >
+              <span
+                class="font-button-label text-[9px] uppercase tracking-[0.15em] group-hover:text-secondary/80 transition-colors"
+                >Ask</span
+              >
+              <div
+                class="w-7 h-7 rounded-full border-[0.5px] border-secondary/30 flex items-center justify-center group-hover:border-secondary group-hover:bg-secondary group-hover:text-stone-950 transition-all duration-300"
+              >
+                <span class="material-symbols-outlined text-[14px]"
+                  >north_east</span
+                >
+              </div>
+            </button>
+          </form>
+          <input type="file" id="file-input" class="hidden" multiple />
+          <p
+            class="text-[8px] text-stone-600 text-center mt-2 font-button-label tracking-wider uppercase"
+          >
+            Powered by Oracle:Atlas
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Chat Widget State
+      const chatWidget = {
+        isOpen: false,
+        isFullscreen: false,
+        isRecording: false,
+        messages: [],
+        isTyping: false,
+      };
+
+      // DOM Elements
+      const edgeTrigger = document.getElementById("edge-trigger");
+      const chatPanel = document.getElementById("chat-panel");
+      const chatClose = document.getElementById("chat-close");
+      const fullscreenToggle = document.getElementById("fullscreen-toggle");
+      const chatMessages = document.getElementById("chat-messages");
+      const chatForm = document.getElementById("chat-form");
+      const chatInput = document.getElementById("chat-input");
+      const fileAttach = document.getElementById("file-attach");
+      const audioRecord = document.getElementById("audio-record");
+      const fileInput = document.getElementById("file-input");
+      const backToTop = document.getElementById("back-to-top");
+
+      // Toggle Chat
+      function toggleChat() {
+        chatWidget.isOpen = !chatWidget.isOpen;
+        if (chatWidget.isOpen) {
+          chatPanel.classList.remove("hidden");
+          chatPanel.classList.add("slide-in");
+          edgeTrigger.classList.remove("edge-peek");
+          chatInput.focus();
+
+          // Mobile: Auto fullscreen on open
+          if (window.innerWidth < 768 && !chatWidget.isFullscreen) {
+            toggleFullscreen();
+          }
+        } else {
+          chatPanel.classList.remove("slide-in");
+          chatPanel.classList.add("slide-out");
+          setTimeout(() => {
+            chatPanel.classList.add("hidden");
+            chatPanel.classList.remove("slide-out");
+          }, 250);
+          edgeTrigger.classList.add("edge-peek");
+          if (chatWidget.isFullscreen) {
+            toggleFullscreen();
+          }
+        }
+      }
+
+      // Toggle Fullscreen
+      function toggleFullscreen() {
+        chatWidget.isFullscreen = !chatWidget.isFullscreen;
+        if (chatWidget.isFullscreen) {
+          chatPanel.classList.remove(
+            "w-[400px]",
+            "sm:w-[450px]",
+            "md:w-[500px]",
+            "lg:w-[600px]",
+          );
+          chatPanel.classList.add("w-full");
+          fullscreenToggle.innerHTML =
+            '<span class="material-symbols-outlined text-lg">fullscreen_exit</span>';
+        } else {
+          chatPanel.classList.remove("w-full");
+          chatPanel.classList.add(
+            "w-[400px]",
+            "sm:w-[450px]",
+            "md:w-[500px]",
+            "lg:w-[600px]",
+          );
+          fullscreenToggle.innerHTML =
+            '<span class="material-symbols-outlined text-lg">fullscreen</span>';
+        }
+      }
+
+      // Event Listeners
+      edgeTrigger.addEventListener("click", toggleChat);
+      chatClose.addEventListener("click", toggleChat);
+      fullscreenToggle.addEventListener("click", toggleFullscreen);
+
+      // File Attachment
+      fileAttach.addEventListener("click", () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        const files = e.target.files;
+        if (files.length > 0) {
+          // Handle file attachment
+          console.log("Files attached:", files);
+          // Add visual feedback
+          addMessage(`Attached ${files.length} file(s)`, true);
+        }
+      });
+
+      // Audio Recording (placeholder)
+      audioRecord.addEventListener("click", () => {
+        if (chatWidget.isRecording) {
+          // Stop recording
+          chatWidget.isRecording = false;
+          audioRecord.innerHTML =
+            '<span class="material-symbols-outlined text-lg">mic</span>';
+          audioRecord.classList.remove("text-secondary");
+          audioRecord.classList.add("text-stone-600");
+          addMessage("Voice message sent", true);
+        } else {
+          // Start recording
+          chatWidget.isRecording = true;
+          audioRecord.innerHTML =
+            '<span class="material-symbols-outlined text-lg">stop</span>';
+          audioRecord.classList.remove("text-stone-600");
+          audioRecord.classList.add("text-secondary");
+        }
+      });
+
+      // Add Message
+      function addMessage(content, isUser = false) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `flex flex-col gap-2 max-w-full animate-fade-in ${isUser ? "items-end" : ""}`;
+
+        const time = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        if (isUser) {
+          messageDiv.innerHTML = `
+            <div class="glass-panel border-[0.5px] border-secondary/10 px-4 py-3 rounded-sm max-w-[85%]">
+              <p class="font-body-main text-sm leading-relaxed text-on-surface-variant font-light">${content}</p>
+            </div>
+            <span class="font-button-label text-[8px] text-stone-600 tracking-widest uppercase">${time}</span>
+          `;
+        } else {
+          messageDiv.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="w-0.5 h-0.5 bg-secondary rounded-full"></span>
+              <span class="font-button-label text-[8px] text-secondary tracking-widest uppercase">Venus Intelligence</span>
+            </div>
+            <div class="glass-panel border-[0.5px] border-secondary/10 px-4 py-3 rounded-sm">
+              <p class="font-venus-light text-base italic leading-relaxed text-on-surface">${content}</p>
+            </div>
+          `;
+        }
+
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Add Typing Indicator
+      function addTypingIndicator() {
+        const typingDiv = document.createElement("div");
+        typingDiv.id = "typing-indicator";
+        typingDiv.className = "flex flex-col gap-2 max-w-full animate-fade-in";
+        typingDiv.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-0.5 h-0.5 bg-secondary rounded-full"></span>
+            <span class="font-button-label text-[8px] text-secondary tracking-widest uppercase">Venus Intelligence</span>
+          </div>
+          <div class="glass-panel border-[0.5px] border-secondary/10 px-4 py-3 rounded-sm">
+            <div class="flex gap-1.5">
+              <div class="w-1.5 h-1.5 bg-secondary/60 rounded-full typing-dot"></div>
+              <div class="w-1.5 h-1.5 bg-secondary/60 rounded-full typing-dot"></div>
+              <div class="w-1.5 h-1.5 bg-secondary/60 rounded-full typing-dot"></div>
+            </div>
+          </div>
+        `;
+        chatMessages.appendChild(typingDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Remove Typing Indicator
+      function removeTypingIndicator() {
+        const typingIndicator = document.getElementById("typing-indicator");
+        if (typingIndicator) {
+          typingIndicator.remove();
+        }
+      }
+
+      // Handle Form Submit
+      chatForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        // Add user message
+        addMessage(message, true);
+        chatInput.value = "";
+        chatWidget.isTyping = true;
+
+        // Show typing indicator
+        addTypingIndicator();
+
+        // Simulate AI response (replace with actual API call)
+        setTimeout(() => {
+          removeTypingIndicator();
+          addMessage(
+            "I'd be happy to help you explore our curated collection. Our featured pieces include artisan ceramics, premium audio equipment, and intentional workspace tools. What type of object interests you?",
+          );
+          chatWidget.isTyping = false;
+        }, 1500);
+      });
+
+      // Back to Top
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 500) {
+          backToTop.classList.remove("opacity-0", "pointer-events-none");
+          backToTop.classList.add("opacity-100");
+        } else {
+          backToTop.classList.add("opacity-0", "pointer-events-none");
+          backToTop.classList.remove("opacity-100");
+        }
+      });
+
+      backToTop.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // Keyboard shortcut (Escape to close)
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && chatWidget.isOpen) {
+          toggleChat();
+        }
+      });
+    </script>
+  </body>
+</html>

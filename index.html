@@ -1,350 +1,2104 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vesna — Curated Digital Products</title>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta
       name="description"
-      content="Handpicked courses, ebooks, and tools to help you grow."
+      content="VESNA — A curated collection of exceptional objects for intentional living. Discover premium tools, thoughtful design, and quiet luxury."
     />
-    <link rel="stylesheet" href="css/styles.css" />
-  </head>
-  <body data-page="home">
-    <a href="#main" class="skip-link">Skip to main content</a>
+    <meta
+      name="keywords"
+      content="luxury products, curated objects, intentional living, premium tools, quiet luxury, Vesna"
+    />
+    <meta name="author" content="Ebenezer Victory" />
+    <meta name="theme-color" content="#131313" />
 
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="loading-screen">
-      <div class="loading-screen__content">
-        <img src="img/mask.png" alt="" class="loading-screen__mask" />
-        <p class="loading-screen__welcome">Welcome to Vesna</p>
-        <img src="img/vesna_card.png" alt="" class="loading-screen__card" />
-        <div class="loading-screen__sheen"></div>
-        <img src="img/logo.png" alt="Vesna" class="loading-screen__logo" />
-        <h1 class="loading-screen__text">
-          <span>V</span><span>e</span><span>s</span><span>n</span><span>a</span>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://vesna.com/" />
+    <meta property="og:title" content="VESNA | The Art of Intentional Living" />
+    <meta
+      property="og:description"
+      content="A curated collection of exceptional objects for the discerning professional."
+    />
+    <meta
+      property="og:image"
+      content="vesna-imgs/20_high_end_editorial_photography.png"
+      .
+    />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://vesna.com/" />
+    <meta
+      property="twitter:title"
+      content="VESNA | The Art of Intentional Living"
+    />
+    <meta
+      property="twitter:description"
+      content="A curated collection of exceptional objects for the discerning professional."
+    />
+    <meta
+      property="twitter:image"
+      content="vesna-imgs/20_high_end_editorial_photography.png"
+    />
+
+    <!-- Performance Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com" />
+
+    <!-- Preload Critical Assets -->
+    <link
+      rel="preload"
+      href="vesna-imgs/20_high_end_editorial_photography.png"
+      as="image"
+    />
+    <link
+      rel="preload"
+      href="vesna-imgs/editorial-luxurious-workspace.png"
+      as="image"
+    />
+
+    <title>VESNA | The Art of Intentional Living</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&amp;family=Spectral:ital,wght@0,300;0,400;1,300&amp;family=Tenor+Sans&amp;family=Cinzel&amp;family=Playfair+Display:ital@0;1&amp;family=Tangerine:wght@700&amp;family=Audiowide&amp;family=Exo+2:wght@400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#e6c364",
+              "on-primary": "#3d2e00",
+              secondary: "#95d4b3",
+              "on-secondary": "#003824",
+              tertiary: "#cbc6bc",
+              background: "#131313",
+              "on-background": "#e5e2e1",
+              surface: "#131313",
+              "surface-dim": "#131313",
+              "surface-container": "#201f1f",
+              "surface-container-low": "#1c1b1b",
+              "surface-container-lowest": "#0e0e0e",
+              "surface-container-high": "#2a2a2a",
+              "on-surface": "#e5e2e1",
+              "on-surface-variant": "#d0c5b2",
+              outline: "#99907e",
+            },
+            fontFamily: {
+              "display-hero": ["DM Serif Display", "serif"],
+              "body-main": ["Spectral", "serif"],
+              "accent-italic": ["Playfair Display", "serif"],
+              logo: ["Tangerine", "cursive"],
+              "button-label": ["Tenor Sans", "sans-serif"],
+              "section-header": ["Cinzel", "serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="css/styles.css" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "VESNA",
+        "description": "A curated collection of exceptional objects for intentional living",
+        "url": "https://vesna.com",
+        "founder": {
+          "@type": "Person",
+          "name": "Ebenezer Victory"
+        },
+        "sameAs": []
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "VESNA",
+        "url": "https://vesna.com"
+      }
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 300,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      @keyframes fade-hero {
+        0%,
+        45% {
+          opacity: 1;
+        }
+        50%,
+        95% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      @keyframes fade-hero-reverse {
+        0%,
+        45% {
+          opacity: 0;
+        }
+        50%,
+        95% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+      @keyframes cycle-overlay {
+        0%,
+        30% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        33%,
+        63% {
+          opacity: 0;
+          transform: scale(1.05);
+        }
+        66%,
+        96% {
+          opacity: 0;
+          transform: scale(1.05);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes cycle-overlay-2 {
+        0%,
+        30% {
+          opacity: 0;
+          transform: scale(1.05);
+        }
+        33%,
+        63% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        66%,
+        96% {
+          opacity: 0;
+          transform: scale(1.05);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.05);
+        }
+      }
+      @keyframes cycle-overlay-3 {
+        0%,
+        30% {
+          opacity: 0;
+          transform: scale(1.05);
+        }
+        33%,
+        63% {
+          opacity: 0;
+          transform: scale(1.05);
+        }
+        66%,
+        96% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.05);
+        }
+      }
+      .hero-mask {
+        clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+      }
+      @media (max-width: 1024px) {
+        .hero-mask {
+          clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
+        }
+      }
+      @media (max-width: 768px) {
+        .hero-mask {
+          clip-path: none;
+        }
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .slider-container {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        overflow-x: auto;
+      }
+      .slider-item {
+        flex-shrink: 0;
+      }
+      /* Scroll Reveal Animations */
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        will-change: opacity, transform;
+        transition:
+          opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
+          transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+      }
+      .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .no-js .reveal {
+        opacity: 1;
+        transform: none;
+      }
+      .reveal-delay-1 {
+        transition-delay: 0.1s;
+      }
+      .reveal-delay-2 {
+        transition-delay: 0.2s;
+      }
+      .reveal-delay-3 {
+        transition-delay: 0.3s;
+      }
+      .reveal-delay-4 {
+        transition-delay: 0.4s;
+      }
+
+      /* Enhanced Hover States - Luxury smoothness */
+      .hover-lift {
+        transition:
+          transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .hover-lift:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(149, 212, 179, 0.2);
+      }
+
+      /* Product card image zoom - smooth ease-out */
+      .product-image-zoom {
+        transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+      }
+      .group:hover .product-image-zoom {
+        transform: scale(1.05);
+      }
+
+      /* Category card image zoom - smooth with opacity */
+      .category-image-zoom {
+        transition:
+          transform 1s cubic-bezier(0.25, 0.1, 0.25, 1),
+          opacity 0.8s ease;
+        opacity: 0.6;
+      }
+      .group:hover .category-image-zoom {
+        transform: scale(1.08);
+        opacity: 0.85;
+      }
+
+      /* Button Shimmer Effect */
+      .btn-shimmer {
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-shimmer::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+      .btn-shimmer:hover::after {
+        left: 100%;
+      }
+
+      /* Gold Glow Effect */
+      .gold-glow:hover {
+        box-shadow: 0 0 30px rgba(230, 195, 100, 0.3);
+      }
+
+      /* Reduced Motion Support */
+      @media (prefers-reduced-motion: reduce) {
+        .reveal,
+        .reveal.active,
+        .stagger-reveal,
+        .stagger-reveal.active {
+          opacity: 1;
+          transform: none;
+          transition: none;
+        }
+      }
+
+      /* Focus Visible Styles */
+      .focus-ring:focus-visible {
+        outline: 2px solid #e6c364;
+        outline-offset: 2px;
+      }
+
+      /* Product Badges */
+      .badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 4px 12px;
+        font-family: "Tenor Sans", sans-serif;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-radius: 9999px;
+        z-index: 10;
+      }
+      .badge-featured {
+        background: rgba(149, 212, 179, 0.9);
+        color: #003824;
+      }
+      .badge-new {
+        background: rgba(230, 195, 100, 0.9);
+        color: #3d2e00;
+      }
+
+      /* Navigation Underline Slide */
+      .nav-link {
+        position: relative;
+      }
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #95d4b3;
+        transition: width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+      }
+      .nav-link:hover::after,
+      .nav-link.active::after {
+        width: 100%;
+      }
+
+      /* Green Glow on Hover */
+      .glow-hover {
+        transition: box-shadow 0.3s ease;
+      }
+      .glow-hover:hover {
+        box-shadow: 0 0 20px rgba(149, 212, 179, 0.15);
+      }
+
+      /* Thin Green Border */
+      .border-green-subtle {
+        border: 1px solid rgba(149, 212, 179, 0.15);
+      }
+
+      /* Green Gradient Wash */
+      .bg-green-wash {
+        background: linear-gradient(
+          135deg,
+          rgba(149, 212, 179, 0.03),
+          transparent
+        );
+      }
+
+      /* Logo Gold Pulse */
+      @keyframes logoPulse {
+        0%,
+        100% {
+          text-shadow: 0 0 0 rgba(230, 195, 100, 0);
+        }
+        50% {
+          text-shadow: 0 0 20px rgba(230, 195, 100, 0.4);
+        }
+      }
+      .logo-pulse:hover {
+        animation: logoPulse 1.5s ease-in-out infinite;
+      }
+
+      /* Product Stagger Reveal */
+      .stagger-reveal {
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease;
+      }
+      .stagger-reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .stagger-1 {
+        transition-delay: 0ms;
+      }
+      .stagger-2 {
+        transition-delay: 100ms;
+      }
+      .stagger-3 {
+        transition-delay: 200ms;
+      }
+
+      /* Slider Progress Bar */
+      .slider-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #e6c364, #95d4b3);
+        transition: width 0.3s ease;
+        z-index: 20;
+      }
+
+      /* Slider touch scrolling - keep clean for mobile */
+      .slider-container {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+      }
+
+      /* Loading Bar Animation */
+      @keyframes loading-bar {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .animate-loading-bar {
+        animation: loading-bar 1.5s ease-in-out infinite;
+      }
+
+      /* Logo Font - Audiowide with Exo 2 Lambda */
+      .font-audiowide {
+        font-family: "Audiowide", cursive;
+      }
+      .lambda-exo2 {
+        font-family: "Exo 2", sans-serif;
+        font-weight: 400;
+        display: inline-block;
+      }
+
+      /* Nav Underline Animation */
+      .nav-underline-anim {
+        position: relative;
+      }
+      .nav-underline-anim::after {
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 1px;
+        bottom: -2px;
+        left: 50%;
+        background-color: #e6c364;
+        transition: all 0.5s ease;
+        transform: translateX(-50%);
+      }
+      .nav-underline-anim:hover::after {
+        width: 100%;
+      }
+
+      /* Gold Text Selection */
+      ::selection {
+        background-color: #c9a84c;
+        color: #000;
+      }
+
+      /* Typewriter Cursor Blink */
+      @keyframes blink {
+        0%,
+        50% {
+          opacity: 1;
+        }
+        51%,
+        100% {
+          opacity: 0;
+        }
+      }
+      .animate-blink {
+        animation: blink 1s infinite;
+      }
+    </style>
+  </head>
+  <body class="bg-background text-on-background antialiased">
+    <!-- Loading Screen - Typewriter Effect with Gradient Wash -->
+    <div
+      id="loading-screen"
+      class="fixed inset-0 z-[100] bg-background flex items-center justify-center overflow-hidden"
+    >
+      <!-- Film Grain Overlay -->
+      <div
+        class="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style="
+          background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E&quot;);
+        "
+      ></div>
+
+      <!-- Subtle Border Tracing -->
+      <div class="absolute inset-0 pointer-events-none">
+        <div
+          class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#e6c364] to-transparent opacity-80 animate-border-top"
+        ></div>
+        <div
+          class="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#95d4b3] to-transparent opacity-80 animate-border-bottom"
+        ></div>
+        <div
+          class="absolute top-0 left-0 h-full w-[2px] bg-gradient-to-b from-transparent via-[#e6c364] to-transparent opacity-80 animate-border-left"
+        ></div>
+        <div
+          class="absolute top-0 right-0 h-full w-[2px] bg-gradient-to-b from-transparent via-[#95d4b3] to-transparent opacity-80 animate-border-right"
+        ></div>
+      </div>
+      <style>
+        @keyframes border-top {
+          0% {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          50% {
+            opacity: 0.8;
+          }
+          100% {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+        }
+        @keyframes border-bottom {
+          0% {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          50% {
+            opacity: 0.8;
+          }
+          100% {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+        }
+        @keyframes border-left {
+          0% {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          50% {
+            opacity: 0.8;
+          }
+          100% {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+        }
+        @keyframes border-right {
+          0% {
+            transform: translateY(100%);
+            opacity: 0;
+          }
+          50% {
+            opacity: 0.8;
+          }
+          100% {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+        }
+        .animate-border-top {
+          animation: border-top 4s ease-in-out infinite;
+        }
+        .animate-border-bottom {
+          animation: border-bottom 4s ease-in-out infinite;
+        }
+        .animate-border-left {
+          animation: border-left 4s ease-in-out infinite;
+        }
+        .animate-border-right {
+          animation: border-right 4s ease-in-out infinite;
+        }
+      </style>
+
+      <div class="text-center relative z-10">
+        <h1
+          id="typewriter-logo"
+          class="font-audiowide text-5xl sm:text-6xl lg:text-7xl text-primary tracking-[0.3em] mb-6"
+        >
+          <span id="typewriter-text"></span
+          ><span
+            id="typewriter-cursor"
+            class="inline-block w-[3px] h-[1em] bg-primary ml-1 animate-blink"
+            >|</span
+          >
         </h1>
+        <div class="h-8">
+          <p
+            id="typewriter-tagline"
+            class="font-label-caps text-sm text-on-surface-variant tracking-[0.2em] uppercase opacity-0 inline"
+          ></p>
+          <span
+            id="tagline-cursor"
+            class="inline-block w-[2px] h-[0.9em] bg-on-surface-variant ml-1 opacity-0"
+            >|</span
+          >
+        </div>
       </div>
     </div>
+    <!-- Skip to Content Link -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[60] focus:bg-primary focus:text-on-primary focus:px-4 focus:py-2 focus:rounded font-button-label text-sm uppercase tracking-wider"
+    >
+      Skip to Content
+    </a>
+    <!-- Scroll Progress Indicator -->
+    <div
+      id="scroll-progress"
+      class="fixed top-0 left-0 w-0 h-1 z-[60] transition-all duration-100"
+      style="background: linear-gradient(90deg, #e6c364, #95d4b3)"
+    ></div>
 
-    <!-- Navigation -->
-    <nav class="nav" role="navigation" aria-label="Main navigation">
-      <div class="container nav__inner">
-        <a href="index.html" class="nav__logo">
-          <img src="img/logo.png" alt="Vesna" class="nav__logo-img" />
-        </a>
+    <!-- Universal Navbar -->
+    <div id="navbar-placeholder"></div>
 
-        <ul class="nav__links" id="main-nav">
-          <li>
-            <a href="index.html" class="nav__link nav__link--active">Home</a>
-          </li>
-          <li><a href="pages/products.html" class="nav__link">Products</a></li>
-          <li><a href="pages/guide.html" class="nav__link">Guide</a></li>
-          <li><a href="pages/compare.html" class="nav__link">Compare</a></li>
-          <li><a href="pages/about.html" class="nav__link">About</a></li>
-        </ul>
-
-        <a href="pages/products.html" class="btn btn--primary nav__cta"
-          >Browse Picks</a
-        >
-
-        <button
-          id="dark-mode-toggle"
-          class="nav__theme-toggle"
-          aria-label="Toggle dark mode"
-          title="Toggle theme"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-        </button>
-
-        <button
-          class="nav__menu-toggle"
-          aria-label="Toggle menu"
-          aria-expanded="false"
-          aria-controls="main-nav"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-      </div>
-    </nav>
-
-    <main id="main">
+    <main id="main-content">
       <!-- Hero Section -->
-      <section class="hero">
-        <div class="hero__bg"></div>
-        <div class="container hero__content">
-          <p class="hero__eyebrow">Affiliate Store</p>
-          <h1 class="hero__title">
-            Curated Digital Products<br /><span class="accent"
-              >Things I actually recommend.</span
-            >
-          </h1>
-          <p class="hero__subtitle">
-            Handpicked courses, ebooks, and tools to help you grow. No fluff —
-            just the good stuff I have personally tested and loved.
-          </p>
-          <div class="hero__search">
-            <div id="search-container"></div>
-          </div>
-          <div class="hero__cta">
-            <a href="pages/products.html" class="btn btn--primary btn--lg"
-              >Explore Products</a
-            >
-            <a href="pages/about.html" class="btn btn--secondary btn--lg"
-              >About Victory</a
-            >
+      <section
+        class="relative min-h-screen w-full flex items-center overflow-hidden bg-surface-dim"
+      >
+        <!-- Animated Background -->
+        <div class="absolute inset-0 w-full h-full z-0">
+          <div class="hero-mask w-full h-full relative overflow-hidden">
+            <img
+              id="hero-img-1"
+              alt="Hero 1"
+              class="absolute inset-0 w-full h-full object-cover brightness-75 will-change-transform"
+              src="vesna-imgs/20_high_end_editorial_photography.png"
+              loading="eager"
+              style="animation: fade-hero 10s infinite"
+            />
+            <img
+              id="hero-img-2"
+              alt="Hero 2"
+              class="absolute inset-0 w-full h-full object-cover brightness-75 will-change-transform"
+              src="vesna-imgs/editorial-luxurious-workspace.png"
+              loading="eager"
+              style="animation: fade-hero-reverse 10s infinite"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-neutral-950/70 via-neutral-950/40 to-transparent"
+            ></div>
           </div>
         </div>
-      </section>
-      <!-- Featured Products -->
-      <section class="section">
-        <div class="container">
-          <div class="section-label">
-            <h2 class="heading-sm">Featured Picks</h2>
+        <!-- Content -->
+        <div class="relative z-20 w-full px-5 sm:px-8 lg:px-20 pt-24 lg:pt-0">
+          <div class="max-w-3xl">
+            <h1
+              class="font-display-hero text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[72px] text-on-background mb-6 leading-[1.05]"
+            >
+              The Art of <span class="block">Intentional Living.</span>
+            </h1>
+            <p
+              class="font-body-main text-base sm:text-lg lg:text-xl text-on-surface-variant mb-10 lg:mb-12 max-w-lg leading-relaxed"
+            >
+              A curated monograph of objects and insights for the discerning
+              professional.
+            </p>
+            <a
+              href="pages/products.html"
+              class="inline-block bg-primary text-on-primary font-button-label text-xs lg:text-sm px-8 lg:px-12 py-4 lg:py-5 uppercase tracking-[0.2em] transition-all hover:bg-white hover:text-black border border-primary shadow-[0_20px_50px_rgba(230,195,100,0.2)] btn-shimmer gold-glow focus-ring"
+            >
+              Enter the Sanctuary
+            </a>
           </div>
-          <div
-            id="featured-products"
-            class="product-grid product-grid--featured"
+        </div>
+        <!-- Animated Detail Images -->
+        <div
+          class="absolute bottom-8 lg:bottom-12 right-4 sm:right-8 lg:right-20 z-30 w-40 sm:w-56 md:w-64 lg:w-72 hidden sm:block"
+        >
+          <div class="relative h-48 md:h-72 lg:h-96">
+            <div class="absolute -inset-2 border border-primary/30"></div>
+            <div
+              class="relative z-10 w-full h-full shadow-2xl brightness-90 overflow-hidden"
+            >
+              <img
+                alt="Detail 1"
+                class="absolute inset-0 w-full h-full object-cover"
+                src="vesna-imgs/secondary-overlay-image.png"
+                loading="lazy"
+                style="animation: cycle-overlay 12s infinite"
+              />
+              <img
+                alt="Detail 2"
+                class="absolute inset-0 w-full h-full object-cover"
+                src="vesna-imgs/vintage-workdesk-darkgold.png"
+                loading="lazy"
+                style="animation: cycle-overlay-2 12s infinite"
+              />
+              <img
+                alt="Detail 3"
+                class="absolute inset-0 w-full h-full object-cover"
+                src="vesna-imgs/minimal-workdesk.png"
+                loading="lazy"
+                style="animation: cycle-overlay-3 12s infinite"
+              />
+            </div>
+            <div class="absolute inset-0 bg-neutral-950/10 z-20"></div>
+          </div>
+        </div>
+        <!-- Scroll Indicator -->
+        <div
+          class="absolute bottom-6 lg:bottom-10 left-5 sm:left-8 lg:left-20 animate-bounce opacity-40 z-20"
+        >
+          <span class="material-symbols-outlined text-on-background text-2xl"
+            >keyboard_double_arrow_down</span
           >
-            <!-- Products injected by JS -->
+        </div>
+      </section>
+
+      <!-- Philosophy Section -->
+      <section
+        class="py-20 lg:py-32 px-5 sm:px-8 lg:px-20 max-w-screen-xl mx-auto border-b border-surface-container reveal"
+      >
+        <div class="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div>
+            <h2
+              class="font-section-header text-xs lg:text-sm text-secondary uppercase mb-6 lg:mb-8 tracking-[0.2em]"
+            >
+              Philosophy
+            </h2>
+            <p
+              class="font-body-main text-base lg:text-lg text-on-surface-variant leading-relaxed mb-6 lg:mb-8"
+            >
+              Vesna was born from the belief that our surroundings dictate our
+              internal tempo. In an age of digital velocity, we advocate for the
+              slow, the tactile, and the enduring.
+            </p>
+            <p
+              class="font-body-main text-base lg:text-lg text-on-surface-variant leading-relaxed"
+            >
+              We don't just curate things; we curate moments of pause.
+            </p>
           </div>
-          <div style="text-align: center; margin-top: var(--space-8)">
-            <a href="pages/products.html" class="btn btn--ghost"
-              >View All Products</a
+          <div class="flex flex-col items-center md:items-start">
+            <span
+              class="text-4xl lg:text-6xl text-primary opacity-20 self-start"
+              >"</span
+            >
+            <blockquote
+              class="font-accent-italic text-xl sm:text-2xl lg:text-3xl xl:text-4xl text-on-surface italic leading-snug -mt-6 lg:-mt-8 px-4 lg:px-8"
+            >
+              True luxury is the space between a thought and an action.
+            </blockquote>
+            <cite
+              class="mt-6 lg:mt-8 font-button-label text-xs lg:text-sm text-secondary uppercase tracking-widest"
+              >— The Vesna Creed</cite
             >
           </div>
         </div>
       </section>
 
-      <!-- Categories -->
-      <section class="section section--sm">
-        <div class="container">
-          <div class="section-label">
-            <h2 class="heading-sm">Browse by Category</h2>
+      <!-- Trust & Stats Section -->
+      <section
+        class="py-16 lg:py-24 px-5 sm:px-8 lg:px-20 bg-surface-container reveal"
+      >
+        <div class="max-w-screen-xl mx-auto">
+          <!-- Stats Grid -->
+          <div
+            id="stats-section"
+            class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 mb-16 lg:mb-20"
+          >
+            <div class="text-center">
+              <p
+                id="stat-objects"
+                class="font-display-hero text-3xl lg:text-5xl text-primary mb-2"
+              >
+                0
+              </p>
+              <p
+                class="font-button-label text-[10px] lg:text-xs text-on-surface-variant uppercase tracking-[0.2em]"
+              >
+                Curated Objects
+              </p>
+            </div>
+            <div class="text-center">
+              <p
+                id="stat-categories"
+                class="font-display-hero text-3xl lg:text-5xl text-primary mb-2"
+              >
+                0
+              </p>
+              <p
+                class="font-button-label text-[10px] lg:text-xs text-on-surface-variant uppercase tracking-[0.2em]"
+              >
+                Categories
+              </p>
+            </div>
+            <div class="text-center">
+              <p
+                id="stat-rating"
+                class="font-display-hero text-3xl lg:text-5xl text-primary mb-2"
+              >
+                0.0
+              </p>
+              <p
+                class="font-button-label text-[10px] lg:text-xs text-on-surface-variant uppercase tracking-[0.2em]"
+              >
+                Avg. Rating
+              </p>
+            </div>
+            <div class="text-center">
+              <p
+                id="stat-subs"
+                class="font-display-hero text-3xl lg:text-5xl text-primary mb-2"
+              >
+                0
+              </p>
+              <p
+                class="font-button-label text-[10px] lg:text-xs text-on-surface-variant uppercase tracking-[0.2em]"
+              >
+                Newsletter Subs
+              </p>
+            </div>
           </div>
-          <div id="categories" class="category-grid">
-            <!-- Categories injected by JS -->
-          </div>
-        </div>
-      </section>
 
-      <!-- About Preview -->
-      <section class="section">
-        <div class="container">
-          <div class="about-preview">
-            <div class="about-preview__content">
-              <h2 class="about-preview__name">Ebenezer Victory</h2>
-              <p class="about-preview__role">Affiliate Curator</p>
-              <p class="body-base">
-                Hey there. I am Victory, and I curate digital products that
-                genuinely help people succeed. Every product on Vesna is one I
-                have tested, loved, and believe in.
-              </p>
-              <p class="body-base" style="margin-top: var(--space-4)">
-                No sponsored reviews, no fake hype — just honest recommendations
-                from someone who actually uses these tools and courses.
-              </p>
-              <a
-                href="pages/about.html"
-                class="btn btn--secondary"
-                style="margin-top: var(--space-6)"
-                >Read My Story</a
+          <!-- Trust Logos -->
+          <div class="border-t border-outline/20 pt-12 lg:pt-16">
+            <p
+              class="font-button-label text-[10px] lg:text-xs text-on-surface-variant uppercase tracking-[0.3em] text-center mb-8 lg:mb-10"
+            >
+              Featured In
+            </p>
+            <div
+              class="flex flex-wrap justify-center items-center gap-8 lg:gap-16 opacity-50"
+            >
+              <span
+                class="font-logo text-2xl lg:text-3xl text-on-surface-variant"
+                >Architectural Digest</span
+              >
+              <span
+                class="font-logo text-2xl lg:text-3xl text-on-surface-variant"
+                >Dezeen</span
+              >
+              <span
+                class="font-logo text-2xl lg:text-3xl text-on-surface-variant"
+                >Wallpaper*</span
+              >
+              <span
+                class="font-logo text-2xl lg:text-3xl text-on-surface-variant"
+                >Monocle</span
               >
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Values -->
-      <section class="section section--sm">
-        <div class="container">
-          <div class="about-values">
-            <div class="about-value">
-              <h3 class="about-value__title">Verified Products</h3>
-              <p class="about-value__text">
-                Every product is tested before being featured
-              </p>
+      <!-- Testimonials Carousel -->
+      <section
+        class="py-20 lg:py-32 bg-surface-container bg-green-wash relative overflow-hidden reveal"
+      >
+        <div class="max-w-6xl mx-auto px-5 sm:px-8 lg:px-20">
+          <div class="text-center mb-12 lg:mb-16">
+            <h2
+              class="font-section-header text-xs lg:text-sm text-secondary uppercase mb-4 tracking-[0.3em]"
+            >
+              From Our Community
+            </h2>
+            <h3
+              class="font-display-hero text-2xl sm:text-3xl lg:text-4xl text-on-background"
+            >
+              Words of Appreciation
+            </h3>
+          </div>
+
+          <!-- Testimonials Slider -->
+          <div class="relative">
+            <div id="testimonials-slider" class="overflow-hidden">
+              <div
+                id="testimonials-track"
+                class="flex transition-transform duration-500 ease-out"
+              >
+                <!-- Testimonial 1 -->
+                <div class="w-full flex-shrink-0 px-4">
+                  <div class="max-w-3xl mx-auto text-center">
+                    <span
+                      class="material-symbols-outlined text-4xl lg:text-5xl text-primary/50 mb-6"
+                    >
+                      format_quote
+                    </span>
+                    <p
+                      class="font-body-main text-lg lg:text-xl text-on-background italic mb-8 leading-relaxed"
+                    >
+                      "Vesna has completely transformed my workspace. The
+                      quality and curation is unmatched. Every piece tells a
+                      story."
+                    </p>
+                    <div class="flex items-center justify-center gap-4">
+                      <div
+                        class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center"
+                      >
+                        <span class="font-display text-primary">AS</span>
+                      </div>
+                      <div class="text-left">
+                        <p class="font-display text-on-background">
+                          Alexander Sterling
+                        </p>
+                        <p class="font-body-main text-sm text-outline">
+                          Architect & Designer
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="w-full flex-shrink-0 px-4">
+                  <div class="max-w-3xl mx-auto text-center">
+                    <span
+                      class="material-symbols-outlined text-4xl lg:text-5xl text-primary/50 mb-6"
+                    >
+                      format_quote
+                    </span>
+                    <p
+                      class="font-body-main text-lg lg:text-xl text-on-background italic mb-8 leading-relaxed"
+                    >
+                      "The attention to detail is remarkable. From packaging to
+                      product, every touchpoint feels intentional and
+                      luxurious."
+                    </p>
+                    <div class="flex items-center justify-center gap-4">
+                      <div
+                        class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center"
+                      >
+                        <span class="font-display text-primary">MC</span>
+                      </div>
+                      <div class="text-left">
+                        <p class="font-display text-on-background">Maya Chen</p>
+                        <p class="font-body-main text-sm text-outline">
+                          Creative Director
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="w-full flex-shrink-0 px-4">
+                  <div class="max-w-3xl mx-auto text-center">
+                    <span
+                      class="material-symbols-outlined text-4xl lg:text-5xl text-primary/50 mb-6"
+                    >
+                      format_quote
+                    </span>
+                    <p
+                      class="font-body-main text-lg lg:text-xl text-on-background italic mb-8 leading-relaxed"
+                    >
+                      "I've never experienced such thoughtful curation. Each
+                      item feels like it was selected specifically for my
+                      aesthetic."
+                    </p>
+                    <div class="flex items-center justify-center gap-4">
+                      <div
+                        class="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center"
+                      >
+                        <span class="font-display text-primary">JR</span>
+                      </div>
+                      <div class="text-left">
+                        <p class="font-display text-on-background">
+                          James Reynolds
+                        </p>
+                        <p class="font-body-main text-sm text-outline">
+                          Entrepreneur
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="about-value">
-              <h3 class="about-value__title">Honest Reviews</h3>
-              <p class="about-value__text">
-                No fake hype, just real experiences
-              </p>
+
+            <!-- Navigation Dots -->
+            <div class="flex justify-center gap-3 mt-8">
+              <button
+                class="testimonial-dot w-3 h-3 rounded-full bg-primary transition-all"
+                data-index="0"
+                aria-label="Testimonial 1"
+              ></button>
+              <button
+                class="testimonial-dot w-3 h-3 rounded-full bg-outline/30 transition-all"
+                data-index="1"
+                aria-label="Testimonial 2"
+              ></button>
+              <button
+                class="testimonial-dot w-3 h-3 rounded-full bg-outline/30 transition-all"
+                data-index="2"
+                aria-label="Testimonial 3"
+              ></button>
             </div>
-            <div class="about-value">
-              <h3 class="about-value__title">Quick Support</h3>
-              <p class="about-value__text">Questions? Reach out anytime</p>
+
+            <!-- Navigation Arrows -->
+            <button
+              id="testimonial-prev"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center border border-outline/30 text-on-background hover:bg-primary hover:text-on-primary transition-all focus-ring hidden lg:flex"
+              aria-label="Previous testimonial"
+            >
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button
+              id="testimonial-next"
+              class="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center border border-outline/30 text-on-background hover:bg-primary hover:text-on-primary transition-all focus-ring hidden lg:flex"
+              aria-label="Next testimonial"
+            >
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Curated Spotlight Slider -->
+      <section
+        class="py-20 lg:py-32 px-5 sm:px-8 lg:px-20 bg-surface-container-lowest reveal"
+      >
+        <div class="flex justify-between items-end mb-10 lg:mb-16">
+          <div>
+            <h2
+              class="font-section-header text-xs lg:text-sm text-secondary uppercase mb-2 lg:mb-4 tracking-[0.2em]"
+            >
+              Curated Spotlight
+            </h2>
+            <p
+              class="font-display-hero text-2xl sm:text-3xl lg:text-4xl text-on-background"
+            >
+              Featured Monoliths
+            </p>
+          </div>
+          <div class="flex gap-2 lg:gap-4">
+            <button
+              id="slider-prev"
+              class="w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center border border-outline/30 text-on-background hover:bg-primary hover:text-on-primary transition-all focus-ring"
+              aria-label="Previous products"
+            >
+              <span class="material-symbols-outlined text-lg lg:text-xl"
+                >chevron_left</span
+              >
+            </button>
+            <button
+              id="slider-next"
+              class="w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center border border-outline/30 text-on-background hover:bg-primary hover:text-on-primary transition-all focus-ring"
+              aria-label="Next products"
+            >
+              <span class="material-symbols-outlined text-lg lg:text-xl"
+                >chevron_right</span
+              >
+            </button>
+          </div>
+        </div>
+        <!-- Slider -->
+        <div class="relative">
+          <div
+            id="product-slider"
+            class="slider-container flex gap-4 lg:gap-8 overflow-x-auto no-scrollbar pb-8"
+          >
+            <!-- Product 1 -->
+            <div
+              class="slider-item min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] group cursor-pointer stagger-reveal stagger-1"
+            >
+              <div
+                class="h-40 sm:h-48 lg:h-56 overflow-hidden bg-neutral-900 mb-3 lg:mb-5 relative"
+              >
+                <span class="badge badge-featured">Featured</span>
+                <div
+                  class="skeleton-loading absolute inset-0 bg-neutral-800 animate-pulse"
+                ></div>
+                <img
+                  alt="Mechanical Keyboard"
+                  class="w-full h-full object-cover product-image-zoom opacity-0 transition-opacity duration-300"
+                  src="vesna-imgs/coloured-keyboard.png"
+                  loading="lazy"
+                  onload="
+                    this.classList.remove('opacity-0');
+                    this.previousElementSibling.classList.add('hidden');
+                  "
+                />
+                <div
+                  class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center"
+                >
+                  <span
+                    class="opacity-0 group-hover:opacity-100 font-button-label text-[10px] tracking-[0.3em] text-white border border-white/50 px-4 lg:px-6 py-2 lg:py-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 uppercase"
+                    >Explore</span
+                  >
+                </div>
+              </div>
+              <h3
+                class="font-section-header text-base lg:text-lg text-on-background mb-2"
+              >
+                The Tactile Engine
+              </h3>
+              <div class="mb-3 lg:mb-4 space-y-1 lg:space-y-2">
+                <p
+                  class="font-body-main text-xs lg:text-sm text-on-surface-variant italic"
+                >
+                  "The rhythmic click is my metronome for focus."
+                </p>
+                <p
+                  class="text-[10px] font-button-label text-secondary uppercase tracking-widest opacity-80"
+                >
+                  Heavy brass weight, zero drift
+                </p>
+              </div>
+              <div
+                class="h-[1px] w-12 bg-secondary transition-all group-hover:w-full"
+              ></div>
+            </div>
+            <!-- Product 2 -->
+            <div
+              class="slider-item min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] group cursor-pointer stagger-reveal stagger-2"
+            >
+              <div
+                class="h-40 sm:h-48 lg:h-56 overflow-hidden bg-neutral-900 mb-3 lg:mb-5 relative"
+              >
+                <span class="badge badge-new">New</span>
+                <div
+                  class="skeleton-loading absolute inset-0 bg-neutral-800 animate-pulse"
+                ></div>
+                <img
+                  alt="Leather Journal"
+                  class="w-full h-full object-cover product-image-zoom opacity-0 transition-opacity duration-300"
+                  src="vesna-imgs/vintage-brown-leather.png"
+                  loading="lazy"
+                  onload="
+                    this.classList.remove('opacity-0');
+                    this.previousElementSibling.classList.add('hidden');
+                  "
+                />
+                <div
+                  class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center"
+                >
+                  <span
+                    class="opacity-0 group-hover:opacity-100 font-button-label text-[10px] tracking-[0.3em] text-white border border-white/50 px-4 lg:px-6 py-2 lg:py-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 uppercase"
+                    >Explore</span
+                  >
+                </div>
+              </div>
+              <h3
+                class="font-section-header text-base lg:text-lg text-on-background mb-2"
+              >
+                Heritage Ledger
+              </h3>
+              <div class="mb-3 lg:mb-4 space-y-1 lg:space-y-2">
+                <p
+                  class="font-body-main text-xs lg:text-sm text-on-surface-variant italic"
+                >
+                  "Ink on grain is a commitment."
+                </p>
+                <p
+                  class="text-[10px] font-button-label text-secondary uppercase tracking-widest opacity-80"
+                >
+                  Hand-dyed Tuscan leather
+                </p>
+              </div>
+              <div
+                class="h-[1px] w-12 bg-secondary transition-all group-hover:w-full"
+              ></div>
+            </div>
+            <!-- Product 3 -->
+            <div
+              class="slider-item min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] group cursor-pointer stagger-reveal stagger-3"
+            >
+              <div
+                class="h-40 sm:h-48 lg:h-56 overflow-hidden bg-neutral-900 mb-3 lg:mb-5 relative"
+              >
+                <div
+                  class="skeleton-loading absolute inset-0 bg-neutral-800 animate-pulse"
+                ></div>
+                <img
+                  alt="Ceramic Vessel"
+                  class="w-full h-full object-cover product-image-zoom opacity-0 transition-opacity duration-300"
+                  src="vesna-imgs/native-cinematic-vase.png"
+                  loading="lazy"
+                  onload="
+                    this.classList.remove('opacity-0');
+                    this.previousElementSibling.classList.add('hidden');
+                  "
+                />
+                <div
+                  class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center"
+                >
+                  <span
+                    class="opacity-0 group-hover:opacity-100 font-button-label text-[10px] tracking-[0.3em] text-white border border-white/50 px-4 lg:px-6 py-2 lg:py-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 uppercase"
+                    >Explore</span
+                  >
+                </div>
+              </div>
+              <h3
+                class="font-section-header text-base lg:text-lg text-on-background mb-2"
+              >
+                Empty Form 01
+              </h3>
+              <div class="mb-3 lg:mb-4 space-y-1 lg:space-y-2">
+                <p
+                  class="font-body-main text-xs lg:text-sm text-on-surface-variant italic"
+                >
+                  "A vessel for light and shadow."
+                </p>
+                <p
+                  class="text-[10px] font-button-label text-secondary uppercase tracking-widest opacity-80"
+                >
+                  Hand-thrown in Kyoto
+                </p>
+              </div>
+              <div
+                class="h-[1px] w-12 bg-secondary transition-all group-hover:w-full"
+              ></div>
+            </div>
+            <!-- Product 4 -->
+            <div
+              class="slider-item min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] group cursor-pointer"
+            >
+              <div
+                class="h-40 sm:h-48 lg:h-56 overflow-hidden bg-neutral-900 mb-3 lg:mb-5 relative"
+              >
+                <div
+                  class="skeleton-loading absolute inset-0 bg-neutral-800 animate-pulse"
+                ></div>
+                <img
+                  alt="Desk Lamp"
+                  class="w-full h-full object-cover product-image-zoom opacity-0 transition-opacity duration-300"
+                  src="vesna-imgs/golden-desklamp.png"
+                  loading="lazy"
+                  onload="
+                    this.classList.remove('opacity-0');
+                    this.previousElementSibling.classList.add('hidden');
+                  "
+                />
+                <div
+                  class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center"
+                >
+                  <span
+                    class="opacity-0 group-hover:opacity-100 font-button-label text-[10px] tracking-[0.3em] text-white border border-white/50 px-4 lg:px-6 py-2 lg:py-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 uppercase"
+                    >Explore</span
+                  >
+                </div>
+              </div>
+              <div class="text-center">
+                <h3
+                  class="font-display text-sm lg:text-base text-on-background mb-2"
+                >
+                  Architect Lamp
+                </h3>
+                <p class="font-body text-xs lg:text-sm text-outline mb-3">
+                  Solid brass, adjustable arm
+                </p>
+                <div
+                  class="h-[1px] w-12 bg-primary transition-all group-hover:w-full"
+                ></div>
+              </div>
+            </div>
+            <!-- Product 5 -->
+            <div
+              class="slider-item min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] group cursor-pointer"
+            >
+              <div
+                class="h-40 sm:h-48 lg:h-56 overflow-hidden bg-neutral-900 mb-3 lg:mb-5 relative"
+              >
+                <span class="badge badge-featured">Featured</span>
+                <div
+                  class="skeleton-loading absolute inset-0 bg-neutral-800 animate-pulse"
+                ></div>
+                <img
+                  alt="Ceramic Mug"
+                  class="w-full h-full object-cover product-image-zoom opacity-0 transition-opacity duration-300"
+                  src="vesna-imgs/coffee-maker-1.png"
+                  loading="lazy"
+                  onload="
+                    this.classList.remove('opacity-0');
+                    this.previousElementSibling.classList.add('hidden');
+                  "
+                />
+                <div
+                  class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center"
+                >
+                  <span
+                    class="opacity-0 group-hover:opacity-100 font-button-label text-[10px] tracking-[0.3em] text-white border border-white/50 px-4 lg:px-6 py-2 lg:py-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 uppercase"
+                    >Explore</span
+                  >
+                </div>
+              </div>
+              <div class="text-center">
+                <h3
+                  class="font-display text-sm lg:text-base text-on-background mb-2"
+                >
+                  Porcelain Mug
+                </h3>
+                <p class="font-body text-xs lg:text-sm text-outline mb-3">
+                  Handcrafted, speckled glaze
+                </p>
+                <div
+                  class="h-[1px] w-12 bg-primary transition-all group-hover:w-full"
+                ></div>
+              </div>
+            </div>
+            <!-- Product 6 -->
+            <div
+              class="slider-item min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] group cursor-pointer"
+            >
+              <div
+                class="h-40 sm:h-48 lg:h-56 overflow-hidden bg-neutral-900 mb-3 lg:mb-5 relative"
+              >
+                <div
+                  class="skeleton-loading absolute inset-0 bg-neutral-800 animate-pulse"
+                ></div>
+                <img
+                  alt="Wooden Tray"
+                  class="w-full h-full object-cover product-image-zoom opacity-0 transition-opacity duration-300"
+                  src="vesna-imgs/minimal-workdesk.png"
+                  loading="lazy"
+                  onload="
+                    this.classList.remove('opacity-0');
+                    this.previousElementSibling.classList.add('hidden');
+                  "
+                />
+                <div
+                  class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center"
+                >
+                  <span
+                    class="opacity-0 group-hover:opacity-100 font-button-label text-[10px] tracking-[0.3em] text-white border border-white/50 px-4 lg:px-6 py-2 lg:py-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 uppercase"
+                    >Explore</span
+                  >
+                </div>
+              </div>
+              <div class="text-center">
+                <h3
+                  class="font-display text-sm lg:text-base text-on-background mb-2"
+                >
+                  Oak Serving Tray
+                </h3>
+                <p class="font-body text-xs lg:text-sm text-outline mb-3">
+                  Natural finish, brass handles
+                </p>
+                <div
+                  class="h-[1px] w-12 bg-primary transition-all group-hover:w-full"
+                ></div>
+              </div>
+            </div>
+            <!-- Product 7 -->
+            <div
+              class="slider-item min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] group cursor-pointer"
+            >
+              <div
+                class="h-40 sm:h-48 lg:h-56 overflow-hidden bg-neutral-900 mb-3 lg:mb-5 relative"
+              >
+                <span class="badge badge-new">New</span>
+                <div
+                  class="skeleton-loading absolute inset-0 bg-neutral-800 animate-pulse"
+                ></div>
+                <img
+                  alt="Fountain Pen"
+                  class="w-full h-full object-cover product-image-zoom opacity-0 transition-opacity duration-300"
+                  src="vesna-imgs/premium-fountain-pen.png"
+                  loading="lazy"
+                  onload="
+                    this.classList.remove('opacity-0');
+                    this.previousElementSibling.classList.add('hidden');
+                  "
+                />
+                <div
+                  class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center"
+                >
+                  <span
+                    class="opacity-0 group-hover:opacity-100 font-button-label text-[10px] tracking-[0.3em] text-white border border-white/50 px-4 lg:px-6 py-2 lg:py-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 uppercase"
+                    >Explore</span
+                  >
+                </div>
+              </div>
+              <div class="text-center">
+                <h3
+                  class="font-display text-sm lg:text-base text-on-background mb-2"
+                >
+                  The Script Master
+                </h3>
+                <p class="font-body text-xs lg:text-sm text-outline mb-3">
+                  18k gold nib, ebonite feed
+                </p>
+                <div
+                  class="h-[1px] w-12 bg-primary transition-all group-hover:w-full"
+                ></div>
+              </div>
+            </div>
+            <!-- Product 8 -->
+            <div
+              class="slider-item min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] group cursor-pointer"
+            >
+              <div
+                class="h-40 sm:h-48 lg:h-56 overflow-hidden bg-neutral-900 mb-3 lg:mb-5 relative"
+              >
+                <div
+                  class="skeleton-loading absolute inset-0 bg-neutral-800 animate-pulse"
+                ></div>
+                <img
+                  alt="Luxury Timepiece"
+                  class="w-full h-full object-cover product-image-zoom opacity-0 transition-opacity duration-300"
+                  src="vesna-imgs/luxury-watch-on-book.png"
+                  loading="lazy"
+                  onload="
+                    this.classList.remove('opacity-0');
+                    this.previousElementSibling.classList.add('hidden');
+                  "
+                />
+                <div
+                  class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center"
+                >
+                  <span
+                    class="opacity-0 group-hover:opacity-100 font-button-label text-[10px] tracking-[0.3em] text-white border border-white/50 px-4 lg:px-6 py-2 lg:py-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 uppercase"
+                    >Explore</span
+                  >
+                </div>
+              </div>
+              <div class="text-center">
+                <h3
+                  class="font-display text-sm lg:text-base text-on-background mb-2"
+                >
+                  Chronograph No. 7
+                </h3>
+                <p class="font-body text-xs lg:text-sm text-outline mb-3">
+                  Swiss movement, sapphire crystal
+                </p>
+                <div
+                  class="h-[1px] w-12 bg-primary transition-all group-hover:w-full"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <!-- Slider Progress Bar -->
+          <div
+            id="slider-progress"
+            class="slider-progress"
+            style="width: 33.33%"
+          ></div>
+          <!-- Pagination -->
+          <div class="flex justify-center gap-2 lg:gap-3 mt-4 lg:mt-8">
+            <div
+              class="w-6 lg:w-8 h-[2px] bg-primary slider-dot active"
+              data-index="0"
+            ></div>
+            <div
+              class="w-6 lg:w-8 h-[2px] bg-outline/30 slider-dot"
+              data-index="1"
+            ></div>
+            <div
+              class="w-6 lg:w-8 h-[2px] bg-outline/30 slider-dot"
+              data-index="2"
+            ></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Category Showcase -->
+      <section
+        class="py-20 lg:py-32 px-5 sm:px-8 lg:px-20 bg-background border-y border-surface-container reveal"
+      >
+        <div class="max-w-screen-xl mx-auto">
+          <div class="text-center mb-12 lg:mb-16">
+            <h2
+              class="font-section-header text-xs lg:text-sm text-secondary uppercase mb-4 tracking-[0.2em]"
+            >
+              Explore Collections
+            </h2>
+            <p
+              class="font-display-hero text-2xl sm:text-3xl lg:text-4xl text-on-background"
+            >
+              Shop by Category
+            </p>
+          </div>
+
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            <!-- Category 1: Home -->
+            <a
+              href="pages/picks.html?category=home"
+              class="group relative aspect-square overflow-hidden bg-surface-container hover-lift glow-hover"
+            >
+              <img
+                src="vesna-imgs/minimal-workdesk.png"
+                alt="Home"
+                class="w-full h-full object-cover category-image-zoom"
+                loading="lazy"
+              />
+              <div
+                class="absolute inset-0 flex flex-col items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-3xl lg:text-4xl text-primary mb-2"
+                  >home</span
+                >
+                <h3
+                  class="font-section-header text-sm lg:text-base text-on-background uppercase tracking-[0.15em]"
+                >
+                  Home
+                </h3>
+              </div>
+              <div
+                class="absolute bottom-0 left-0 w-full h-1 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
+              ></div>
+            </a>
+
+            <!-- Category 2: Tech -->
+            <a
+              href="pages/picks.html?category=tech"
+              class="group relative aspect-square overflow-hidden bg-surface-container hover-lift glow-hover"
+            >
+              <img
+                src="vesna-imgs/coloured-keyboard.png"
+                alt="Tech"
+                class="w-full h-full object-cover category-image-zoom"
+                loading="lazy"
+              />
+              <div
+                class="absolute inset-0 flex flex-col items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-3xl lg:text-4xl text-primary mb-2"
+                  >laptop</span
+                >
+                <h3
+                  class="font-section-header text-sm lg:text-base text-on-background uppercase tracking-[0.15em]"
+                >
+                  Tech
+                </h3>
+              </div>
+              <div
+                class="absolute bottom-0 left-0 w-full h-1 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
+              ></div>
+            </a>
+
+            <!-- Category 3: Fashion -->
+            <a
+              href="pages/picks.html?category=fashion"
+              class="group relative aspect-square overflow-hidden bg-surface-container hover-lift glow-hover"
+            >
+              <img
+                src="vesna-imgs/luxury-brown-duffel.png"
+                alt="Fashion"
+                class="w-full h-full object-cover category-image-zoom"
+                loading="lazy"
+              />
+              <div
+                class="absolute inset-0 flex flex-col items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-3xl lg:text-4xl text-primary mb-2"
+                  >checkroom</span
+                >
+                <h3
+                  class="font-section-header text-sm lg:text-base text-on-background uppercase tracking-[0.15em]"
+                >
+                  Fashion
+                </h3>
+              </div>
+              <div
+                class="absolute bottom-0 left-0 w-full h-1 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
+              ></div>
+            </a>
+
+            <!-- Category 4: Finance -->
+            <a
+              href="pages/picks.html?category=finance"
+              class="group relative aspect-square overflow-hidden bg-surface-container hover-lift glow-hover"
+            >
+              <img
+                src="vesna-imgs/luxury-watch-on-book.png"
+                alt="Finance"
+                class="w-full h-full object-cover category-image-zoom"
+                loading="lazy"
+              />
+              <div
+                class="absolute inset-0 flex flex-col items-center justify-center"
+              >
+                <span
+                  class="material-symbols-outlined text-3xl lg:text-4xl text-primary mb-2"
+                  >account_balance</span
+                >
+                <h3
+                  class="font-section-header text-sm lg:text-base text-on-background uppercase tracking-[0.15em]"
+                >
+                  Finance
+                </h3>
+              </div>
+              <div
+                class="absolute bottom-0 left-0 w-full h-1 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
+              ></div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- The Curator -->
+      <section
+        class="py-20 lg:py-32 px-5 sm:px-8 lg:px-20 bg-background reveal"
+      >
+        <div class="grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
+          <div class="order-2 md:order-1">
+            <h2
+              class="font-section-header text-xs lg:text-sm text-secondary uppercase mb-4 lg:mb-6 tracking-[0.2em]"
+            >
+              The Curator
+            </h2>
+            <p
+              class="font-display-hero text-3xl sm:text-4xl lg:text-5xl text-on-background mb-6 lg:mb-8"
+            >
+              Ebenezer Victory
+            </p>
+            <p
+              class="font-body-main text-base lg:text-lg text-on-surface-variant leading-relaxed mb-4 lg:mb-6"
+            >
+              A multidisciplinary architect of digital experiences who finds
+              balance in the physical world. Ebenezer's pursuit of "Quiet
+              Luxury" is not about opulence, but about the surgical removal of
+              the unnecessary.
+            </p>
+            <p
+              class="font-body-main text-base lg:text-lg text-on-surface-variant leading-relaxed mb-8 lg:mb-10"
+            >
+              Vesna is the journal of that pursuit—a living archive of what
+              remains when the noise stops.
+            </p>
+            <a
+              href="pages/about.html"
+              class="inline-flex items-center gap-3 lg:gap-4 font-button-label text-xs lg:text-sm text-on-background group hover:text-primary transition-colors"
+            >
+              READ THE MONOGRAPH
+              <span
+                class="material-symbols-outlined group-hover:translate-x-2 transition-transform"
+                >arrow_right_alt</span
+              >
+            </a>
+          </div>
+          <div class="order-1 md:order-2">
+            <div class="relative group">
+              <div
+                class="absolute -inset-3 lg:-inset-4 border border-primary/20 transition-all group-hover:inset-0"
+              ></div>
+              <img
+                alt="Ebenezer Victory"
+                class="relative z-10 w-full h-[400px] sm:h-[500px] lg:h-[600px] object-cover grayscale brightness-90"
+                src="vesna-imgs/victory.png"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>
       </section>
-    </main>
 
-    <!-- Chat Button -->
-    <button id="chat-toggle" class="chat-toggle" aria-label="Open chat">
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
+      <!-- Newsletter CTA -->
+      <section
+        class="py-20 lg:py-32 bg-neutral-950 border-y border-neutral-900 relative overflow-hidden reveal"
       >
-        <path
-          d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-        ></path>
-      </svg>
-    </button>
-
-    <!-- Chat Widget -->
-    <div
-      id="chat-widget"
-      class="chat-widget"
-      role="dialog"
-      aria-labelledby="chat-title"
-      aria-hidden="true"
-    >
-      <div class="chat-header">
-        <div class="chat-header__avatar">
-          <img src="img/mask.png" alt="Vesna" class="chat-avatar-img" />
-        </div>
-        <div class="chat-header__info">
-          <h3 id="chat-title" class="chat-title">Ask Vesna</h3>
-          <p class="chat-status">AI Product Assistant</p>
-        </div>
-        <button id="chat-close" class="chat-close" aria-label="Close chat">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
+        <div
+          class="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/pinstriped-suit.png')]"
+        ></div>
+        <div class="max-w-4xl mx-auto px-5 sm:px-8 text-center relative z-10">
+          <h2
+            class="font-section-header text-xs lg:text-sm text-secondary uppercase mb-4 lg:mb-6 tracking-[0.3em]"
           >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-      <div
-        id="chat-messages"
-        class="chat-messages"
-        role="log"
-        aria-live="polite"
-        aria-atomic="false"
-      ></div>
-      <div class="chat-typing" id="chat-typing" style="display: none">
-        <div class="chat-typing__dots">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <span>Thinking...</span>
-      </div>
-      <div class="chat-input-container">
-        <input
-          type="text"
-          id="chat-input"
-          class="chat-input"
-          placeholder="Ask me about products..."
-          aria-label="Chat message"
-          maxlength="500"
-        />
-        <button id="chat-send" class="chat-send" aria-label="Send message">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
+            Digital Ephemera
+          </h2>
+          <h3
+            class="font-display-hero text-2xl sm:text-3xl lg:text-4xl xl:text-5xl text-on-background mb-6 lg:mb-8"
           >
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22,2 15,22 11,13 2,9"></polygon>
-          </svg>
-        </button>
-      </div>
-    </div>
+            The Weekly Dispatch
+          </h3>
+          <p
+            class="font-body-main text-base lg:text-lg text-on-surface-variant mb-6 lg:mb-8 max-w-2xl mx-auto leading-relaxed"
+          >
+            A limited-entry journal on design, solitude, and the tools of the
+            trade. Delivered every Sunday.
+          </p>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <div class="footer__inner">
-          <div class="footer__brand">
-            <div class="footer__logo">Vesna<span>.</span></div>
-            <p class="footer__tagline">
-              Curated digital product recommendations from Ebenezer Victory.
+          <!-- Value Props -->
+          <div
+            class="flex flex-wrap justify-center gap-4 lg:gap-8 mb-8 lg:mb-10"
+          >
+            <div class="flex items-center gap-2 text-on-surface-variant">
+              <span class="material-symbols-outlined text-primary text-lg"
+                >check_circle</span
+              >
+              <span class="font-body-main text-xs lg:text-sm"
+                >Curated picks weekly</span
+              >
+            </div>
+            <div class="flex items-center gap-2 text-on-surface-variant">
+              <span class="material-symbols-outlined text-primary text-lg"
+                >check_circle</span
+              >
+              <span class="font-body-main text-xs lg:text-sm"
+                >No spam, ever</span
+              >
+            </div>
+            <div class="flex items-center gap-2 text-on-surface-variant">
+              <span class="material-symbols-outlined text-primary text-lg"
+                >check_circle</span
+              >
+              <span class="font-body-main text-xs lg:text-sm"
+                >Unsubscribe anytime</span
+              >
+            </div>
+          </div>
+          <form
+            id="newsletter-form"
+            class="flex flex-col sm:flex-row gap-4 lg:gap-6 max-w-xl mx-auto items-center"
+          >
+            <div class="w-full relative group">
+              <input
+                id="newsletter-email"
+                type="email"
+                placeholder="Your private email address"
+                class="w-full bg-transparent border-b border-neutral-800 focus:border-primary focus:ring-0 text-on-surface font-body-main py-3 lg:py-4 transition-all outline-none placeholder-neutral-600 text-sm lg:text-base"
+                required
+              />
+              <div
+                id="email-error"
+                class="absolute -bottom-6 left-0 text-red-500 text-xs font-body-main hidden"
+              >
+                Please enter a valid email address
+              </div>
+              <div
+                class="absolute bottom-0 left-0 h-[1px] w-0 bg-primary transition-all duration-700 group-focus-within:w-full"
+              ></div>
+            </div>
+            <button
+              type="submit"
+              class="w-full sm:w-auto sm:min-w-max flex-shrink-0 bg-primary text-on-primary font-button-label text-[10px] lg:text-xs px-6 lg:px-10 py-4 lg:py-5 uppercase tracking-[0.12em] hover:bg-white hover:text-black transition-all shadow-xl btn-shimmer gold-glow"
+            >
+              Join the Dispatch
+            </button>
+          </form>
+          <!-- Success Message -->
+          <div id="newsletter-success" class="mt-6 lg:mt-8 hidden">
+            <p class="font-body-main text-base lg:text-lg text-primary">
+              <span class="material-symbols-outlined inline-block mr-2"
+                >check_circle</span
+              >
+              You're in. Welcome to the Dispatch.
             </p>
           </div>
-          <div>
-            <h4 class="footer__links-title">Explore</h4>
-            <ul class="footer__links">
-              <li><a href="index.html" class="footer__link">Home</a></li>
-              <li>
-                <a href="pages/products.html" class="footer__link"
-                  >All Products</a
-                >
-              </li>
-              <li><a href="pages/about.html" class="footer__link">About</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="footer__links-title">Categories</h4>
-            <ul class="footer__links">
-              <li>
-                <a href="pages/category.html?name=Courses" class="footer__link"
-                  >Courses</a
-                >
-              </li>
-              <li>
-                <a href="pages/category.html?name=Ebooks" class="footer__link"
-                  >Ebooks</a
-                >
-              </li>
-              <li>
-                <a href="pages/category.html?name=Tools" class="footer__link"
-                  >Tools</a
-                >
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div class="footer__bottom">
-          <p class="footer__copy">© 2026 Vesna. All rights reserved.</p>
-          <p class="footer__disclosure">
-            Affiliate disclosure: Some links may earn me a commission at no
-            extra cost to you.
+
+          <p
+            id="newsletter-subtitle"
+            class="mt-6 lg:mt-8 font-body-main italic text-[10px] lg:text-xs text-neutral-600 tracking-widest uppercase"
+          >
+            Privacy is the ultimate luxury. Join 2,000+ discerning readers.
           </p>
         </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#0a0a0a] border-t border-[#242424] px-12 py-16">
+      <div class="flex flex-col items-center gap-8 max-w-[1440px] mx-auto">
+        <a
+          href="index.html"
+          class="font-audiowide text-2xl lg:text-3xl text-on-background tracking-[0.3em]"
+          >VESN<span class="lambda-exo2">Λ</span></a
+        >
+        <div class="flex flex-wrap justify-center gap-8">
+          <a
+            href="#"
+            class="font-button-label uppercase text-[10px] tracking-widest text-[#666666] hover:text-[#f0ebe0] transition-colors"
+            >Privacy Policy</a
+          >
+          <a
+            href="#"
+            class="font-button-label uppercase text-[10px] tracking-widest text-[#666666] hover:text-[#f0ebe0] transition-colors"
+            >Terms of Service</a
+          >
+          <a
+            href="#"
+            class="font-button-label uppercase text-[10px] tracking-widest text-[#666666] hover:text-[#f0ebe0] transition-colors"
+            >Affiliate Disclosure</a
+          >
+          <a
+            href="#"
+            class="font-button-label uppercase text-[10px] tracking-widest text-[#666666] hover:text-[#f0ebe0] transition-colors"
+            >Contact</a
+          >
+          <a
+            href="#"
+            class="font-button-label uppercase text-[10px] tracking-widest text-[#666666] hover:text-[#f0ebe0] transition-colors"
+            >Shipping &amp; Returns</a
+          >
+        </div>
+        <div
+          class="text-primary font-button-label text-[10px] tracking-widest uppercase"
+        >
+          © 2026 VESNA. ALL RIGHTS RESERVED.
+        </div>
+        <div
+          class="font-button-label text-[9px] tracking-widest text-[#666666]/50 uppercase"
+        >
+          Oracle:Atlas
+        </div>
+        <p
+          class="max-w-2xl text-center text-[#666666] text-[9px] tracking-widest leading-relaxed uppercase"
+        >
+          Vesna is a curated platform. We may earn a commission from products
+          purchased through our links, supporting our editorial independence and
+          high-standard curation.
+        </p>
       </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="js/loading.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/components.js"></script>
-    <script src="js/features.js"></script>
-    <script src="js/chat.js"></script>
+    <!-- Product Quick View Modal -->
+    <div
+      id="quick-view-modal"
+      class="fixed inset-0 z-50 hidden"
+      aria-hidden="true"
+    >
+      <!-- Backdrop -->
+      <div
+        id="modal-backdrop"
+        class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0"
+      ></div>
+
+      <!-- Modal Content -->
+      <div
+        id="modal-content"
+        class="absolute inset-0 flex items-center justify-center p-4 sm:p-8"
+      >
+        <div
+          class="relative bg-surface-container max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-lg shadow-2xl transform scale-95 opacity-0 transition-all duration-300"
+        >
+          <!-- Close Button -->
+          <button
+            id="modal-close"
+            class="absolute top-4 right-4 z-10 w-10 h-10 flex items-center justify-center bg-surface-dim rounded-full text-on-background hover:bg-primary hover:text-on-primary transition-all focus-ring"
+            aria-label="Close modal"
+          >
+            <span class="material-symbols-outlined">close</span>
+          </button>
+
+          <!-- Modal Body -->
+          <div id="modal-body" class="p-6 sm:p-8 lg:p-12">
+            <!-- Content will be injected by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Lightbox -->
+    <div
+      id="image-lightbox"
+      class="fixed inset-0 z-[60] hidden"
+      aria-hidden="true"
+    >
+      <!-- Backdrop -->
+      <div
+        id="lightbox-backdrop"
+        class="absolute inset-0 bg-black/95 backdrop-blur-sm transition-opacity duration-300 opacity-0"
+      ></div>
+
+      <!-- Lightbox Content -->
+      <div
+        id="lightbox-content"
+        class="absolute inset-0 flex items-center justify-center p-4"
+      >
+        <img
+          id="lightbox-image"
+          src=""
+          alt=""
+          class="max-w-full max-h-full object-contain transform scale-95 opacity-0 transition-all duration-300"
+        />
+      </div>
+
+      <!-- Close Button -->
+      <button
+        id="lightbox-close"
+        class="absolute top-4 right-4 z-10 w-12 h-12 flex items-center justify-center bg-neutral-800/80 rounded-full text-white hover:bg-primary transition-all focus-ring"
+        aria-label="Close lightbox"
+      >
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <!-- Navigation Arrows -->
+      <button
+        id="lightbox-prev"
+        class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-neutral-800/80 rounded-full text-white hover:bg-primary transition-all focus-ring hidden"
+        aria-label="Previous image"
+      >
+        <span class="material-symbols-outlined">chevron_left</span>
+      </button>
+      <button
+        id="lightbox-next"
+        class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center bg-neutral-800/80 rounded-full text-white hover:bg-primary transition-all focus-ring hidden"
+        aria-label="Next image"
+      >
+        <span class="material-symbols-outlined">chevron_right</span>
+      </button>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button
+      id="back-to-top"
+      class="fixed bottom-8 right-8 w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center opacity-0 invisible transition-all duration-300 hover:bg-primary/80 focus-ring z-50"
+      aria-label="Back to top"
+    >
+      <span class="material-symbols-outlined">arrow_upward</span>
+    </button>
+
+    <!-- Typewriter Loading Animation -->
+    <script>
+      (function () {
+        const typewriterText = document.getElementById("typewriter-text");
+        const typewriterCursor = document.getElementById("typewriter-cursor");
+        const taglineText = document.getElementById("typewriter-tagline");
+        const taglineCursor = document.getElementById("tagline-cursor");
+        const loadingScreen = document.getElementById("loading-screen");
+        const BLINK_DURATION = 500;
+        const LETTER_DELAY = 280;
+        const PAUSE_DELAY = 600;
+        const TAGLINE = "◊ The Art of Intentional Living ◊";
+
+        function blinkMainCursor(times, callback) {
+          let count = 0;
+          function doBlink() {
+            if (count >= times * 2) {
+              if (callback) callback();
+              return;
+            }
+            typewriterCursor.style.opacity = count % 2 === 0 ? "0" : "1";
+            count++;
+            setTimeout(doBlink, BLINK_DURATION);
+          }
+          doBlink();
+        }
+
+        function blinkTaglineCursor(times, callback) {
+          let count = 0;
+          function doBlink() {
+            if (count >= times * 2) {
+              if (callback) callback();
+              return;
+            }
+            taglineCursor.style.opacity = count % 2 === 0 ? "0" : "1";
+            count++;
+            setTimeout(doBlink, BLINK_DURATION);
+          }
+          taglineCursor.style.opacity = "1";
+          doBlink();
+        }
+
+        function typeLambda(callback) {
+          typewriterText.innerHTML = '<span class="lambda-exo2">Λ</span>';
+          setTimeout(callback, PAUSE_DELAY);
+        }
+
+        function deleteLambda(callback) {
+          typewriterText.innerHTML = "";
+          setTimeout(callback, PAUSE_DELAY);
+        }
+
+        function typeLetters(letters, index, callback) {
+          if (index >= letters.length) {
+            if (callback) callback();
+            return;
+          }
+          if (letters[index] === "Λ") {
+            typewriterText.innerHTML +=
+              '<span class="lambda-exo2" style="background: linear-gradient(90deg, #e6c364, #95d4b3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Λ</span>';
+          } else {
+            typewriterText.innerHTML += `<span style="background: linear-gradient(90deg, #e6c364, #95d4b3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${letters[index]}</span>`;
+          }
+          setTimeout(function () {
+            typeLetters(letters, index + 1, callback);
+          }, LETTER_DELAY);
+        }
+
+        function typeTagline(callback) {
+          taglineText.style.opacity = "1";
+          let index = 0;
+          function typeChar() {
+            if (index >= TAGLINE.length) {
+              if (callback) callback();
+              return;
+            }
+            taglineText.textContent += TAGLINE.charAt(index);
+            index++;
+            setTimeout(typeChar, 80);
+          }
+          typeChar();
+        }
+
+        function fadeOut() {
+          typewriterCursor.style.opacity = "0";
+          taglineCursor.style.opacity = "0";
+          setTimeout(function () {
+            loadingScreen.style.transition = "opacity 1.5s ease";
+            loadingScreen.style.opacity = "0";
+            setTimeout(function () {
+              loadingScreen.style.display = "none";
+            }, 1500);
+          }, 600);
+        }
+
+        function runAnimation() {
+          // Step 1: Blink 3 times
+          blinkMainCursor(3, function () {
+            // Step 2: Type lambda (catch attention)
+            typeLambda(function () {
+              // Step 3: Blink 3 times before deletion
+              blinkMainCursor(3, function () {
+                // Step 4: Delete lambda
+                deleteLambda(function () {
+                  // Step 5: One blink
+                  blinkMainCursor(1, function () {
+                    // Step 6: Type VESNΛ (brand name with lambda)
+                    typeLetters(["V", "E", "S", "N", "Λ"], 0, function () {
+                      // Step 7: Pause then start tagline
+                      setTimeout(function () {
+                        // Step 8: Type tagline
+                        typeTagline(function () {
+                          // Step 9: Hide tagline cursor immediately after typing
+                          taglineCursor.style.opacity = "0";
+                          // Step 10: Fade out
+                          fadeOut();
+                        });
+                      }, 400);
+                    });
+                  });
+                });
+              });
+            });
+          });
+        }
+
+        // Start animation when DOM is ready
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", runAnimation);
+        } else {
+          runAnimation();
+        }
+      })();
+    </script>
+    <!-- Universal Navbar Loader -->
+    <script src="js/navbar-loader.js"></script>
+    <!-- Mobile Bottom Navigation Loader -->
+    <script src="js/mobile-nav-loader.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/onboarding.js"></script>
   </body>
 </html>
