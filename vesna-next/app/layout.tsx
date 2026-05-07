@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Serif_Display, Spectral, Playfair_Display, Tangerine, Tenor_Sans, Cinzel } from "next/font/google";
+import { DM_Serif_Display, Spectral, Playfair_Display, Tangerine, Tenor_Sans, Cinzel, Audiowide, Exo_2 } from "next/font/google";
 import "./globals.css";
 import VenusChatWidget from "@/components/VenusChatWidget";
 
@@ -46,6 +46,20 @@ const cinzel = Cinzel({
   display: "swap",
 });
 
+const audiowide = Audiowide({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-audiowide",
+  display: "swap",
+});
+
+const exo2 = Exo_2({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-exo2",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Vesna - Curated Living by Victory Ebenezer",
   description: "A curated collection of exceptional products across tech, audio, lifestyle, workspace, and travel. Each item personally selected by Victory Ebenezer.",
@@ -80,7 +94,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${dmSerifDisplay.variable} ${spectral.variable} ${playfairDisplay.variable} ${tangerine.variable} ${tenorSans.variable} ${cinzel.variable} antialiased`}
+        className={`${dmSerifDisplay.variable} ${spectral.variable} ${playfairDisplay.variable} ${tangerine.variable} ${tenorSans.variable} ${cinzel.variable} ${audiowide.variable} ${exo2.variable} antialiased`}
       >
         {children}
         <VenusChatWidget />

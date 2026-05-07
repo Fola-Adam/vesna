@@ -1,10 +1,9 @@
-import { createClient } from './server'
 import { unstable_cache } from 'next/cache'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 // Cache products list with 5 minute revalidation
 export const getCachedProducts = unstable_cache(
-  async (limit = 50, page = 1) => {
-    const supabase = createClient()
+  async (supabase: SupabaseClient, limit = 50, page = 1) => {
     const from = (page - 1) * limit
     const to = from + limit - 1
     
@@ -22,8 +21,7 @@ export const getCachedProducts = unstable_cache(
 
 // Cache featured curated products
 export const getCachedFeaturedProducts = unstable_cache(
-  async (limit = 4) => {
-    const supabase = createClient()
+  async (supabase: SupabaseClient, limit = 4) => {
     const { data } = await supabase
       .from('products')
       .select('id, name, slug, price, image_urls, why_victory, item_type')
@@ -40,8 +38,7 @@ export const getCachedFeaturedProducts = unstable_cache(
 
 // Cache categories
 export const getCachedCategories = unstable_cache(
-  async () => {
-    const supabase = createClient()
+  async (supabase: SupabaseClient) => {
     const { data } = await supabase
       .from('categories')
       .select('id, name, slug, display_order')
@@ -56,8 +53,7 @@ export const getCachedCategories = unstable_cache(
 
 // Cache single product by slug
 export const getCachedProduct = unstable_cache(
-  async (slug: string) => {
-    const supabase = createClient()
+  async (supabase: SupabaseClient, slug: string) => {
     const { data } = await supabase
       .from('products')
       .select('*, categories(name)')
@@ -72,9 +68,7 @@ export const getCachedProduct = unstable_cache(
 
 // Cache dashboard stats
 export const getCachedDashboardStats = unstable_cache(
-  async () => {
-    const supabase = createClient()
-    
+  async (supabase: SupabaseClient) => {
     const [
       { count: productsCount },
       { count: curatedCount },
