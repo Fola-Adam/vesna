@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             newsletterEmail.classList.remove('border-red-500');
             newsletterForm.classList.add('hidden');
             newsletterSuccess.classList.remove('hidden');
-            newsletterSubtitle.textContent = 'Thank you for joining our community of discerning readers.';
+            newsletterSubtitle.textContent = "Welcome to Victory's Picks!";
 
             // Optional: Confetti effect
             createConfetti();
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             id: 1,
             name: 'Mechanical Keyboard',
-            description: 'Heavy brass weight, zero drift. Premium switches with custom keycaps for the discerning typist.',
+            description: 'Heavy brass weight, zero drift. Premium switches with custom keycaps for people who type all day.',
             price: '$299',
             image: 'vesna-imgs/coloured-keyboard.png',
             badge: 'Featured'
@@ -283,10 +283,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const statSubs = document.getElementById('stat-subs');
 
     const stats = [
-        { element: statObjects, target: 50, suffix: '+', duration: 2000 },
-        { element: statCategories, target: 12, suffix: '', duration: 1500 },
-        { element: statRating, target: 4.9, suffix: '', duration: 2000, isDecimal: true },
-        { element: statSubs, target: 2000, suffix: '+', duration: 2500 }
+        { element: statObjects, target: 47, suffix: '', duration: 2000 },
+        { element: statCategories, target: 9, suffix: '', duration: 1500 },
+        { element: statRating, target: 0, suffix: '', duration: 0, isDecimal: true },
+        { element: statSubs, target: 0, suffix: '', duration: 0 }
     ];
 
     function animateCounter(stat) {

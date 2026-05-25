@@ -3,10 +3,66 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>Vesna</title>
+    <title>Vesna - All Products</title>
+    <meta
+      name="description"
+      content="Browse all curated products on Vesna. Courses, ebooks, tools, tech, and more."
+    />
     <link rel="stylesheet" href="../css/styles.css" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tenor+Sans&amp;family=Spectral:wght@200;300;400&amp;family=Cinzel:wght@400;700&amp;family=Caveat:wght@400;700&amp;family=DM+Serif+Display&amp;family=Playfair+Display:ital,wght@0,400;1,400&amp;family=Audiowide&amp;family=Exo+2:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#e6c364",
+              "on-primary": "#3d2e00",
+              secondary: "#95d4b3",
+              "on-secondary": "#003824",
+              background: "#131313",
+              "on-background": "#e5e2e1",
+              surface: "#131313",
+              "surface-container": "#201f1f",
+              "surface-container-low": "#1c1b1b",
+              "surface-container-lowest": "#0e0e0e",
+              "surface-container-high": "#2a2a2a",
+              "on-surface": "#e5e2e1",
+              "on-surface-variant": "#d0c5b2",
+              outline: "#99907e",
+            },
+            fontFamily: {
+              "display-hero": ["DM Serif Display", "serif"],
+              "body-main": ["Spectral", "serif"],
+              logo: ["Tangerine", "cursive"],
+              "button-label": ["Tenor Sans", "sans-serif"],
+              "section-header": ["Cinzel", "serif"],
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
+  <body class="bg-background text-on-background antialiased">
+    <!-- Simple redirect to picks page which has the full product grid -->
+    <div class="min-h-screen flex items-center justify-center">
+      <div class="text-center px-5">
+        <h1 class="font-display-hero text-3xl text-on-background mb-4">All Products</h1>
+        <p class="font-body-main text-outline mb-8">Browse Victory's full curated collection.</p>
+        <a href="picks.html" class="inline-block px-8 py-3 bg-primary text-on-primary font-button-label text-xs uppercase tracking-widest hover:bg-primary/80 transition-colors">
+          View All Picks
+        </a>
+      </div>
+    </div>
+
     <script src="../js/app.js"></script>
   </body>
 </html>
