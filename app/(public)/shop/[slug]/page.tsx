@@ -71,7 +71,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
           {product.why_victory && (
             <div className="mb-12 border-l border-primary/30 pl-6">
               <p className="font-body-main text-on-surface-variant leading-relaxed opacity-80 italic">
-                "{product.why_victory}"
+                {'“'}{product.why_victory}{'”'}
               </p>
               <cite className="block mt-4 font-button-label text-[10px] uppercase tracking-widest text-outline not-italic">
                 — Ebenezer Victory
@@ -116,7 +116,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
           </div>
           <div className="space-y-8">
             <h3 className="font-button-label text-xs tracking-[0.4em] text-primary border-b border-primary/20 pb-4 inline-block">
-              WHO IT'S FOR
+              WHO IT&apos;S FOR
             </h3>
             <p className="font-body-main text-on-surface-variant leading-loose">
               Designed for the intentional minimalist and the connoisseur of
@@ -210,7 +210,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   )
 }
 
-async function getRelatedProducts(currentId: string, category?: string) {
+async function getRelatedProducts(currentId: string) {
   const supabase = createClient()
   
   const { data } = await supabase

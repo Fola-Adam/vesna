@@ -38,8 +38,8 @@ export default function LoginPage() {
         await supabase.auth.signOut()
         setError('Access denied. Admin access only.')
       }
-    } catch (err: any) {
-      setError(err.message || 'Login failed')
+    } catch (err: unknown) {
+      setError((err as { message: string }).message || 'Login failed')
     } finally {
       setLoading(false)
     }

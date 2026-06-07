@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
 
+interface ChatMessage {
+  role: string;
+  content: string;
+}
+
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 })
@@ -40,7 +45,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`
 
     const messages = [
       { role: 'system', content: systemPrompt },
-      ...history.map((h: any) => ({
+      ...history.map((h: ChatMessage) => ({
         role: h.role,
         content: h.content,
       })),
@@ -50,7 +55,7 @@ Current date: ${new Date().toISOString().split('T')[0]}`
     const completion = await groq.chat.completions.create({
       model: 'meta-llama/llama-4-scout-17b-16e-instruct',
       max_tokens: 500,
-      messages: messages as any,
+      messages: messages as ChatMessage[],
     })
 
     const content = completion.choices[0]?.message?.content

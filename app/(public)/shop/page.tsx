@@ -472,7 +472,7 @@ export default function ShopPage() {
               Vesna Picks
             </h1>
             <p className="font-[family-name:var(--font-spectral)] text-xl text-[#e5e2e1] mb-6 opacity-70 font-light">
-              Victory's personal recommendations.
+              Victory&apos;s personal recommendations.
             </p>
             <span className="font-[family-name:var(--font-tenor-sans)] text-xs tracking-widest text-[#666666] uppercase">
               47 picks

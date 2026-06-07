@@ -119,7 +119,7 @@ function AdminSidebar() {
   )
 }
 
-function AdminHeader({ user, profile }: { user: any, profile: any }) {
+function AdminHeader({ user, profile }: { user: React.ReactNode, profile: React.ReactNode }) {
   return (
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b border-outline-variant">
       <div className="flex items-center justify-between h-16 px-6">

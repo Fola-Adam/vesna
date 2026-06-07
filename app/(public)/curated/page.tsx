@@ -175,7 +175,7 @@ function ProductCard({ product }: { product: Product }) {
           <h3 className="font-display-hero text-2xl text-on-surface mb-4">{product.name}</h3>
           {product.why_victory && (
             <p className="font-body-main text-on-surface-variant text-sm opacity-80 mb-8 line-clamp-2">
-              "{product.why_victory}"
+              {'“'}{product.why_victory}{'”'}
             </p>
           )}
           <button className="mt-auto w-full py-4 border border-primary text-primary font-button-label uppercase text-[10px] tracking-[0.2em] hover:bg-primary hover:text-on-primary transition-all duration-300">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import Link from "next/link";
 import ScrollProgress from "@/components/ScrollProgress";
 
 export default function AboutPage() {
@@ -61,9 +61,9 @@ export default function AboutPage() {
         <section className="relative min-h-[70vh] flex items-center bg-surface-dim">
           <div className="absolute inset-0 overflow-hidden">
             <img
-              src="/vesna-imgs/native-cinematic-vase.png"
-              alt="Ebenezer Victory"
-              className="w-full h-full object-cover opacity-30"
+              src="/vesna-imgs/native-cinematic-vase.png",
+              alt="Ebenezer Victory",
+              className="w-full h-full object-cover opacity-30",
             />
             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
           </div>
@@ -95,9 +95,9 @@ export default function AboutPage() {
                 <div className="relative">
                   <div className="absolute -inset-4 border border-[#e6c364]/20" />
                   <img
-                    src="/vesna-imgs/victory.png"
-                    alt="Ebenezer Victory"
-                    className="relative w-full aspect-[3/4] object-cover grayscale"
+                    src="/vesna-imgs/victory.png",
+                    alt="Ebenezer Victory",
+                    className="relative w-full aspect-[3/4] object-cover grayscale",
                   />
                 </div>
               </div>
@@ -108,13 +108,13 @@ export default function AboutPage() {
         {/* Philosophy Statement */}
         <section className="py-20 lg:py-32 px-5 sm:px-8 lg:px-20 border-b border-[#201f1f]">
           <div className="max-w-4xl mx-auto text-center">
-            <span className="text-6xl text-[#e6c364]/20 font-[family-name:var(--font-playfair)] italic">&ldquo;</span>
+            <span className="text-6xl text-[#e6c364]/20 font-[family-name:var(--font-playfair)] italic">&amp;ldquo;</span>
             <blockquote className="font-[family-name:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl text-[#e5e2e1] italic leading-relaxed -mt-8 mb-8">
-              True luxury is not possessionâ€”it is the space between a thought and
+              True luxury is not possession—it is the space between a thought and
               an action, the pause before we choose.
             </blockquote>
             <cite className="font-[family-name:var(--font-tenor-sans)] text-sm text-[#95d4b3] uppercase tracking-widest">
-              â€” The Vesna Creed
+              — The Vesna Creed
             </cite>
           </div>
         </section>
@@ -139,7 +139,7 @@ export default function AboutPage() {
                   <p>
                     Every item in our collection has been touched, considered, and
                     ultimately selected because it represents something more than
-                    functionâ€”it embodies a philosophy of living.
+                    function—it embodies a philosophy of living.
                   </p>
                   <p>
                     We don&apos;t sell products. We curate possibilities for a more
@@ -211,7 +211,7 @@ export default function AboutPage() {
                 </h3>
                 <p className="font-[family-name:var(--font-spectral)] text-sm text-[#d0c5b2]">
                   After years of collecting objects from artisans worldwide, the
-                  idea of Vesna began to formâ€”a place to share discoveries with
+                  idea of Vesna began to form—a place to share discoveries with
                   like-minded seekers of quality.
                 </p>
               </div>
@@ -238,7 +238,7 @@ export default function AboutPage() {
                   The Community
                 </h3>
                 <p className="font-[family-name:var(--font-spectral)] text-sm text-[#d0c5b2]">
-                  Vesna found its audienceâ€”architects, designers, writers, and
+                  Vesna found its audience—architects, designers, writers, and
                   thinkers who understood that environment shapes consciousness.
                 </p>
               </div>
@@ -251,7 +251,7 @@ export default function AboutPage() {
                   The Vision
                 </h3>
                 <p className="font-[family-name:var(--font-spectral)] text-sm text-[#d0c5b2]">
-                  The full vision for Vesna took shapeâ€”a comprehensive platform
+                  The full vision for Vesna took shape—a comprehensive platform
                   spanning commerce, community, and intelligence, built on trust
                   as infrastructure.
                 </p>
@@ -265,7 +265,7 @@ export default function AboutPage() {
                   The Foundation
                 </h3>
                 <p className="font-[family-name:var(--font-spectral)] text-sm text-[#d0c5b2]">
-                  Vesna is being builtâ€”starting with the curated affiliate
+                  Vesna is being built—starting with the curated affiliate
                   showcase, Venus AI integration, and the foundation for what will
                   become a complete ecosystem of intentional living.
                 </p>
