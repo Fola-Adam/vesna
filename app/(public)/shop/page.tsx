@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 const PICKS = [
   {
@@ -528,13 +529,8 @@ export default function ShopPage() {
                     {product.badge}
                   </div>
                 )}
-                <div className="aspect-video overflow-hidden cursor-pointer">
-                  <img
-                    alt={product.name}
-                    className="w-full h-full object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700"
-                    src={product.image}
-                    loading="lazy"
-                  />
+                <div className="relative aspect-video overflow-hidden cursor-pointer">
+                  <Image alt={product.name} src={product.image} fill className="object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700" />
                 </div>
                 <div className="p-8 flex flex-col flex-grow">
                   <div className="flex justify-between items-start mb-4">

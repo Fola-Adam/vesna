@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ScrollProgress from "@/components/ScrollProgress";
+import Image from "next/image";
 
 const COLLECTION = [
   {
@@ -226,14 +227,10 @@ export default function ArchivePage() {
             <div className="max-w-screen-xl mx-auto">
               <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                 {/* Image */}
-                <div className="relative order-2 lg:order-1">
+                <div className="relative aspect-[4/5] order-2 lg:order-1">
                   <div className="absolute -inset-4 border border-[#e6c364]/20" />
                   <div className="absolute -inset-8 border border-[#e6c364]/10" />
-                  <img
-                    src="/vesna-imgs/native-cinematic-vase.png"
-                    alt="Artisan Ceramic Teakettle"
-                    className="relative w-full aspect-[4/5] object-cover"
-                  />
+                  <Image src="/vesna-imgs/native-cinematic-vase.png" alt="Artisan Ceramic Teakettle" fill className="object-cover" />
                   <div className="absolute top-4 right-4">
                     <span className="rarity-badge font-[family-name:var(--font-tenor-sans)] text-[10px] uppercase tracking-[0.2em] bg-[#e6c364] text-[#3d2e00] px-4 py-2">
                       One of One
@@ -386,14 +383,7 @@ export default function ArchivePage() {
                   } ${!item.available ? "opacity-75" : ""}`}
                 >
                   <div className="relative aspect-[4/5] overflow-hidden bg-[#1c1917]">
-                    <img
-                      alt={item.name}
-                      src={item.image}
-                      className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ${
-                        !item.available ? "grayscale-[40%]" : "grayscale-[20%]"
-                      }`}
-                      loading="lazy"
-                    />
+                    <Image alt={item.name} src={item.image} fill className={`object-cover group-hover:scale-105 transition-transform duration-700 ${!item.available ? "grayscale-[40%]" : "grayscale-[20%]"}`} />
                     {!item.available && (
                       <div className="absolute top-4 left-4 z-10">
                         <span className="font-[family-name:var(--font-tenor-sans)] text-[10px] tracking-[0.2em] bg-[#44403c] text-[#d6d3d1] px-3 py-1.5 border border-[#78716c]">
@@ -474,11 +464,7 @@ export default function ArchivePage() {
               {PAST_SPOTLIGHTS.map((item) => (
                 <article key={item.id} className="group cursor-pointer border-green-subtle">
                   <div className="relative aspect-[4/3] overflow-hidden mb-4">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-full object-cover grayscale-[30%] group-hover:scale-105 transition-transform duration-700"
-                    />
+                    <Image src={item.image} alt={item.title} fill className="object-cover grayscale-[30%] group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute top-3 left-3">
                       {item.badgeStyle === "filled" && (
                         <span className="font-[family-name:var(--font-tenor-sans)] text-[9px] uppercase tracking-[0.2em] bg-[#e6c364]/90 text-[#3d2e00] px-2 py-1">

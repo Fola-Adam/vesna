@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const categories = [
   { name: "Home", icon: "home", image: "/vesna-imgs/minimal-workdesk.png", href: "/picks?category=home" },
@@ -54,11 +55,11 @@ export default function CategoryGrid() {
               href={category.href}
               className="group relative aspect-square overflow-hidden bg-surface-container hover-lift glow-hover"
             >
-              <img
+              <Image
                 src={category.image}
                 alt={category.name}
-                className="w-full h-full object-cover category-image-zoom"
-                loading="lazy"
+                className="object-cover category-image-zoom"
+                fill
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="material-symbols-outlined text-3xl lg:text-4xl text-primary mb-2">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -27,11 +27,7 @@ export default function CuratedPage() {
   const [displayedCount, setDisplayedCount] = useState(ITEMS_PER_LOAD)
   const supabase = createClient()
 
-  useEffect(() => {
-    fetchProducts()
-  }, [])
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true)
     const { data, error } = await supabase
       .from('products')
@@ -43,7 +39,11 @@ export default function CuratedPage() {
       setProducts(data as Product[])
     }
     setLoading(false)
-  }
+  }, [supabase])
+
+  useEffect(() => {
+    fetchProducts()
+  }, [fetchProducts])
 
   const filteredProducts = currentCategory === 'all' 
     ? products 
@@ -175,7 +175,7 @@ function ProductCard({ product }: { product: Product }) {
           <h3 className="font-display-hero text-2xl text-on-surface mb-4">{product.name}</h3>
           {product.why_victory && (
             <p className="font-body-main text-on-surface-variant text-sm opacity-80 mb-8 line-clamp-2">
-              {'“'}{product.why_victory}{'”'}
+              {'"'}{product.why_victory}{'"'}
             </p>
           )}
           <button className="mt-auto w-full py-4 border border-primary text-primary font-button-label uppercase text-[10px] tracking-[0.2em] hover:bg-primary hover:text-on-primary transition-all duration-300">

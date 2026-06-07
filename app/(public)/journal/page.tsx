@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ScrollProgress from "@/components/ScrollProgress";
+import Image from "next/image";
 
 const ARTICLES = [
   {
@@ -122,11 +123,7 @@ export default function JournalPage() {
         {/* Hero Section */}
         <section className="relative min-h-[60vh] flex items-center justify-center bg-surface-dim">
           <div className="absolute inset-0 overflow-hidden">
-            <img
-              src="/vesna-imgs/editorial-luxurious-workspace.png"
-              alt="Journal"
-              className="w-full h-full object-cover opacity-40"
-            />
+            <Image src="/vesna-imgs/editorial-luxurious-workspace.png" alt="Journal" fill className="object-cover opacity-40" />
             <div className="absolute inset-0 bg-gradient-to-b from-[#131313]/50 via-[#131313]/70 to-[#131313]" />
           </div>
           <div className="relative z-10 text-center px-5 max-w-4xl mx-auto pt-24">
@@ -170,11 +167,7 @@ export default function JournalPage() {
             <article className="article-card group cursor-pointer">
               <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                 <div className="relative aspect-[4/3] overflow-hidden bg-[#201f1f]">
-                  <img
-                    src="/vesna-imgs/vintage-workdesk-darkgold.png"
-                    alt="The Weight of Quality"
-                    className="w-full h-full object-cover"
-                  />
+                  <Image src="/vesna-imgs/vintage-workdesk-darkgold.png" alt="The Weight of Quality" fill className="object-cover" />
                   <div className="absolute top-4 left-4">
                     <span className="font-[family-name:var(--font-tenor-sans)] text-[10px] uppercase tracking-[0.2em] px-3 py-1 bg-[#e6c364] text-[#3d2e00]">
                       Featured
@@ -219,11 +212,7 @@ export default function JournalPage() {
                   className={`article-card group cursor-pointer ${article.hasGreenBorder ? 'border-green-subtle' : ''}`}
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-[#201f1f] mb-5">
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <Image src={article.image} alt={article.title} fill className="object-cover" />
                   </div>
                   <p className={`font-[family-name:var(--font-tenor-sans)] text-[10px] uppercase tracking-[0.2em] mb-2 ${article.isPrimaryCategory ? 'text-[#e6c364]' : 'text-[#95d4b3]'}`}>
                     {article.categoryLabel}

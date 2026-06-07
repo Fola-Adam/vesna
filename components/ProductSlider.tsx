@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Product {
   id: number;
@@ -184,11 +185,11 @@ export default function ProductSlider() {
                     {product.badge === "featured" ? "Featured" : "New"}
                   </span>
                 )}
-                <img
+                <Image
                   alt={product.name}
-                  className="w-full h-full object-cover product-image-zoom"
+                  className="object-cover product-image-zoom"
                   src={product.image}
-                  loading="lazy"
+                  fill
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 flex items-center justify-center">
                   <span className="opacity-0 group-hover:opacity-100 font-button-label text-[10px] tracking-[0.3em] text-white border border-white/50 px-4 lg:px-6 py-2 lg:py-3 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 uppercase">

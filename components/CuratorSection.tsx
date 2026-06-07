@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CuratorSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -61,11 +62,11 @@ export default function CuratorSection() {
         <div className="order-1 md:order-2">
           <div className="relative group">
             <div className="absolute -inset-3 lg:-inset-4 border border-primary/20 transition-all group-hover:inset-0" />
-            <img
+            <Image
               alt="Ebenezer Victory"
-              className="relative z-10 w-full h-[400px] sm:h-[500px] lg:h-[600px] object-cover grayscale brightness-90"
+              className="object-cover grayscale brightness-90"
               src="/vesna-imgs/victory.png"
-              loading="lazy"
+              fill
             />
           </div>
         </div>

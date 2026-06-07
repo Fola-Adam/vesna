@@ -1,23 +1,27 @@
 "use client";
 
+import Image from "next/image";
+
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen w-full flex items-center overflow-hidden bg-surface-dim">
       {/* Animated Background */}
       <div className="absolute inset-0 w-full h-full z-0">
         <div className="hero-mask w-full h-full relative overflow-hidden">
-          <img
+          <Image
+            priority
             alt="Hero 1"
-            className="absolute inset-0 w-full h-full object-cover brightness-75 will-change-transform"
+            className="object-cover brightness-75 will-change-transform"
             src="/vesna-imgs/20_high_end_editorial_photography.png"
-            loading="eager"
+            fill
             style={{ animation: "fade-hero 10s infinite" }}
           />
-          <img
+          <Image
+            priority
             alt="Hero 2"
-            className="absolute inset-0 w-full h-full object-cover brightness-75 will-change-transform"
+            className="object-cover brightness-75 will-change-transform"
             src="/vesna-imgs/editorial-luxurious-workspace.png"
-            loading="eager"
+            fill
             style={{ animation: "fade-hero-reverse 10s infinite" }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/70 via-neutral-950/40 to-transparent" />
@@ -47,25 +51,25 @@ export default function HeroSection() {
         <div className="relative h-48 md:h-72 lg:h-96">
           <div className="absolute -inset-2 border border-primary/30" />
           <div className="relative z-10 w-full h-full shadow-2xl brightness-90 overflow-hidden">
-            <img
+            <Image
               alt="Detail 1"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="object-cover"
               src="/vesna-imgs/secondary-overlay-image.png"
-              loading="lazy"
+              fill
               style={{ animation: "cycle-overlay 12s infinite" }}
             />
-            <img
+            <Image
               alt="Detail 2"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="object-cover"
               src="/vesna-imgs/vintage-workdesk-darkgold.png"
-              loading="lazy"
+              fill
               style={{ animation: "cycle-overlay-2 12s infinite" }}
             />
-            <img
+            <Image
               alt="Detail 3"
-              className="absolute inset-0 w-full h-full object-cover"
+              className="object-cover"
               src="/vesna-imgs/minimal-workdesk.png"
-              loading="lazy"
+              fill
               style={{ animation: "cycle-overlay-3 12s infinite" }}
             />
           </div>

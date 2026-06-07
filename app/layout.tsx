@@ -72,7 +72,6 @@ export const metadata: Metadata = {
     locale: "en_US",
   },
   manifest: "/manifest.json",
-  themeColor: "#131312",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -83,7 +82,7 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  themeColor: "#131312",
 };
 
 export default function RootLayout({
