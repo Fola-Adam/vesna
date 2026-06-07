@@ -61,9 +61,9 @@ export default function AboutPage() {
         <section className="relative min-h-[70vh] flex items-center bg-surface-dim">
           <div className="absolute inset-0 overflow-hidden">
             <img
-              src="/vesna-imgs/native-cinematic-vase.png",
-              alt="Ebenezer Victory",
-              className="w-full h-full object-cover opacity-30",
+              src="/vesna-imgs/native-cinematic-vase.png"
+              alt="Ebenezer Victory"
+              className="w-full h-full object-cover opacity-30"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
           </div>
@@ -95,9 +95,9 @@ export default function AboutPage() {
                 <div className="relative">
                   <div className="absolute -inset-4 border border-[#e6c364]/20" />
                   <img
-                    src="/vesna-imgs/victory.png",
-                    alt="Ebenezer Victory",
-                    className="relative w-full aspect-[3/4] object-cover grayscale",
+                    src="/vesna-imgs/victory.png"
+                    alt="Ebenezer Victory"
+                    className="relative w-full aspect-[3/4] object-cover grayscale"
                   />
                 </div>
               </div>
