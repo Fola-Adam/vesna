@@ -72,10 +72,8 @@ export default function StatsSection() {
   }, []);
 
   const stats = [
-    { end: 47, label: "Curated Objects" },
-    { end: 8, label: "Categories" },
-    { end: 4.9, decimals: 1, label: "Avg. Rating" },
-    { end: 2000, suffix: "+", label: "Newsletter Subs" },
+    { end: 12, label: "Curated Objects" },
+    { end: 5, label: "Categories" },
   ];
 
   return (
@@ -85,38 +83,16 @@ export default function StatsSection() {
     >
       <div className="max-w-screen-xl mx-auto">
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 mb-16 lg:mb-20">
+        <div className="grid grid-cols-2 gap-8 lg:gap-12 mb-16 lg:mb-20">
           {stats.map((stat, index) => (
             <StatItem
               key={index}
               end={stat.end}
-              suffix={stat.suffix}
-              decimals={stat.decimals || 0}
+              
               label={stat.label}
               isVisible={isVisible}
             />
           ))}
-        </div>
-
-        {/* Trust Logos */}
-        <div className="border-t border-outline/20 pt-12 lg:pt-16">
-          <p className="font-button-label text-[10px] lg:text-xs text-on-surface-variant uppercase tracking-[0.3em] text-center mb-8 lg:mb-10">
-            Featured In
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-8 lg:gap-16 opacity-50">
-            <span className="font-logo text-2xl lg:text-3xl text-on-surface-variant">
-              Architectural Digest
-            </span>
-            <span className="font-logo text-2xl lg:text-3xl text-on-surface-variant">
-              Dezeen
-            </span>
-            <span className="font-logo text-2xl lg:text-3xl text-on-surface-variant">
-              Wallpaper*
-            </span>
-            <span className="font-logo text-2xl lg:text-3xl text-on-surface-variant">
-              Monocle
-            </span>
-          </div>
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&family=Exo+2:wght@400&family=Tenor+Sans&family=Spectral:ital,wght@0,200;0,300;0,400;1,200;1,300;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0");
 
 @tailwind base;
 @tailwind components;
@@ -91,7 +91,6 @@ body {
 
 /* Lambda symbol styling */
 .lambda-exo2 {
-  font-family: "Exo 2", sans-serif;
   font-weight: 400;
   display: inline-block;
 }
@@ -193,4 +192,10 @@ body {
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+}
+
+/* Focus Ring - Accessibility */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }

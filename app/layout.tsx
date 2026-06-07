@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { DM_Serif_Display, Spectral, Playfair_Display, Tangerine, Tenor_Sans, Cinzel, Audiowide, Exo_2 } from "next/font/google";
+import { DM_Serif_Display, Tenor_Sans, Audiowide } from "next/font/google";
 import "./globals.css";
-import VenusChatWidget from "@/components/VenusChatWidget";
 
 const dmSerifDisplay = DM_Serif_Display({
   weight: "400",
@@ -10,27 +9,7 @@ const dmSerifDisplay = DM_Serif_Display({
   display: "swap",
 });
 
-const spectral = Spectral({
-  weight: ["200", "300", "400", "500", "600"],
-  subsets: ["latin"],
-  variable: "--font-body-main",
-  display: "swap",
-});
 
-const playfairDisplay = Playfair_Display({
-  weight: ["400", "500", "600"],
-  subsets: ["latin"],
-  variable: "--font-accent-italic",
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const tangerine = Tangerine({
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  variable: "--font-logo",
-  display: "swap",
-});
 
 const tenorSans = Tenor_Sans({
   weight: "400",
@@ -39,24 +18,10 @@ const tenorSans = Tenor_Sans({
   display: "swap",
 });
 
-const cinzel = Cinzel({
-  weight: ["400", "500", "600"],
-  subsets: ["latin"],
-  variable: "--font-section-header",
-  display: "swap",
-});
-
 const audiowide = Audiowide({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-audiowide",
-  display: "swap",
-});
-
-const exo2 = Exo_2({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-exo2",
   display: "swap",
 });
 
@@ -93,10 +58,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${dmSerifDisplay.variable} ${spectral.variable} ${playfairDisplay.variable} ${tangerine.variable} ${tenorSans.variable} ${cinzel.variable} ${audiowide.variable} ${exo2.variable} antialiased`}
+        className={`${dmSerifDisplay.variable} ${tenorSans.variable} ${audiowide.variable} antialiased`}
       >
         {children}
-        <VenusChatWidget />
       </body>
     </html>
   );

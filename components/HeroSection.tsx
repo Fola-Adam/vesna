@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 export default function HeroSection() {
   return (
@@ -37,12 +38,12 @@ export default function HeroSection() {
           <p className="font-body-main text-base sm:text-lg lg:text-xl text-on-surface-variant mb-10 lg:mb-12 max-w-lg leading-relaxed">
             A curated monograph of objects and insights for the discerning professional.
           </p>
-          <a
+          <Link
             href="/picks"
             className="inline-block bg-primary text-on-primary font-button-label text-xs lg:text-sm px-8 lg:px-12 py-4 lg:py-5 uppercase tracking-[0.2em] transition-all hover:bg-white hover:text-black border border-primary shadow-[0_20px_50px_rgba(230,195,100,0.2)] btn-shimmer gold-glow focus-ring"
           >
             Enter the Sanctuary
-          </a>
+          </Link>
         </div>
       </div>
 

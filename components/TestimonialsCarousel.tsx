@@ -12,24 +12,10 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     quote:
-      "Vesna has completely transformed my workspace. The quality and curation is unmatched. Every piece tells a story.",
-    name: "Alexander Sterling",
-    role: "Architect & Designer",
-    initials: "AS",
-  },
-  {
-    quote:
-      "The attention to detail is remarkable. From packaging to product, every touchpoint feels intentional and luxurious.",
-    name: "Maya Chen",
-    role: "Creative Director",
-    initials: "MC",
-  },
-  {
-    quote:
-      "I've never experienced such thoughtful curation. Each item feels like it was selected specifically for my aesthetic.",
-    name: "James Reynolds",
-    role: "Entrepreneur",
-    initials: "JR",
+      "Every object in my workspace now tells a story. Vesna helped me find pieces that actually matter.",
+    name: "Sample User",
+    role: "Beta Tester",
+    initials: "SU",
   },
 ];
 
@@ -138,9 +124,7 @@ export default function TestimonialsCarousel() {
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all ${
-                  index === currentIndex ? "bg-primary" : "bg-outline/30"
-                }`}
+                className={`w-3 h-3 rounded-full transition-all ${index === currentIndex ? 'bg-primary scale-125' : 'bg-outline/30'}`}
                 aria-label={`Testimonial ${index + 1}`}
               />
             ))}

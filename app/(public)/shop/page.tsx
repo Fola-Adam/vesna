@@ -465,23 +465,23 @@ export default function ShopPage() {
         }
       `}</style>
 
-      <main className="bg-[#0a0a0a] font-[family-name:var(--font-spectral)] antialiased selection:bg-[#c9a84c] selection:text-black">
+      <main className="bg-background font-[family-name:var(--font-spectral)] antialiased selection:bg-primary selection:text-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32">
           {/* Hero Header */}
           <section className="max-w-3xl mb-16">
-            <h1 className="font-[family-name:var(--font-dm-serif)] text-6xl text-[#c9a84c] mb-4">
+            <h1 className="font-[family-name:var(--font-dm-serif)] text-6xl text-primary mb-4">
               Vesna Picks
             </h1>
-            <p className="font-[family-name:var(--font-spectral)] text-xl text-[#e5e2e1] mb-6 opacity-70 font-light">
+            <p className="font-[family-name:var(--font-spectral)] text-xl text-on-background mb-6 opacity-70 font-light">
               Victory&apos;s personal recommendations.
             </p>
-            <span className="font-[family-name:var(--font-tenor-sans)] text-xs tracking-widest text-[#666666] uppercase">
+            <span className="font-[family-name:var(--font-tenor-sans)] text-xs tracking-widest text-outline uppercase">
               47 picks
             </span>
           </section>
 
           {/* Filter Bar */}
-          <div className="sticky top-[97px] z-40 bg-[#0a0a0a] py-6 mb-8 border-b border-[#242424]">
+          <div className="sticky top-[97px] z-40 bg-background py-6 mb-8 border-b border-outline-variant">
             <div className="flex items-center gap-4 overflow-x-auto hide-scrollbar">
               {CATEGORIES.map((cat) => (
                 <button
@@ -489,8 +489,8 @@ export default function ShopPage() {
                   onClick={() => handleCategoryChange(cat.id)}
                   className={`px-6 py-2 font-[family-name:var(--font-tenor-sans)] uppercase text-[10px] tracking-widest whitespace-nowrap transition-colors ${
                     activeCategory === cat.id
-                      ? "bg-[#c9a84c] text-black"
-                      : "border border-[#242424] text-[#f0ebe0] hover:border-[#c9a84c]"
+                      ? "bg-primary text-black"
+                      : "border border-outline-variant text-on-background hover:border-primary"
                   }`}
                 >
                   {cat.label}
@@ -501,7 +501,7 @@ export default function ShopPage() {
 
           {/* Results Counter */}
           <div className="mb-8">
-            <p className="font-[family-name:var(--font-tenor-sans)] text-xs text-[#666666] uppercase tracking-widest">
+            <p className="font-[family-name:var(--font-tenor-sans)] text-xs text-outline uppercase tracking-widest">
               Showing {displayedProducts.length} of {filteredProducts.length}{" "}
               picks
             </p>
@@ -512,9 +512,9 @@ export default function ShopPage() {
             {displayedProducts.map((product) => (
               <article
                 key={product.id}
-                className={`bg-[#141414] group relative flex flex-col ${
+                className={`bg-surface-container group relative flex flex-col ${
                   product.badge === "Victory's pick"
-                    ? "border-t-2 border-[#c9a84c]"
+                    ? "border-t-2 border-primary"
                     : ""
                 }`}
               >
@@ -522,8 +522,8 @@ export default function ShopPage() {
                   <div
                     className={`absolute top-4 left-4 z-10 px-3 py-1 text-[9px] font-[family-name:var(--font-tenor-sans)] uppercase tracking-widest ${
                       product.badge === "Victory's pick"
-                        ? "bg-[#c9a84c] text-black"
-                        : "bg-[#12533a] text-[#87c6a5]"
+                        ? "bg-primary text-black"
+                        : "bg-secondary-container text-on-secondary-container"
                     }`}
                   >
                     {product.badge}
@@ -534,28 +534,28 @@ export default function ShopPage() {
                 </div>
                 <div className="p-8 flex flex-col flex-grow">
                   <div className="flex justify-between items-start mb-4">
-                    <span className="text-[#c9a84c] font-[family-name:var(--font-tenor-sans)] text-[10px] uppercase tracking-widest">
+                    <span className="text-primary font-[family-name:var(--font-tenor-sans)] text-[10px] uppercase tracking-widest">
                       {product.category}
                     </span>
                     <div className="text-right">
                       {product.originalPrice && (
-                        <span className="text-[#666666] line-through text-xs mr-2 font-[family-name:var(--font-spectral)]">
+                        <span className="text-outline line-through text-xs mr-2 font-[family-name:var(--font-spectral)]">
                           {product.originalPrice}
                         </span>
                       )}
-                      <span className="text-[#c9a84c] text-sm font-medium font-[family-name:var(--font-spectral)]">
+                      <span className="text-primary text-sm font-medium font-[family-name:var(--font-spectral)]">
                         {product.price}
                       </span>
                     </div>
                   </div>
-                  <h3 className="font-[family-name:var(--font-dm-serif)] text-2xl text-[#e5e2e1] mb-4">
+                  <h3 className="font-[family-name:var(--font-dm-serif)] text-2xl text-on-background mb-4">
                     {product.name}
                   </h3>
-                  <p className="font-[family-name:var(--font-playfair)] text-[#d0c5b2] text-sm italic opacity-80 mb-8 line-clamp-2">
+                  <p className="font-[family-name:var(--font-playfair)] text-on-surface-variant text-sm italic opacity-80 mb-8 line-clamp-2">
                     &ldquo;{product.quote}&rdquo;
                   </p>
-                  <button className="mt-auto w-full py-4 border border-[#c9a84c] text-[#c9a84c] font-[family-name:var(--font-tenor-sans)] uppercase text-[10px] tracking-[0.2em] hover:bg-[#c9a84c] hover:text-black transition-all duration-300">
-                    See this →
+                  <button className="mt-auto w-full py-4 border border-primary text-primary font-[family-name:var(--font-tenor-sans)] uppercase text-[10px] tracking-[0.2em] hover:bg-primary hover:text-black transition-all duration-300">
+                    See this Ã¢â€ â€™
                   </button>
                 </div>
               </article>
@@ -567,7 +567,7 @@ export default function ShopPage() {
             <div className="flex justify-center mb-32">
               <button
                 onClick={handleLoadMore}
-                className="border border-[#242424] px-12 py-5 font-[family-name:var(--font-tenor-sans)] uppercase tracking-[0.3em] text-[10px] hover:border-[#c9a84c] hover:text-[#c9a84c] transition-all text-[#f0ebe0]"
+                className="border border-outline-variant px-12 py-5 font-[family-name:var(--font-tenor-sans)] uppercase tracking-[0.3em] text-[10px] hover:border-primary hover:text-primary transition-all text-on-background"
               >
                 Show more products
               </button>

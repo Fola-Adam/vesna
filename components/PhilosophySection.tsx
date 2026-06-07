@@ -47,7 +47,7 @@ export default function PhilosophySection() {
           <span className="text-4xl lg:text-6xl text-primary opacity-20 self-start">
             &ldquo;
           </span>
-          <blockquote className="font-accent-italic text-xl sm:text-2xl lg:text-3xl xl:text-4xl text-on-surface italic leading-snug -mt-6 lg:-mt-8 px-4 lg:px-8">
+          <blockquote className="font-display-hero text-xl italic sm:text-2xl lg:text-3xl xl:text-4xl text-on-surface italic leading-snug -mt-6 lg:-mt-8 px-4 lg:px-8">
             True luxury is the space between a thought and an action.
           </blockquote>
           <cite className="mt-6 lg:mt-8 font-button-label text-xs lg:text-sm text-secondary uppercase tracking-widest">

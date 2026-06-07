@@ -38,7 +38,7 @@ export default function Navbar() {
             href="/"
             className="font-['Audiowide'] text-xl lg:text-2xl text-on-background tracking-[0.3em] hover:text-primary transition-colors logo-pulse"
           >
-            VESN<span className="font-['Exo_2'] font-normal inline-block">Λ</span>
+            VESN<span className="inline-block">Λ</span>
           </Link>
 
           {/* Desktop Navigation */}

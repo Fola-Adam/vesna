@@ -18,7 +18,7 @@ export default function Footer() {
           href="/"
           className="font-['Audiowide'] text-2xl lg:text-3xl text-on-background tracking-[0.3em]"
         >
-          VESN<span className="font-['Exo_2'] font-normal inline-block">Λ</span>
+          VESN<span className="inline-block">Λ</span>
         </Link>
 
         <div className="flex flex-wrap justify-center gap-6 lg:gap-8">
