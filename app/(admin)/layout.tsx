@@ -9,7 +9,8 @@ export default async function AdminLayout({
 }) {
   const supabase = createClient()
   
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data } = await supabase.auth.getUser()
+  const user = data?.user
   
   if (!user) {
     redirect('/login')
@@ -18,7 +19,7 @@ export default async function AdminLayout({
   // Check if user is admin
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, full_name')
     .eq('id', user.id)
     .single()
   
@@ -119,7 +120,7 @@ function AdminSidebar() {
   )
 }
 
-function AdminHeader({ user, profile }: { user: React.ReactNode, profile: React.ReactNode }) {
+function AdminHeader({ user, profile }: { user: import('@supabase/supabase-js').User, profile: { role?: string; full_name?: string } | null }) {
   return (
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b border-outline-variant">
       <div className="flex items-center justify-between h-16 px-6">

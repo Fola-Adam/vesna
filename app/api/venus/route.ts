@@ -1,27 +1,22 @@
 import { NextResponse } from 'next/server'
-import Groq from 'groq-sdk'
-
-interface ChatMessage {
-  role: string;
-  content: string;
-}
-
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-})
 
 export async function POST(request: Request) {
-  try {
-    const { message, history = [] } = await request.json()
+  const { message, history = [] } = await request.json()
 
-    if (!message) {
-      return NextResponse.json(
-        { error: 'Message is required' },
-        { status: 400 }
-      )
-    }
+  if (!message) {
+    return NextResponse.json(
+      { error: 'Message is required' },
+      { status: 400 }
+    )
+  }
 
-    const systemPrompt = `You are Venus, the AI assistant for Vesna - a curated lifestyle platform by Ebenezer Victory. 
+  // Lazy-load Groq so build doesn't fail without env vars
+  const { Groq } = await import('groq-sdk')
+  const groq = new Groq({
+    apiKey: process.env.GROQ_API_KEY || '',
+  })
+
+  const systemPrompt = `You are Venus, the AI assistant for Vesna - a curated lifestyle platform by Ebenezer Victory. 
 
 Your personality:
 - Warm, knowledgeable, and slightly poetic
@@ -32,7 +27,7 @@ About Vesna:
 - Vesna curates exceptional products across tech, audio, lifestyle, workspace, and travel
 - Each item is personally vetted by Ebenezer Victory
 - The platform emphasizes objects with purpose and stories worth telling
-- Current sections: Curated (Victory's picks), Shop (full catalog), Archive (rare finds)
+- Current sections: Curated (Victory picks), Shop (full catalog), Archive (rare finds)
 
 Guidelines:
 - Keep responses concise (2-3 sentences for simple questions)
@@ -43,19 +38,27 @@ Guidelines:
 
 Current date: ${new Date().toISOString().split('T')[0]}`
 
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...history.map((h: ChatMessage) => ({
-        role: h.role,
-        content: h.content,
-      })),
-      { role: 'user', content: message },
-    ]
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    ...(history ?? []).map((h: { role: string; content: string }) => ({
+      role: h.role as string,
+      content: h.content,
+    })),
+    { role: 'user', content: message },
+  ]
 
+  if (!process.env.GROQ_API_KEY) {
+    return NextResponse.json(
+      { error: 'AI service is not configured' },
+      { status: 503 }
+    )
+  }
+
+  try {
     const completion = await groq.chat.completions.create({
       model: 'meta-llama/llama-4-scout-17b-16e-instruct',
       max_tokens: 500,
-      messages: messages as ChatMessage[],
+      messages,
     })
 
     const content = completion.choices[0]?.message?.content
