@@ -166,17 +166,6 @@ export default function NewsletterSection() {
         .gold-glow:hover {
           box-shadow: 0 0 30px rgba(230, 195, 100, 0.3);
         }
-        .reveal {
-          opacity: 0;
-          transform: translateY(30px);
-          will-change: opacity, transform;
-          transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
-                      transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-        .reveal.active {
-          opacity: 1;
-          transform: translateY(0);
-        }
       `}</style>
     </section>
   );

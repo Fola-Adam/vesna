@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface LoadingScreenProps {
   onComplete: () => void;
@@ -15,6 +15,22 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const mainText = "VESNA";
   const tagline = "◊ The Art of Intentional Living ◊";
 
+  const handleSkip = useCallback(() => {
+    setIsVisible(false);
+    setTimeout(onComplete, 500);
+  }, [onComplete]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === " ") {
+        e.preventDefault();
+        handleSkip();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSkip]);
+
   useEffect(() => {
     const timeouts: NodeJS.Timeout[] = [];
 
@@ -23,14 +39,14 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
       mainText.split("").forEach((char, index) => {
         const timeout = setTimeout(() => {
           setDisplayText((prev) => prev + char);
-        }, index * 280);
+        }, index * 150);
         timeouts.push(timeout);
       });
 
       // After main text, blink cursor then show tagline
       const taglineTimeout = setTimeout(() => {
         setShowTagline(true);
-      }, mainText.length * 280 + 500);
+      }, mainText.length * 150 + 300);
       timeouts.push(taglineTimeout);
     };
 
@@ -50,7 +66,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
     tagline.split("").forEach((char, index) => {
       const timeout = setTimeout(() => {
         setTaglineText((prev) => prev + char);
-      }, index * 80);
+      }, index * 50);
       timeouts.push(timeout);
     });
 
@@ -58,7 +74,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
     const completeTimeout = setTimeout(() => {
       setIsVisible(false);
       setTimeout(onComplete, 500);
-    }, tagline.length * 80 + 600);
+    }, tagline.length * 50 + 400);
     timeouts.push(completeTimeout);
 
     return () => {
@@ -111,6 +127,14 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
           </p>
         </div>
       </div>
+
+      {/* Skip Button */}
+      <button
+        onClick={handleSkip}
+        className="absolute bottom-8 right-8 font-button-label text-xs uppercase tracking-[0.15em] text-on-surface-variant/60 hover:text-on-surface-variant transition-colors focus-ring"
+      >
+        Skip
+      </button>
 
       <style jsx global>{`
         @keyframes border-top {

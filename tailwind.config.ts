@@ -77,8 +77,6 @@ const config: Config = {
         "body-main": ["DM Sans", "sans-serif"],
         "button-label": ["Tenor Sans", "sans-serif"],
         "section-header": ["Tenor Sans", "sans-serif"],
-        "cormorant": ["Cormorant Garamond", "serif"],
-        "exo-2": ["Exo 2", "sans-serif"],
       },
     },
   },

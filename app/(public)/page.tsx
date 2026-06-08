@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import LoadingScreen from "@/components/LoadingScreen";
-import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import PhilosophySection from "@/components/PhilosophySection";
 import StatsSection from "@/components/StatsSection";
@@ -11,7 +10,6 @@ import ProductSlider from "@/components/ProductSlider";
 import CategoryGrid from "@/components/CategoryGrid";
 import CuratorSection from "@/components/CuratorSection";
 import NewsletterSection from "@/components/NewsletterSection";
-import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
 import ScrollProgress from "@/components/ScrollProgress";
 
@@ -24,7 +22,6 @@ export default function HomePage() {
         <LoadingScreen onComplete={() => setIsLoading(false)} />
       )}
       <ScrollProgress />
-      <Navbar />
       <main className={`${isLoading ? "opacity-0" : "opacity-100"} transition-opacity duration-500`}>
         <HeroSection />
         <PhilosophySection />
@@ -35,7 +32,6 @@ export default function HomePage() {
         <CuratorSection />
         <NewsletterSection />
       </main>
-      <Footer />
       <BackToTop />
     </>
   );

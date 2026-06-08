@@ -160,17 +160,6 @@ export default function TestimonialsCarousel() {
         .bg-green-wash {
           background: linear-gradient(135deg, rgba(149, 212, 179, 0.03), transparent);
         }
-        .reveal {
-          opacity: 0;
-          transform: translateY(30px);
-          will-change: opacity, transform;
-          transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
-                      transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-        .reveal.active {
-          opacity: 1;
-          transform: translateY(0);
-        }
       `}</style>
     </section>
   );

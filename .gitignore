@@ -8,3 +8,4 @@ next-env.d.ts
 .netlify
 .DS_Store
 Thumbs.db
+public/sw.js
