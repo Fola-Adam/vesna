@@ -1,30 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRevealOnScroll } from "@/hooks/use-reveal-on-scroll";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function CuratorSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("active");
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const sectionRef = useRevealOnScroll();
 
   return (
     <section
@@ -60,13 +41,14 @@ export default function CuratorSection() {
           </Link>
         </div>
         <div className="order-1 md:order-2">
-          <div className="relative group">
+          <div className="relative group aspect-[3/4]">
             <div className="absolute -inset-3 lg:-inset-4 border border-primary/20 transition-all group-hover:inset-0" />
             <Image
-              alt="Ebenezer Victory"
+              alt="Ebenezer Victory — Vesna curator"
               className="object-cover grayscale brightness-90"
-              src="/vesna-imgs/victory.png"
+              src="/vesna-imgs/victory.webp"
               fill
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
         </div>

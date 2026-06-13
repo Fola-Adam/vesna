@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRevealOnScroll } from "@/hooks/use-reveal-on-scroll";
 import Image from "next/image";
 
 interface Product {
@@ -19,7 +20,7 @@ const products: Product[] = [
     name: "The Tactile Engine",
     quote: '"The rhythmic click is my metronome for focus."',
     detail: "Heavy brass weight, zero drift",
-    image: "/vesna-imgs/coloured-keyboard.png",
+    image: "/vesna-imgs/coloured-keyboard.webp",
     badge: "featured",
   },
   {
@@ -27,7 +28,7 @@ const products: Product[] = [
     name: "Heritage Ledger",
     quote: '"Ink on grain is a commitment."',
     detail: "Hand-dyed Tuscan leather",
-    image: "/vesna-imgs/vintage-brown-leather.png",
+    image: "/vesna-imgs/vintage-brown-leather.webp",
     badge: "new",
   },
   {
@@ -35,21 +36,21 @@ const products: Product[] = [
     name: "Empty Form 01",
     quote: '"A vessel for light and shadow."',
     detail: "Hand-thrown in Kyoto",
-    image: "/vesna-imgs/native-cinematic-vase.png",
+    image: "/vesna-imgs/native-cinematic-vase.webp",
   },
   {
     id: 4,
     name: "Architect Lamp",
     quote: "",
     detail: "Solid brass, adjustable arm",
-    image: "/vesna-imgs/golden-desklamp.png",
+    image: "/vesna-imgs/golden-desklamp.webp",
   },
   {
     id: 5,
     name: "Porcelain Mug",
     quote: "",
     detail: "Handcrafted, speckled glaze",
-    image: "/vesna-imgs/coffee-maker-1.png",
+    image: "/vesna-imgs/coffee-maker-1.webp",
     badge: "featured",
   },
   {
@@ -57,14 +58,14 @@ const products: Product[] = [
     name: "Oak Serving Tray",
     quote: "",
     detail: "Natural finish, brass handles",
-    image: "/vesna-imgs/minimal-workdesk.png",
+    image: "/vesna-imgs/minimal-workdesk.webp",
   },
   {
     id: 7,
     name: "The Script Master",
     quote: "",
     detail: "18k gold nib, ebonite feed",
-    image: "/vesna-imgs/premium-fountain-pen.png",
+    image: "/vesna-imgs/premium-fountain-pen.webp",
     badge: "new",
   },
   {
@@ -72,39 +73,24 @@ const products: Product[] = [
     name: "Chronograph No. 7",
     quote: "",
     detail: "Swiss movement, sapphire crystal",
-    image: "/vesna-imgs/luxury-watch-on-book.png",
+    image: "/vesna-imgs/luxury-watch-on-book.webp",
   },
 ];
 
 export default function ProductSlider() {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(33.33);
-  const sectionRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("active");
-            const items = entry.target.querySelectorAll(".stagger-reveal");
-            items.forEach((item, index) => {
-              setTimeout(() => {
-                item.classList.add("active");
-              }, index * 100);
-            });
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
+  const handleReveal = useCallback(() => {
+    const items = sectionRef.current?.querySelectorAll(".stagger-reveal");
+    items?.forEach((item, index) => {
+      setTimeout(() => { item.classList.add("active"); }, index * 100);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const sectionRef = useRevealOnScroll({ onReveal: handleReveal });
 
   const handleScroll = () => {
     if (!sliderRef.current) return;

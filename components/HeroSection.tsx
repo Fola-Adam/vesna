@@ -11,18 +11,20 @@ export default function HeroSection() {
         <div className="hero-mask w-full h-full relative overflow-hidden">
           <Image
             priority
-            alt="Hero 1"
+            alt="Luxurious editorial workspace with dark moody lighting"
             className="object-cover brightness-75 will-change-transform"
-            src="/vesna-imgs/20_high_end_editorial_photography.png"
+            src="/vesna-imgs/20_high_end_editorial_photography.webp"
             fill
+            sizes="100vw"
             style={{ animation: "fade-hero 10s infinite" }}
           />
           <Image
             priority
-            alt="Hero 2"
+            alt="Curated workspace with warm ambient lighting"
             className="object-cover brightness-75 will-change-transform"
-            src="/vesna-imgs/editorial-luxurious-workspace.png"
+            src="/vesna-imgs/editorial-luxurious-workspace.webp"
             fill
+            sizes="100vw"
             style={{ animation: "fade-hero-reverse 10s infinite" }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/70 via-neutral-950/40 to-transparent" />
@@ -53,24 +55,30 @@ export default function HeroSection() {
           <div className="absolute -inset-2 border border-primary/30" />
           <div className="relative z-10 w-full h-full shadow-2xl brightness-90 overflow-hidden">
             <Image
-              alt="Detail 1"
+              priority
+              alt="Editorial detail with warm tones"
               className="object-cover"
-              src="/vesna-imgs/secondary-overlay-image.png"
+              src="/vesna-imgs/secondary-overlay-image.webp"
               fill
+              sizes="(max-width: 768px) 100vw, 30vw"
               style={{ animation: "cycle-overlay 12s infinite" }}
             />
             <Image
-              alt="Detail 2"
+              priority
+              alt="Vintage dark gold workspace detail"
               className="object-cover"
-              src="/vesna-imgs/vintage-workdesk-darkgold.png"
+              src="/vesna-imgs/vintage-workdesk-darkgold.webp"
               fill
+              sizes="(max-width: 768px) 100vw, 30vw"
               style={{ animation: "cycle-overlay-2 12s infinite" }}
             />
             <Image
-              alt="Detail 3"
+              priority
+              alt="Minimal workspace arrangement"
               className="object-cover"
-              src="/vesna-imgs/minimal-workdesk.png"
+              src="/vesna-imgs/minimal-workdesk.webp"
               fill
+              sizes="(max-width: 768px) 100vw, 30vw"
               style={{ animation: "cycle-overlay-3 12s infinite" }}
             />
           </div>

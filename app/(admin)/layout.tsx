@@ -1,39 +1,15 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
-export const dynamic = 'force-dynamic';
-
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createClient()
-  
-  const { data } = await supabase.auth.getUser()
-  const user = data?.user
-  
-  if (!user) {
-    redirect('/login')
-  }
-  
-  // Check if user is admin
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, full_name')
-    .eq('id', user.id)
-    .single()
-  
-  if (profile?.role !== 'admin') {
-    redirect('/')
-  }
-  
   return (
     <div className="min-h-screen bg-background">
       <AdminSidebar />
       <main className="lg:ml-64 min-h-screen">
-        <AdminHeader user={user} profile={profile} />
+        <AdminHeader />
         <div className="p-6">
           {children}
         </div>
@@ -92,9 +68,9 @@ function AdminSidebar() {
     <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-64 lg:bg-surface lg:border-r lg:border-outline-variant">
       <div className="flex flex-col h-full">
         <div className="p-6 border-b border-outline-variant">
-          <a href="/" className="font-audiowide text-2xl text-on-background tracking-[0.3em]">
+          <Link href="/" className="font-audiowide text-2xl text-on-background tracking-[0.3em]">
             VESN<span className="lambda-exo2">Λ</span>
-          </a>
+          </Link>
           <p className="text-xs text-on-surface-variant mt-1">Admin Dashboard</p>
         </div>
         
@@ -122,24 +98,11 @@ function AdminSidebar() {
   )
 }
 
-function AdminHeader({ user, profile }: { user: import('@supabase/supabase-js').User, profile: { role?: string; full_name?: string } | null }) {
+function AdminHeader() {
   return (
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b border-outline-variant">
       <div className="flex items-center justify-between h-16 px-6">
         <h1 className="text-lg font-semibold text-on-background">Admin</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-on-surface-variant">
-            {profile?.full_name || user.email}
-          </span>
-          <form action="/auth/signout" method="post">
-            <button
-              type="submit"
-              className="text-sm text-on-surface-variant hover:text-on-surface"
-            >
-              Sign out
-            </button>
-          </form>
-        </div>
       </div>
     </header>
   )

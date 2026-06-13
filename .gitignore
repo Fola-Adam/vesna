@@ -9,3 +9,9 @@ next-env.d.ts
 .DS_Store
 Thumbs.db
 public/sw.js
+
+# Test artifacts
+.playwright-mcp/
+# Screenshots
+vesna-*.png
+vesna-*.jpg

@@ -9,15 +9,15 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
+      setIsScrolled(window.scrollY > 50);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/picks", label: "Picks" },
+    { href: "/curated", label: "Picks" },
     { href: "/journal", label: "Journal" },
     { href: "/about", label: "About" },
     { href: "/archive", label: "Archive" },
@@ -27,7 +27,7 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled
-          ? "bg-[#0a0a0a]/95 backdrop-blur-md border-b border-[#242424]"
+          ? "bg-[#0a0a0a] backdrop-blur-md border-b border-[#242424]"
           : "bg-transparent"
       }`}
     >
@@ -36,7 +36,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="font-['Audiowide'] text-xl lg:text-2xl text-on-background tracking-[0.3em] hover:text-primary transition-colors logo-pulse"
+            className="font-audiowide text-xl lg:text-2xl text-on-background tracking-[0.3em] hover:text-primary transition-colors logo-pulse"
           >
             VESN<span className="inline-block">Λ</span>
           </Link>
@@ -47,7 +47,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="nav-link font-button-label text-xs uppercase tracking-[0.15em] text-on-surface-variant hover:text-on-background transition-colors"
+                className="font-button-label text-xs uppercase tracking-[0.15em] text-on-surface-variant hover:text-on-background transition-colors"
               >
                 {link.label}
               </Link>
@@ -67,19 +67,18 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — full-screen fixed panel */}
       <div
-        className={`lg:hidden absolute top-full left-0 right-0 bg-[#0a0a0a]/98 backdrop-blur-md border-b border-[#242424] transition-all duration-300 ${
-          isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        className={`lg:hidden fixed top-16 lg:top-20 bottom-0 left-0 right-0 z-50 bg-[#0a0a0a] transition-all duration-300 overflow-y-auto ${
+          isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         }`}
       >
-        <div className="px-6 py-4 space-y-4">
+        <div className="px-6 py-6 space-y-2">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="block font-button-label text-sm uppercase tracking-[0.15em] text-on-surface-variant hover:text-on-background transition-colors py-2"
+              className="block font-button-label text-sm uppercase tracking-[0.15em] text-on-surface-variant hover:text-on-background transition-colors py-4 border-b border-[#242424]/50 last:border-0"
             >
               {link.label}
             </Link>

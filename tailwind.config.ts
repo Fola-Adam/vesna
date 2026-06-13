@@ -19,6 +19,7 @@ const config: Config = {
         "surface-container": "var(--surface-container)",
         "surface-container-high": "var(--surface-container-high)",
         "surface-container-low": "var(--surface-container-low)",
+        "surface-container-lowest": "var(--surface-container-lowest)",
         
         // Primary - Gold
         primary: "var(--primary)",
@@ -69,17 +70,19 @@ const config: Config = {
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
-        radius: "var(--radius)",
       },
       fontFamily: {
-        audiowide: ["Audiowide", "cursive"],
-        "display-hero": ["DM Serif Display", "serif"],
-        "body-main": ["DM Sans", "sans-serif"],
-        "button-label": ["Tenor Sans", "sans-serif"],
-        "section-header": ["Tenor Sans", "sans-serif"],
+        audiowide: ["var(--font-audiowide)", "cursive"],
+        "display-hero": ["var(--font-audiowide)", "cursive"],
+        "body-main": ["var(--font-tenor-sans)", "sans-serif"],
+        "button-label": ["var(--font-button-label)", "sans-serif"],
+        "section-header": ["var(--font-button-label)", "sans-serif"],
+        spectral: ["var(--font-spectral)", "serif"],
+        cinzel: ["var(--font-cinzel)", "serif"],
+        playfair: ["var(--font-playfair)", "serif"],
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 };
 export default config;

@@ -1,28 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRevealOnScroll } from "@/hooks/use-reveal-on-scroll";
 
 export default function PhilosophySection() {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("active");
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const sectionRef = useRevealOnScroll({ rootMargin: "0px 0px -50px 0px" });
 
   return (
     <section

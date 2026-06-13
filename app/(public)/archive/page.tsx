@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ScrollProgress from "@/components/ScrollProgress";
@@ -11,7 +11,7 @@ const COLLECTION = [
     category: "workspace",
     price: "$450",
     available: true,
-    image: "/vesna-imgs/coloured-keyboard.png",
+    image: "/vesna-imgs/coloured-keyboard.webp",
     curatorNote: "An uncompromising tactile experience wrapped in solid brass. The ultimate centerpiece for the modern workspace. I used this for three years before upgrading to my current custom build.",
   },
   {
@@ -21,7 +21,7 @@ const COLLECTION = [
     price: "$890",
     originalPrice: "$1,100",
     available: true,
-    image: "/vesna-imgs/tai-headphones.png",
+    image: "/vesna-imgs/tai-headphones.webp",
     curatorNote: "Unparalleled sound stage clarity paired with hand-stitched leather. These were my daily drivers during the development of Vesna.",
   },
   {
@@ -30,7 +30,7 @@ const COLLECTION = [
     category: "travel",
     price: "$620",
     available: true,
-    image: "/vesna-imgs/brown-duffel.png",
+    image: "/vesna-imgs/brown-duffel.webp",
     curatorNote: "Built to last generations. The patina this bag develops over time is the true mark of luxury. I've taken this on every significant journey.",
   },
   {
@@ -39,7 +39,7 @@ const COLLECTION = [
     category: "lifestyle",
     price: null,
     available: false,
-    image: "/vesna-imgs/luxury-watch-on-book.png",
+    image: "/vesna-imgs/luxury-watch-on-book.webp",
     curatorNote: "A piece of horological history. This pre-moon Speedmaster has been with me since my first successful exit. Not for sale - ever.",
   },
   {
@@ -57,7 +57,7 @@ const COLLECTION = [
     category: "workspace",
     price: null,
     available: false,
-    image: "/vesna-imgs/golden-desklamp.png",
+    image: "/vesna-imgs/golden-desklamp.webp",
     curatorNote: "Found in a Paris flea market in 2019. Fully restored and rewired. The warm glow it produces is unmatched by modern LEDs.",
   },
   {
@@ -75,7 +75,7 @@ const COLLECTION = [
     category: "travel",
     price: "$380",
     available: true,
-    image: "/vesna-imgs/luxury-brown-duffel.png",
+    image: "/vesna-imgs/luxury-brown-duffel.webp",
     curatorNote: "1950s airline pilot bag in incredible condition. The perfect size for daily essentials. A piece of aviation history.",
   },
   {
@@ -84,7 +84,7 @@ const COLLECTION = [
     category: "workspace",
     price: null,
     available: false,
-    image: "/vesna-imgs/vintage-workdesk-darkgold.png",
+    image: "/vesna-imgs/vintage-workdesk-darkgold.webp",
     curatorNote: "My grandfather's 1932 Remington. I learned to type on this machine. The rhythm of the keys is meditative. NFS - family heirloom.",
   },
   {
@@ -102,7 +102,7 @@ const COLLECTION = [
     category: "workspace",
     price: "$1,850",
     available: true,
-    image: "/vesna-imgs/minimal-workdesk.png",
+    image: "/vesna-imgs/minimal-workdesk.webp",
     curatorNote: "Solid walnut with brass hardware. I designed this with a craftsman in Portland. Electric height adjustment with memory positions.",
   },
   {
@@ -111,7 +111,7 @@ const COLLECTION = [
     category: "travel",
     price: "$245",
     available: true,
-    image: "/vesna-imgs/coffee-maker-1.png",
+    image: "/vesna-imgs/coffee-maker-1.webp",
     curatorNote: "Everything you need for perfect pour-over anywhere. The case is handmade leather. My constant travel companion.",
   },
 ];
@@ -121,7 +121,7 @@ const PAST_SPOTLIGHTS = [
     id: 1,
     title: "The Writer's Pen",
     date: "December 2024",
-    image: "/vesna-imgs/premium-fountain-pen.png",
+    image: "/vesna-imgs/premium-fountain-pen.webp",
     badge: "Limited Edition",
     badgeStyle: "filled",
     excerpt: "One of twelve ever made. 18k gold nib with hand-engraved barrel.",
@@ -131,7 +131,7 @@ const PAST_SPOTLIGHTS = [
     id: 2,
     title: "Titanium Audio Masterpiece",
     date: "November 2024",
-    image: "/vesna-imgs/tai-headphones.png",
+    image: "/vesna-imgs/tai-headphones.webp",
     badge: "Artisan Made",
     badgeStyle: "outline",
     excerpt: "Hand-assembled in Tokyo. Only 24 units produced annually.",
@@ -141,7 +141,7 @@ const PAST_SPOTLIGHTS = [
     id: 3,
     title: "The Meditation Vessel",
     date: "October 2024",
-    image: "/vesna-imgs/minimalist-incense-flask.png",
+    image: "/vesna-imgs/minimalist-incense-flask.webp",
     badge: "One of One",
     badgeStyle: "filled-primary",
     excerpt: "A singular piece from a master potter's 50-year retrospective.",
@@ -230,7 +230,7 @@ export default function ArchivePage() {
                 <div className="relative aspect-[4/5] order-2 lg:order-1">
                   <div className="absolute -inset-4 border border-primary/20" />
                   <div className="absolute -inset-8 border border-primary/10" />
-                  <Image src="/vesna-imgs/native-cinematic-vase.png" alt="Artisan Ceramic Teakettle" fill className="object-cover" />
+                  <Image src="/vesna-imgs/native-cinematic-vase.webp" alt="Artisan Ceramic Teakettle" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
                   <div className="absolute top-4 right-4">
                     <span className="rarity-badge font-[family-name:var(--font-tenor-sans)] text-[10px] uppercase tracking-[0.2em] bg-primary text-primary-foreground px-4 py-2">
                       One of One
@@ -247,7 +247,7 @@ export default function ArchivePage() {
                     </p>
                   </div>
 
-                  <h1 className="font-[family-name:var(--font-dm-serif)] text-4xl sm:text-5xl lg:text-6xl text-on-background mb-6">
+                  <h1 className="font-audiowide text-4xl sm:text-5xl lg:text-6xl text-on-background mb-6">
                     Artisan Ceramic<br />Teakettle
                   </h1>
 
@@ -345,7 +345,7 @@ export default function ArchivePage() {
               <p className="font-[family-name:var(--font-tenor-sans)] text-[10px] tracking-[0.3em] text-primary mb-4 uppercase">
                 The Personal Collection
               </p>
-              <h1 className="font-[family-name:var(--font-dm-serif)] text-4xl md:text-5xl text-on-background mb-4 italic">
+              <h1 className="font-audiowide text-4xl md:text-5xl text-on-background mb-4 italic">
                 Objects with History
               </h1>
               <p className="font-[family-name:var(--font-spectral)] text-lg text-on-surface-variant max-w-2xl">
@@ -383,7 +383,7 @@ export default function ArchivePage() {
                   } ${!item.available ? "opacity-75" : ""}`}
                 >
                   <div className="relative aspect-[4/5] overflow-hidden bg-surface-container">
-                    <Image alt={item.name} src={item.image} fill className={`object-cover group-hover:scale-105 transition-transform duration-700 ${!item.available ? "grayscale-[40%]" : "grayscale-[20%]"}`} />
+                    <Image alt={item.name} src={item.image} fill className={`object-cover group-hover:scale-105 transition-transform duration-700 ${!item.available ? "grayscale-[40%]" : "grayscale-[20%]"}`} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     {!item.available && (
                       <div className="absolute top-4 left-4 z-10">
                         <span className="font-[family-name:var(--font-tenor-sans)] text-[10px] tracking-[0.2em] bg-surface-container-high text-on-surface px-3 py-1.5 border border-outline">
@@ -464,7 +464,7 @@ export default function ArchivePage() {
               {PAST_SPOTLIGHTS.map((item) => (
                 <article key={item.id} className="group cursor-pointer border-green-subtle">
                   <div className="relative aspect-[4/3] overflow-hidden mb-4">
-                    <Image src={item.image} alt={item.title} fill className="object-cover grayscale-[30%] group-hover:scale-105 transition-transform duration-700" />
+                    <Image src={item.image} alt={item.title} fill className="object-cover grayscale-[30%] group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     <div className="absolute top-3 left-3">
                       {item.badgeStyle === "filled" && (
                         <span className="font-[family-name:var(--font-tenor-sans)] text-[9px] uppercase tracking-[0.2em] bg-primary/90 text-primary-foreground px-2 py-1">
@@ -486,7 +486,7 @@ export default function ArchivePage() {
                   <p className="font-[family-name:var(--font-tenor-sans)] text-[10px] text-secondary uppercase tracking-wider mb-1">
                     {item.date}
                   </p>
-                  <h3 className="font-[family-name:var(--font-dm-serif)] text-lg text-on-background mb-2">
+                  <h3 className="font-audiowide text-lg text-on-background mb-2">
                     {item.title}
                   </h3>
                   <p className="font-[family-name:var(--font-spectral)] text-sm text-on-surface-variant line-clamp-2">
@@ -505,7 +505,7 @@ export default function ArchivePage() {
         <section className="py-20 lg:py-32 px-5 sm:px-8 lg:px-20">
           <div className="max-w-3xl mx-auto text-center">
             <span className="material-symbols-outlined text-4xl text-primary mb-6">workspace_premium</span>
-            <h2 className="font-[family-name:var(--font-dm-serif)] text-2xl sm:text-3xl lg:text-4xl text-on-background mb-4">
+            <h2 className="font-audiowide text-2xl sm:text-3xl lg:text-4xl text-on-background mb-4">
               Archive Access
             </h2>
             <p className="font-[family-name:var(--font-spectral)] text-base text-on-surface-variant mb-8">

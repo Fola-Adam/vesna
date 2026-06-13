@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 
 export default function Footer() {
@@ -16,7 +14,7 @@ export default function Footer() {
       <div className="flex flex-col items-center gap-6 lg:gap-8 max-w-[1440px] mx-auto">
         <Link
           href="/"
-          className="font-['Audiowide'] text-2xl lg:text-3xl text-on-background tracking-[0.3em]"
+          className="font-audiowide text-2xl lg:text-3xl text-on-background tracking-[0.3em]"
         >
           VESN<span className="inline-block">Λ</span>
         </Link>

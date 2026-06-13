@@ -71,7 +71,7 @@ const PICKS = [
     name: "Leather Weekender Bag",
     category: "fashion",
     price: "$450",
-    image: "/vesna-imgs/brown-duffel.png",
+    image: "/vesna-imgs/brown-duffel.webp",
     quote: "The perfect travel companion, ages beautifully.",
   },
   {
@@ -79,7 +79,7 @@ const PICKS = [
     name: "Mechanical Keyboard Pro",
     category: "tech",
     price: "$320",
-    image: "/vesna-imgs/coloured-keyboard.png",
+    image: "/vesna-imgs/coloured-keyboard.webp",
     badge: "Featured",
     quote: "Heavy brass weight, zero drift. The typist's dream.",
   },
@@ -88,7 +88,7 @@ const PICKS = [
     name: "Heritage Leather Journal",
     category: "tools",
     price: "$149",
-    image: "/vesna-imgs/vintage-brown-leather.png",
+    image: "/vesna-imgs/vintage-brown-leather.webp",
     quote: "Hand-dyed Tuscan leather with hand-stitched binding.",
   },
   {
@@ -96,7 +96,7 @@ const PICKS = [
     name: "Artisan Ceramic Vessel",
     category: "home",
     price: "$189",
-    image: "/vesna-imgs/native-cinematic-vase.png",
+    image: "/vesna-imgs/native-cinematic-vase.webp",
     quote: "Hand-thrown in Kyoto. Each piece is unique.",
   },
   {
@@ -104,7 +104,7 @@ const PICKS = [
     name: "Brass Architect Lamp",
     category: "home",
     price: "$349",
-    image: "/vesna-imgs/golden-desklamp.png",
+    image: "/vesna-imgs/golden-desklamp.webp",
     quote: "Solid brass, adjustable arm. Mid-century inspired.",
   },
   {
@@ -112,7 +112,7 @@ const PICKS = [
     name: "Porcelain Ritual Mug",
     category: "home",
     price: "$79",
-    image: "/vesna-imgs/coffee-maker-1.png",
+    image: "/vesna-imgs/coffee-maker-1.webp",
     badge: "Featured",
     quote: "Handcrafted with speckled glaze. Morning ritual essential.",
   },
@@ -121,7 +121,7 @@ const PICKS = [
     name: "Premium Fountain Pen",
     category: "tools",
     price: "$425",
-    image: "/vesna-imgs/premium-fountain-pen.png",
+    image: "/vesna-imgs/premium-fountain-pen.webp",
     quote: "18k gold nib, ebonite feed. Writes like a dream.",
   },
   {
@@ -129,7 +129,7 @@ const PICKS = [
     name: "Swiss Chronograph",
     category: "fashion",
     price: "$2,400",
-    image: "/vesna-imgs/luxury-watch-on-book.png",
+    image: "/vesna-imgs/luxury-watch-on-book.webp",
     badge: "Limited",
     quote: "Swiss movement, sapphire crystal. Timeless.",
   },
@@ -138,7 +138,7 @@ const PICKS = [
     name: "Minimalist Workspace",
     category: "courses",
     price: "$149",
-    image: "/vesna-imgs/minimal-workdesk.png",
+    image: "/vesna-imgs/minimal-workdesk.webp",
     quote: "Design your space for focus and flow.",
   },
   {
@@ -192,7 +192,7 @@ const PICKS = [
     name: "Designer Sunglasses",
     category: "fashion",
     price: "$340",
-    image: "/vesna-imgs/luxury-watch-on-book.png",
+    image: "/vesna-imgs/luxury-watch-on-book.webp",
     quote: "Japanese titanium frames. Weightless perfection.",
   },
   {
@@ -200,7 +200,7 @@ const PICKS = [
     name: "Smart Home Hub",
     category: "tech",
     price: "$199",
-    image: "/vesna-imgs/editorial-luxurious-workspace.png",
+    image: "/vesna-imgs/editorial-luxurious-workspace.webp",
     quote: "Control your environment with intention.",
   },
   {
@@ -208,7 +208,7 @@ const PICKS = [
     name: "Minimalist Wallet",
     category: "fashion",
     price: "$95",
-    image: "/vesna-imgs/brown-duffel.png",
+    image: "/vesna-imgs/brown-duffel.webp",
     quote: "Slim profile, full grain leather. Carry less.",
   },
   {
@@ -216,7 +216,7 @@ const PICKS = [
     name: "Artisan Coffee Beans",
     category: "food",
     price: "$48",
-    image: "/vesna-imgs/coffee-maker-2.png",
+    image: "/vesna-imgs/coffee-maker-2.webp",
     quote: "Ethiopian single origin. Roasted to order.",
   },
   {
@@ -224,7 +224,7 @@ const PICKS = [
     name: "Writing Masterclass",
     category: "courses",
     price: "$129",
-    image: "/vesna-imgs/vesna-fountain-pen-on-parchment.png",
+    image: "/vesna-imgs/vesna-fountain-pen-on-parchment.webp",
     quote: "Find your voice. Tell your story.",
   },
   {
@@ -232,7 +232,7 @@ const PICKS = [
     name: "Noise Cancelling Headphones",
     category: "tech",
     price: "$449",
-    image: "/vesna-imgs/tai-headphones.png",
+    image: "/vesna-imgs/tai-headphones.webp",
     badge: "Popular",
     quote: "Silence is a luxury. These deliver.",
   },
@@ -268,7 +268,7 @@ const PICKS = [
     name: "Leather Desk Mat",
     category: "tools",
     price: "$165",
-    image: "/vesna-imgs/editorial-luxurious-workspace.png",
+    image: "/vesna-imgs/editorial-luxurious-workspace.webp",
     quote: "Full-grain leather. Develops patina over time.",
   },
   {
@@ -276,7 +276,7 @@ const PICKS = [
     name: "Incense Ceremony Set",
     category: "home",
     price: "$89",
-    image: "/vesna-imgs/minimalist-incense-flask.png",
+    image: "/vesna-imgs/minimalist-incense-flask.webp",
     quote: "Kyoto-style incense. Transform your space.",
   },
   {
@@ -284,7 +284,7 @@ const PICKS = [
     name: "Botanical Hair Oil",
     category: "fashion",
     price: "$68",
-    image: "/vesna-imgs/vesna-hairoil.png",
+    image: "/vesna-imgs/vesna-hairoil.webp",
     quote: "Clean ingredients. Visible results.",
   },
   {
@@ -301,7 +301,7 @@ const PICKS = [
     name: "Ceramic Tea Set",
     category: "home",
     price: "$245",
-    image: "/vesna-imgs/native-incense-platform.png",
+    image: "/vesna-imgs/native-incense-platform.webp",
     quote: "Hand-glazed ceramics. Tea becomes ritual.",
   },
   {
@@ -319,7 +319,7 @@ const PICKS = [
     name: "Leather Messenger Bag",
     category: "fashion",
     price: "$580",
-    image: "/vesna-imgs/luxury-brown-duffel.png",
+    image: "/vesna-imgs/luxury-brown-duffel.webp",
     quote: "Italian leather. Made to last decades.",
   },
   {
@@ -336,7 +336,7 @@ const PICKS = [
     name: "Vintage Book Collection",
     category: "home",
     price: "$350",
-    image: "/vesna-imgs/curated-novels.png",
+    image: "/vesna-imgs/curated-novels.webp",
     quote: "First editions. Literary treasures.",
   },
   {
@@ -344,7 +344,7 @@ const PICKS = [
     name: "Culinary Knife Set",
     category: "food",
     price: "$675",
-    image: "/vesna-imgs/native-cinematic-vase.png",
+    image: "/vesna-imgs/native-cinematic-vase.webp",
     quote: "Japanese Damascus steel. A chef's dream.",
   },
   {
@@ -352,7 +352,7 @@ const PICKS = [
     name: "Architectural Desk Lamp",
     category: "tools",
     price: "$295",
-    image: "/vesna-imgs/vintage-workdesk-darkgold.png",
+    image: "/vesna-imgs/vintage-workdesk-darkgold.webp",
     badge: "Restored",
     quote: "Vintage 1960s lamp. Fully restored.",
   },
@@ -370,7 +370,7 @@ const PICKS = [
     name: "Premium Notebook Set",
     category: "tools",
     price: "$78",
-    image: "/vesna-imgs/hand-touching-cloth.png",
+    image: "/vesna-imgs/hand-touching-cloth.webp",
     quote: "Three notebooks for different purposes.",
   },
   {
@@ -378,7 +378,7 @@ const PICKS = [
     name: "Smart Watch Edition",
     category: "tech",
     price: "$799",
-    image: "/vesna-imgs/luxury-watch-on-book.png",
+    image: "/vesna-imgs/luxury-watch-on-book.webp",
     quote: "Titanium case. Health tracking refined.",
   },
   {
@@ -386,7 +386,7 @@ const PICKS = [
     name: "Luxury Duffel Bag",
     category: "fashion",
     price: "$1,200",
-    image: "/vesna-imgs/cinematic-handbag.png",
+    image: "/vesna-imgs/cinematic-handbag.webp",
     badge: "Limited",
     quote: "Weekend trips never looked so good.",
   },
@@ -404,7 +404,7 @@ const PICKS = [
     name: "Home Bar Essentials",
     category: "home",
     price: "$450",
-    image: "/vesna-imgs/coffee-maker-in-kitchen.png",
+    image: "/vesna-imgs/coffee-maker-in-kitchen.webp",
     quote: "Everything for the perfect evening ritual.",
   },
   {
@@ -412,7 +412,7 @@ const PICKS = [
     name: "Photography Masterclass",
     category: "courses",
     price: "$199",
-    image: "/vesna-imgs/secondary-overlay-image.png",
+    image: "/vesna-imgs/secondary-overlay-image.webp",
     badge: "Featured",
     quote: "See the world differently. Capture moments.",
   },
@@ -469,7 +469,7 @@ export default function ShopPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32">
           {/* Hero Header */}
           <section className="max-w-3xl mb-16">
-            <h1 className="font-[family-name:var(--font-dm-serif)] text-6xl text-primary mb-4">
+            <h1 className="font-audiowide text-6xl text-primary mb-4">
               Vesna Picks
             </h1>
             <p className="font-[family-name:var(--font-spectral)] text-xl text-on-background mb-6 opacity-70 font-light">
@@ -548,14 +548,14 @@ export default function ShopPage() {
                       </span>
                     </div>
                   </div>
-                  <h3 className="font-[family-name:var(--font-dm-serif)] text-2xl text-on-background mb-4">
+                  <h3 className="font-audiowide text-2xl text-on-background mb-4">
                     {product.name}
                   </h3>
                   <p className="font-[family-name:var(--font-playfair)] text-on-surface-variant text-sm italic opacity-80 mb-8 line-clamp-2">
                     &ldquo;{product.quote}&rdquo;
                   </p>
                   <button className="mt-auto w-full py-4 border border-primary text-primary font-[family-name:var(--font-tenor-sans)] uppercase text-[10px] tracking-[0.2em] hover:bg-primary hover:text-black transition-all duration-300">
-                    See this Ã¢â€ â€™
+                    See this  →
                   </button>
                 </div>
               </article>

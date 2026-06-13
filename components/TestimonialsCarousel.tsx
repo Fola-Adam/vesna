@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useRevealOnScroll } from "@/hooks/use-reveal-on-scroll";
 
 interface Testimonial {
   quote: string;
@@ -20,9 +21,10 @@ const testimonials: Testimonial[] = [
 ];
 
 export default function TestimonialsCarousel() {
+
+  const sectionRef = useRevealOnScroll();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const sectionRef = useRef<HTMLElement>(null);
   const autoPlayRef = useRef<NodeJS.Timeout>();
 
   const nextSlide = useCallback(() => {
@@ -48,24 +50,6 @@ export default function TestimonialsCarousel() {
     };
   }, [isAutoPlaying, nextSlide]);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("active");
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <section

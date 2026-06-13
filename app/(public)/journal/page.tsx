@@ -10,8 +10,8 @@ const ARTICLES = [
     title: "Why We Choose Less",
     category: "curator",
     categoryLabel: "Curator's Notes",
-    excerpt: "Curation is an act of elimination. For every object we showcase, dozens are set aside. The question isn't what to includeâ€”it's what to leave out.",
-    image: "/vesna-imgs/curated-novels.png",
+    excerpt: "Curation is an act of elimination. For every object we showcase, dozens are set aside. The question isn't what to include—it's what to leave out.",
+    image: "/vesna-imgs/curated-novels.webp",
     readTime: "5 min",
     hasGreenBorder: true,
   },
@@ -21,7 +21,7 @@ const ARTICLES = [
     category: "objects",
     categoryLabel: "Object Stories",
     excerpt: "There's something sacred about the first stroke of ink on paper. In our digital age, the fountain pen becomes not just a tool, but a portal to intentionality.",
-    image: "/vesna-imgs/premium-fountain-pen.png",
+    image: "/vesna-imgs/premium-fountain-pen.webp",
     readTime: "6 min",
     hasGreenBorder: false,
   },
@@ -30,8 +30,8 @@ const ARTICLES = [
     title: "Space as Sanctuary",
     category: "philosophy",
     categoryLabel: "Design Philosophy",
-    excerpt: "Our environments shape our thoughts. The minimalist isn't denying themselvesâ€”they're making room for what matters.",
-    image: "/vesna-imgs/native-incense-platform.png",
+    excerpt: "Our environments shape our thoughts. The minimalist isn't denying themselves—they're making room for what matters.",
+    image: "/vesna-imgs/native-incense-platform.webp",
     readTime: "4 min",
     hasGreenBorder: false,
     isPrimaryCategory: true,
@@ -42,7 +42,7 @@ const ARTICLES = [
     category: "objects",
     categoryLabel: "Object Stories",
     excerpt: "The mechanical watch is an anachronism that refuses to die. In a world of digital precision, its imperfection becomes its charm.",
-    image: "/vesna-imgs/luxury-watch-on-book.png",
+    image: "/vesna-imgs/luxury-watch-on-book.webp",
     readTime: "7 min",
     hasGreenBorder: false,
   },
@@ -52,7 +52,7 @@ const ARTICLES = [
     category: "curator",
     categoryLabel: "Curator's Notes",
     excerpt: "Behind every curated collection lies a thousand rejected options. The curator's eye is trained not just to see quality, but to recognize the subtle signals of authenticity.",
-    image: "/vesna-imgs/cinematic-handbag.png",
+    image: "/vesna-imgs/cinematic-handbag.webp",
     readTime: "5 min",
     hasGreenBorder: true,
   },
@@ -61,8 +61,8 @@ const ARTICLES = [
     title: "Tactile Memory",
     category: "philosophy",
     categoryLabel: "Design Philosophy",
-    excerpt: "We remember texture more vividly than sight. The grain of leather, the weight of ceramicâ€”our hands hold memories our eyes cannot.",
-    image: "/vesna-imgs/hand-touching-cloth.png",
+    excerpt: "We remember texture more vividly than sight. The grain of leather, the weight of ceramic—our hands hold memories our eyes cannot.",
+    image: "/vesna-imgs/hand-touching-cloth.webp",
     readTime: "4 min",
     hasGreenBorder: false,
     isPrimaryCategory: true,
@@ -123,7 +123,7 @@ export default function JournalPage() {
         {/* Hero Section */}
         <section className="relative min-h-[60vh] flex items-center justify-center bg-surface-dim">
           <div className="absolute inset-0 overflow-hidden">
-            <Image src="/vesna-imgs/editorial-luxurious-workspace.png" alt="Journal" fill className="object-cover opacity-40" />
+            <Image src="/vesna-imgs/editorial-luxurious-workspace.webp" alt="Journal" fill priority sizes="100vw" className="object-cover opacity-40" />
             <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/70 to-background" />
           </div>
           <div className="relative z-10 text-center px-5 max-w-4xl mx-auto pt-24">
@@ -167,7 +167,7 @@ export default function JournalPage() {
             <article className="article-card group cursor-pointer">
               <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                 <div className="relative aspect-[4/3] overflow-hidden bg-surface-container">
-                  <Image src="/vesna-imgs/vintage-workdesk-darkgold.png" alt="The Weight of Quality" fill className="object-cover" />
+                  <Image src="/vesna-imgs/vintage-workdesk-darkgold.webp" alt="The Weight of Quality" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
                   <div className="absolute top-4 left-4">
                     <span className="font-[family-name:var(--font-tenor-sans)] text-[10px] uppercase tracking-[0.2em] px-3 py-1 bg-primary text-primary-foreground">
                       Featured
@@ -184,7 +184,7 @@ export default function JournalPage() {
                   <p className="font-[family-name:var(--font-spectral)] text-base text-on-surface-variant mb-6 leading-relaxed">
                     In an age of disposable everything, we often forget the
                     satisfying heft of a well-made object. The weight of quality
-                    isn&apos;t measured in gramsâ€”it&apos;s felt in the permanence of
+                    isn&apos;t measured in grams—it&apos;s felt in the permanence of
                     something built to last, to be repaired, to be passed down.
                   </p>
                   <div className="flex items-center gap-4 text-sm text-outline">
@@ -198,39 +198,94 @@ export default function JournalPage() {
           </div>
         </section>
 
-        {/* Article Grid */}
+        {/* Article Grid — Editorial Layout */}
         <section className="py-16 lg:py-24 px-5 sm:px-8 lg:px-20 bg-surface-container-low bg-green-wash">
           <div className="max-w-screen-xl mx-auto">
             <h2 className="font-[family-name:var(--font-cinzel)] text-xs text-secondary uppercase tracking-[0.2em] mb-12 text-center">
               Recent Essays
             </h2>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredArticles.map((article) => (
-                <article
-                  key={article.id}
-                  className={`article-card group cursor-pointer ${article.hasGreenBorder ? 'border-green-subtle' : ''}`}
-                >
-                  <div className="relative aspect-[4/3] overflow-hidden bg-surface-container mb-5">
-                    <Image src={article.image} alt={article.title} fill className="object-cover" />
+            {/* Featured first article — horizontal card */}
+            {filteredArticles.length > 0 && (
+              <article className="article-card group cursor-pointer mb-10 sm:mb-14">
+                <div className="grid grid-cols-1 sm:grid-cols-5 gap-6 sm:gap-8 items-start">
+                  <div className="relative aspect-[16/10] sm:col-span-3 overflow-hidden bg-surface-container">
+                    <Image
+                      src={filteredArticles[0].image}
+                      alt={filteredArticles[0].title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, 60vw"
+                    />
                   </div>
-                  <p className={`font-[family-name:var(--font-tenor-sans)] text-[10px] uppercase tracking-[0.2em] mb-2 ${article.isPrimaryCategory ? 'text-primary' : 'text-secondary'}`}>
-                    {article.categoryLabel}
-                  </p>
-                  <h3 className="font-[family-name:var(--font-dm-serif)] text-xl text-on-background mb-3 group-hover:text-primary transition-colors">
-                    {article.title}
-                  </h3>
-                  <p className="font-[family-name:var(--font-spectral)] text-sm text-on-surface-variant mb-4 line-clamp-3">
-                    {article.excerpt}
-                  </p>
-                  <div className="flex items-center gap-3 text-xs text-outline">
-                    <span className="font-[family-name:var(--font-tenor-sans)] uppercase tracking-[0.1em]">Ebenezer Victory</span>
-                    <span>|</span>
-                    <span className="font-[family-name:var(--font-spectral)]">{article.readTime}</span>
+                  <div className="sm:col-span-2 sm:pt-4">
+                    <span className="font-[family-name:var(--font-dm-serif)] text-5xl sm:text-6xl text-outline/20 leading-none block mb-2">
+                      01
+                    </span>
+                    <p className={`font-[family-name:var(--font-tenor-sans)] text-[10px] uppercase tracking-[0.2em] mb-2 ${filteredArticles[0].isPrimaryCategory ? 'text-primary' : 'text-secondary'}`}>
+                      {filteredArticles[0].categoryLabel}
+                    </p>
+                    <h3 className="font-[family-name:var(--font-dm-serif)] text-xl sm:text-2xl text-on-background mb-3 group-hover:text-primary transition-colors">
+                      {filteredArticles[0].title}
+                    </h3>
+                    <p className="font-[family-name:var(--font-spectral)] text-sm text-on-surface-variant mb-4 line-clamp-3 leading-relaxed">
+                      {filteredArticles[0].excerpt}
+                    </p>
+                    <div className="flex items-center gap-3 text-xs text-outline">
+                      <span className="font-[family-name:var(--font-tenor-sans)] uppercase tracking-[0.1em]">Ebenezer Victory</span>
+                      <span className="text-outline/30">·</span>
+                      <span className="font-[family-name:var(--font-spectral)]">{filteredArticles[0].readTime}</span>
+                    </div>
                   </div>
-                </article>
-              ))}
-            </div>
+                </div>
+              </article>
+            )}
+
+            {/* Remaining articles — staggered masonry grid */}
+            {filteredArticles.length > 1 && (
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-12 lg:gap-x-8 lg:gap-y-16">
+                {filteredArticles.slice(1).map((article, i) => (
+                  <article
+                    key={article.id}
+                    className={`article-card group cursor-pointer ${article.hasGreenBorder ? 'border-green-subtle' : ''} ${
+                      i % 2 === 0 ? 'lg:mt-0' : 'lg:mt-16'
+                    } ${i % 2 !== 0 && i < 3 ? 'sm:mt-10' : ''}`}
+                  >
+                    {/* Portrait aspect for editorial feel */}
+                    <div className="relative aspect-[3/4] overflow-hidden bg-surface-container mb-4">
+                      <Image
+                        src={article.image}
+                        alt={article.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                      />
+                    </div>
+                    <div className="px-1">
+                      <div className="flex items-baseline gap-2 mb-1.5">
+                        <span className="font-[family-name:var(--font-dm-serif)] text-lg text-outline/25">
+                          {String(i + 2).padStart(2, '0')}
+                        </span>
+                        <p className={`font-[family-name:var(--font-tenor-sans)] text-[9px] uppercase tracking-[0.2em] ${article.isPrimaryCategory ? 'text-primary' : 'text-secondary'}`}>
+                          {article.categoryLabel}
+                        </p>
+                      </div>
+                      <h3 className="font-[family-name:var(--font-dm-serif)] text-base sm:text-lg text-on-background mb-2 group-hover:text-primary transition-colors leading-snug">
+                        {article.title}
+                      </h3>
+                      <p className="font-[family-name:var(--font-spectral)] text-xs sm:text-sm text-on-surface-variant mb-3 line-clamp-2 leading-relaxed">
+                        {article.excerpt}
+                      </p>
+                      <div className="flex items-center gap-2 text-[11px] text-outline">
+                        <span className="font-[family-name:var(--font-tenor-sans)] uppercase tracking-[0.1em]">Ebenezer Victory</span>
+                        <span className="text-outline/30">·</span>
+                        <span className="font-[family-name:var(--font-spectral)]">{article.readTime}</span>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

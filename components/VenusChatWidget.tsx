@@ -75,7 +75,7 @@ export default function VenusChatWidget() {
         minute: "2-digit",
       }),
     };
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -99,8 +99,9 @@ export default function VenusChatWidget() {
   return (
     <div className="fixed top-0 right-0 h-full z-50">
       {/* Edge Trigger */}
-      <div
+      <button
         onClick={toggleChat}
+        aria-label="Open chat assistant"
         className={`absolute right-0 top-1/2 -translate-y-1/2 w-[6px] h-32 bg-secondary/20 hover:bg-secondary/40 cursor-pointer rounded-l-sm transition-colors ${
           isOpen ? "" : styles.edgePeek
         }`}

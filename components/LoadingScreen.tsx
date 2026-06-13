@@ -110,7 +110,7 @@ export default function LoadingScreen({ onComplete }: LoadingScreenProps) {
       </div>
 
       <div className="text-center relative z-10">
-        <h1 className="font-['Audiowide'] text-5xl sm:text-6xl lg:text-7xl text-primary tracking-[0.3em] mb-6">
+        <h1 className="font-audiowide text-5xl sm:text-6xl lg:text-7xl text-primary tracking-[0.3em] mb-6">
           <span>{displayText}</span>
           <span className="inline-block w-[3px] h-[1em] bg-primary ml-1 animate-blink">|</span>
         </h1>

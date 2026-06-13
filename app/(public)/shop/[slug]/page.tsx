@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+﻿import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
@@ -34,14 +34,14 @@ export default async function ProductPage({ params }: { params: { slug: string }
       <section className="flex flex-col md:flex-row min-h-[600px]">
         <div className="w-full md:w-[60%] h-[400px] md:h-auto relative overflow-hidden bg-surface-container-lowest">
           {product.image_urls?.[0] ? (
-            <Image src={product.image_urls[0]} alt={product.name} fill className="object-cover object-center hover:scale-105 transition-transform duration-1000" priority />
+            <Image src={product.image_urls[0]} alt={product.name} fill className="object-cover object-center hover:scale-105 transition-transform duration-1000" priority sizes="(max-width: 768px) 100vw, 60vw" />
           ) : (
             <div className="w-full h-full bg-surface-container" />
           )}
         </div>
         <div className="w-full md:w-[40%] flex flex-col justify-center px-8 md:px-16 py-16 bg-stone-950">
           <p className="text-xs text-[#95d4b3] uppercase tracking-[0.3em] mb-4 font-[family-name:var(--font-tenor-sans)]">{product.item_type}</p>
-          <h1 className="font-[family-name:var(--font-dm-serif)] text-4xl text-[#e5e2e1] mb-6">{product.name}</h1>
+          <h1 className="font-audiowide text-4xl text-[#e5e2e1] mb-6">{product.name}</h1>
           <p className="font-[family-name:var(--font-spectral)] text-[#d0c5b2] leading-relaxed mb-8">{product.description}</p>
           <p className="text-2xl text-[#e6c364] font-medium mb-8">{product.price ? `$${product.price}` : 'Inquire'}</p>
           <a href="#" className="inline-block border border-[#95d4b3] text-[#95d4b3] px-8 py-3 text-xs uppercase tracking-[0.3em] hover:bg-[#95d4b3] hover:text-stone-950 transition-all">View Details</a>
@@ -78,7 +78,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
                   {p.image_urls?.[0] && <Image src={p.image_urls[0]} alt={p.name} fill className="object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 50vw, 25vw" />}
                 </div>
                 <p className="text-xs text-[#95d4b3] uppercase tracking-widest mb-1">{p.item_type}</p>
-                <p className="font-[family-name:var(--font-dm-serif)] text-lg text-[#e5e2e1] group-hover:text-[#e6c364] transition-colors">{p.name}</p>
+                <p className="font-audiowide text-lg text-[#e5e2e1] group-hover:text-[#e6c364] transition-colors">{p.name}</p>
                 {p.price && <p className="text-sm text-[#d0c5b2] mt-1">${p.price}</p>}
               </Link>
             ))}

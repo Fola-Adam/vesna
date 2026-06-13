@@ -5,10 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 
 const categories = [
-  { name: "Home", icon: "home", image: "/vesna-imgs/minimal-workdesk.png", href: "/picks?category=home" },
-  { name: "Tech", icon: "laptop", image: "/vesna-imgs/coloured-keyboard.png", href: "/picks?category=tech" },
-  { name: "Fashion", icon: "checkroom", image: "/vesna-imgs/luxury-brown-duffel.png", href: "/picks?category=fashion" },
-  { name: "Finance", icon: "account_balance", image: "/vesna-imgs/luxury-watch-on-book.png", href: "/picks?category=finance" },
+  { name: "Home", icon: "home", image: "/vesna-imgs/minimal-workdesk.webp", href: "/curatedhome" },
+  { name: "Tech", icon: "laptop", image: "/vesna-imgs/coloured-keyboard.webp", href: "/curatedtech" },
+  { name: "Fashion", icon: "checkroom", image: "/vesna-imgs/luxury-brown-duffel.webp", href: "/curatedfashion" },
+  { name: "Finance", icon: "account_balance", image: "/vesna-imgs/luxury-watch-on-book.webp", href: "/curatedfinance" },
 ];
 
 export default function CategoryGrid() {
@@ -60,6 +60,7 @@ export default function CategoryGrid() {
                 alt={category.name}
                 className="object-cover category-image-zoom"
                 fill
+                sizes="(max-width: 768px) 50vw, 25vw"
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="material-symbols-outlined text-3xl lg:text-4xl text-primary mb-2">

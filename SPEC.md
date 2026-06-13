@@ -35,18 +35,38 @@ Text:
 
 ### Typography
 ```
-Display Font: Caveat (Google Fonts)
-- Headings, hero text, accent phrases
-- Weights: 400, 600, 700
-- Cursive warmth for brand personality
+Display Font: DM Serif Display (Google Fonts)
+- Hero text, main headlines
+- Weight: 400
+- Elegant serif for brand personality
 
-Body Font: Tenor Sans (Google Fonts)
-- Labels, navigation, section headers
-- Uppercase with letter-spacing for elegance
+Logo Font: Audiowide (Google Fonts)
+- Logo, brand name
+- Weight: 400
+- Futuristic display font for brand identity
 
-UI Font: DM Sans (Google Fonts)
+Body Font: DM Sans (Google Fonts)
 - Body text, descriptions, form elements
 - Light weight (300) for readability
+
+Label Font: Tenor Sans (Google Fonts)
+- Navigation, buttons, section headers
+- Uppercase with letter-spacing for elegance
+
+Editorial Serif: Spectral (Google Fonts)
+- Shop and journal page text
+- Weight: 400
+- Refined serif for editorial content
+
+Accent Serif: Cinzel (Google Fonts)
+- Journal and archive page accents
+- Weight: 400
+- Classical serif for premium feel
+
+Decorative Serif: Playfair Display (Google Fonts)
+- Shop page decorative elements
+- Weight: 400
+- High-contrast serif for luxury accents
 ```
 
 ### Spatial System
@@ -247,7 +267,7 @@ Duration: 5 seconds auto-dismiss
 ```
 - Sticky position
 - Blur backdrop (16px)
-- Logo: Caveat font with gold period
+- Logo: Audiowide font with gold period
 - Links: Uppercase, letter-spaced
 - CTA: Primary button (Browse Picks)
 ```
@@ -257,7 +277,7 @@ Duration: 5 seconds auto-dismiss
 - Full viewport height (85vh minimum)
 - Radial gradient background accents
 - Eyebrow: Small caps, green
-- Title: Caveat display, large
+- Title: DM Serif Display, large
 - Subtitle: DM Sans light, muted
 - CTA buttons: Primary + Secondary
 ```

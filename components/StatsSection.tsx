@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useRevealOnScroll } from "@/hooks/use-reveal-on-scroll";
 
 interface StatItemProps {
   end: number;
@@ -48,28 +49,8 @@ function StatItem({ end, suffix = "", decimals = 0, label, isVisible }: StatItem
 }
 
 export default function StatsSection() {
-  const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            entry.target.classList.add("active");
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const sectionRef = useRevealOnScroll({ onReveal: () => setIsVisible(true) });
 
   const stats = [
     { end: 12, label: "Curated Objects" },
