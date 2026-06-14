@@ -1,124 +1,179 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Link from 'next/link'
 
 export default async function AdminDashboard() {
   const supabase = createClient()
-  
-  // Fetch stats
+
   const { count: productsCount } = await supabase
     .from('products')
     .select('*', { count: 'exact', head: true })
     .eq('is_active', true)
-  
+
   const { count: subscribersCount } = await supabase
     .from('email_subscribers')
     .select('*', { count: 'exact', head: true })
     .is('unsubscribed_at', null)
-  
+
   const { data: recentClicks } = await supabase
     .from('click_tracking')
     .select('*')
     .order('clicked_at', { ascending: false })
     .limit(5)
-  
+
   const { data: recentProducts } = await supabase
     .from('products')
     .select('*')
     .order('created_at', { ascending: false })
     .limit(5)
-  
+
+  const { count: totalClicks } = await supabase
+    .from('click_tracking')
+    .select('*', { count: 'exact', head: true })
+
+  const stats = [
+    {
+      label: 'Active Products',
+      value: productsCount || 0,
+      href: '/admin/products',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Email Subscribers',
+      value: subscribersCount || 0,
+      href: '/admin/subscribers',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Total Clicks',
+      value: totalClicks || 0,
+      href: '/admin/analytics',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+    },
+  ]
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-on-background">Dashboard</h2>
-      
-      {/* Stats Cards */}
+    <div className="space-y-8">
+      <div>
+        <h2 className="font-section-header text-on-surface-variant text-xs tracking-[0.2em] mb-1">Overview</h2>
+        <p className="font-audiowide text-2xl text-on-background">Dashboard</p>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {stats.map((stat) => (
+          <Link key={stat.label} href={stat.href}>
+            <Card className="group hover:border-primary/40 transition-colors cursor-pointer">
+              <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                <CardTitle className="font-section-header text-xs tracking-[0.15em] text-on-surface-variant">
+                  {stat.label}
+                </CardTitle>
+                <span className="text-on-surface-variant group-hover:text-primary transition-colors">{stat.icon}</span>
+              </CardHeader>
+              <CardContent>
+                <div className="font-audiowide text-4xl text-primary tracking-wider">
+                  {String(stat.value).padStart(2, '0')}
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-on-surface-variant">
-              Active Products
+          <CardHeader>
+            <CardTitle className="font-section-header text-xs tracking-[0.15em] text-on-surface-variant">
+              Recent Products
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-on-background">
-              {productsCount || 0}
+            <div className="space-y-1">
+              {recentProducts?.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex items-center justify-between py-3 px-3 rounded-md hover:bg-surface-container transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded bg-surface-container flex items-center justify-center">
+                      <span className="font-audiowide text-xs text-primary">
+                        {product.name.charAt(0)}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-on-background">{product.name}</p>
+                      <p className="font-section-header text-[10px] text-on-surface-variant tracking-[0.1em]">
+                        {product.item_type}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="font-section-header text-[10px] text-on-surface-variant tracking-[0.1em]">
+                    {new Date(product.created_at).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </span>
+                </div>
+              )) || (
+                <p className="text-sm text-on-surface-variant py-4 text-center">
+                  No products yet
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-on-surface-variant">
-              Email Subscribers
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-on-background">
-              {subscribersCount || 0}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-on-surface-variant">
+          <CardHeader>
+            <CardTitle className="font-section-header text-xs tracking-[0.15em] text-on-surface-variant">
               Recent Clicks
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-on-background">
-              {recentClicks?.length || 0}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Recent Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentProducts?.map((product) => (
-                <div
-                  key={product.id}
-                  className="flex items-center justify-between py-2 border-b border-outline-variant/30 last:border-0"
-                >
-                  <div>
-                    <p className="font-medium text-on-background">{product.name}</p>
-                    <p className="text-sm text-on-surface-variant">{product.item_type}</p>
-                  </div>
-                  <span className="text-sm text-on-surface-variant">
-                    {new Date(product.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-              )) || <p className="text-on-surface-variant">No products yet</p>}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Recent Clicks</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+            <div className="space-y-1">
               {recentClicks?.map((click) => (
                 <div
                   key={click.id}
-                  className="flex items-center justify-between py-2 border-b border-outline-variant/30 last:border-0"
+                  className="flex items-center justify-between py-3 px-3 rounded-md hover:bg-surface-container transition-colors"
                 >
-                  <div>
-                    <p className="font-medium text-on-background">Product ID: {click.product_id}</p>
-                    <p className="text-sm text-on-surface-variant">{click.referrer || 'Direct'}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded bg-surface-container flex items-center justify-center">
+                      <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-on-background">
+                        Product ID: <span className="font-mono text-xs">{click.product_id?.slice(0, 8)}</span>
+                      </p>
+                      <p className="font-section-header text-[10px] text-on-surface-variant tracking-[0.1em]">
+                        {click.referrer || 'Direct'}
+                      </p>
+                    </div>
                   </div>
-                  <span className="text-sm text-on-surface-variant">
-                    {new Date(click.clicked_at).toLocaleDateString()}
+                  <span className="font-section-header text-[10px] text-on-surface-variant tracking-[0.1em]">
+                    {new Date(click.clicked_at).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
                   </span>
                 </div>
-              )) || <p className="text-on-surface-variant">No clicks yet</p>}
+              )) || (
+                <p className="text-sm text-on-surface-variant py-4 text-center">
+                  No clicks yet
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>

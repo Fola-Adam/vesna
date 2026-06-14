@@ -31,7 +31,7 @@ export default function CuratorSection() {
             remains when the noise stops.
           </p>
           <Link
-            href="/about"
+            href="/journal"
             className="inline-flex items-center gap-3 lg:gap-4 font-button-label text-xs lg:text-sm text-on-background group hover:text-primary transition-colors"
           >
             READ THE MONOGRAPH

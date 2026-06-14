@@ -5,10 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 
 const categories = [
-  { name: "Home", icon: "home", image: "/vesna-imgs/minimal-workdesk.webp", href: "/curatedhome" },
-  { name: "Tech", icon: "laptop", image: "/vesna-imgs/coloured-keyboard.webp", href: "/curatedtech" },
-  { name: "Fashion", icon: "checkroom", image: "/vesna-imgs/luxury-brown-duffel.webp", href: "/curatedfashion" },
-  { name: "Finance", icon: "account_balance", image: "/vesna-imgs/luxury-watch-on-book.webp", href: "/curatedfinance" },
+  { name: "Home", icon: "home", image: "/vesna-imgs/minimal-workdesk.webp", href: "/picks" },
+  { name: "Tech", icon: "laptop", image: "/vesna-imgs/coloured-keyboard.webp", href: "/picks" },
+  { name: "Fashion", icon: "checkroom", image: "/vesna-imgs/luxury-brown-duffel.webp", href: "/picks" },
+  { name: "Finance", icon: "account_balance", image: "/vesna-imgs/luxury-watch-on-book.webp", href: "/picks" },
 ];
 
 export default function CategoryGrid() {

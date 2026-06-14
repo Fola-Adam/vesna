@@ -1,0 +1,252 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - generic [ref=e4]:
+      - link "VESN Λ" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - text: VESN
+        - generic [ref=e6]: Λ
+      - generic [ref=e7]:
+        - link "Home" [ref=e8] [cursor=pointer]:
+          - /url: /
+        - link "Picks" [ref=e9] [cursor=pointer]:
+          - /url: /curated
+        - link "Journal" [ref=e10] [cursor=pointer]:
+          - /url: /journal
+        - link "About" [ref=e11] [cursor=pointer]:
+          - /url: /about
+        - link "Archive" [ref=e12] [cursor=pointer]:
+          - /url: /archive
+  - progressbar "Page scroll progress" [ref=e19]
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e23]:
+        - img "Luxurious editorial workspace with dark moody lighting" [ref=e24]
+        - img "Curated workspace with warm ambient lighting" [ref=e25]
+      - generic [ref=e28]:
+        - heading "The Art of Intentional Living." [level=1] [ref=e29]:
+          - text: The Art of
+          - generic [ref=e30]: Intentional Living.
+        - paragraph [ref=e31]: A curated monograph of objects and insights for the discerning professional.
+        - link "Enter the Sanctuary" [ref=e32] [cursor=pointer]:
+          - /url: /picks
+      - generic [ref=e36]:
+        - img "Editorial detail with warm tones" [ref=e37]
+        - img "Vintage dark gold workspace detail" [ref=e38]
+        - img "Minimal workspace arrangement" [ref=e39]
+      - generic [ref=e42]: keyboard_double_arrow_down
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - heading "Philosophy" [level=2] [ref=e46]
+        - paragraph [ref=e47]: Vesna was born from the belief that our surroundings dictate our internal tempo. In an age of digital velocity, we advocate for the slow, the tactile, and the enduring.
+        - paragraph [ref=e48]: We don't just curate things; we curate moments of pause.
+      - generic [ref=e49]:
+        - generic [ref=e50]: “
+        - blockquote [ref=e51]: True luxury is the space between a thought and an action.
+        - generic [ref=e52]: — The Vesna Creed
+    - generic [ref=e55]:
+      - generic [ref=e56]:
+        - paragraph [ref=e57]: "0"
+        - paragraph [ref=e58]: Curated Objects
+      - generic [ref=e59]:
+        - paragraph [ref=e60]: "0"
+        - paragraph [ref=e61]: Categories
+    - generic [ref=e63]:
+      - generic [ref=e64]:
+        - heading "From Our Community" [level=2] [ref=e65]
+        - heading "Words of Appreciation" [level=3] [ref=e66]
+      - generic [ref=e67]:
+        - generic [ref=e71]:
+          - generic [ref=e72]: format_quote
+          - paragraph [ref=e73]: “Every object in my workspace now tells a story. Vesna helped me find pieces that actually matter.”
+          - generic [ref=e74]:
+            - generic [ref=e76]: SU
+            - generic [ref=e77]:
+              - paragraph [ref=e78]: Sample User
+              - paragraph [ref=e79]: Beta Tester
+        - button "Testimonial 1" [ref=e81] [cursor=pointer]
+        - button "Previous testimonial" [ref=e82] [cursor=pointer]:
+          - generic [ref=e83]: chevron_left
+        - button "Next testimonial" [ref=e84] [cursor=pointer]:
+          - generic [ref=e85]: chevron_right
+    - generic [ref=e86]:
+      - generic [ref=e87]:
+        - generic [ref=e88]:
+          - heading "Curated Spotlight" [level=2] [ref=e89]
+          - paragraph [ref=e90]: Featured Monoliths
+        - generic [ref=e91]:
+          - button "Previous products" [ref=e92] [cursor=pointer]:
+            - generic [ref=e93]: chevron_left
+          - button "Next products" [ref=e94] [cursor=pointer]:
+            - generic [ref=e95]: chevron_right
+      - generic [ref=e97]:
+        - link "Featured The Tactile Engine Explore The Tactile Engine \"The rhythmic click is my metronome for focus.\" Heavy brass weight, zero drift" [ref=e98] [cursor=pointer]:
+          - /url: /picks/1
+          - generic [ref=e99]:
+            - generic [ref=e249]: Featured
+            - img "The Tactile Engine" [ref=e100]
+            - generic [ref=e102]: Explore
+          - heading "The Tactile Engine" [level=3] [ref=e103]
+          - generic [ref=e104]:
+            - paragraph [ref=e105]: "\"The rhythmic click is my metronome for focus.\""
+            - paragraph [ref=e106]: Heavy brass weight, zero drift
+        - link "New Heritage Ledger Explore Heritage Ledger \"Ink on grain is a commitment.\" Hand-dyed Tuscan leather" [ref=e108] [cursor=pointer]:
+          - /url: /picks/2
+          - generic [ref=e109]:
+            - generic [ref=e250]: New
+            - img "Heritage Ledger" [ref=e110]
+            - generic [ref=e112]: Explore
+          - heading "Heritage Ledger" [level=3] [ref=e113]
+          - generic [ref=e114]:
+            - paragraph [ref=e115]: "\"Ink on grain is a commitment.\""
+            - paragraph [ref=e116]: Hand-dyed Tuscan leather
+        - link "Empty Form 01 Explore Empty Form 01 \"A vessel for light and shadow.\" Hand-thrown in Kyoto" [ref=e118] [cursor=pointer]:
+          - /url: /picks/3
+          - generic [ref=e119]:
+            - img "Empty Form 01" [ref=e120]
+            - generic [ref=e122]: Explore
+          - heading "Empty Form 01" [level=3] [ref=e123]
+          - generic [ref=e124]:
+            - paragraph [ref=e125]: "\"A vessel for light and shadow.\""
+            - paragraph [ref=e126]: Hand-thrown in Kyoto
+        - link "Architect Lamp Explore Architect Lamp Solid brass, adjustable arm" [ref=e128] [cursor=pointer]:
+          - /url: /picks/4
+          - generic [ref=e129]:
+            - img "Architect Lamp" [ref=e130]
+            - generic [ref=e132]: Explore
+          - heading "Architect Lamp" [level=3] [ref=e133]
+          - paragraph [ref=e135]: Solid brass, adjustable arm
+        - link "Featured Porcelain Mug Explore Porcelain Mug Handcrafted, speckled glaze" [ref=e137] [cursor=pointer]:
+          - /url: /picks/5
+          - generic [ref=e138]:
+            - generic [ref=e251]: Featured
+            - img "Porcelain Mug" [ref=e139]
+            - generic [ref=e141]: Explore
+          - heading "Porcelain Mug" [level=3] [ref=e142]
+          - paragraph [ref=e144]: Handcrafted, speckled glaze
+        - link "Oak Serving Tray Explore Oak Serving Tray Natural finish, brass handles" [ref=e146] [cursor=pointer]:
+          - /url: /picks/6
+          - generic [ref=e147]:
+            - img "Oak Serving Tray" [ref=e148]
+            - generic [ref=e150]: Explore
+          - heading "Oak Serving Tray" [level=3] [ref=e151]
+          - paragraph [ref=e153]: Natural finish, brass handles
+        - link "New The Script Master Explore The Script Master 18k gold nib, ebonite feed" [ref=e155] [cursor=pointer]:
+          - /url: /picks/7
+          - generic [ref=e156]:
+            - generic [ref=e252]: New
+            - img "The Script Master" [ref=e157]
+            - generic [ref=e159]: Explore
+          - heading "The Script Master" [level=3] [ref=e160]
+          - paragraph [ref=e162]: 18k gold nib, ebonite feed
+        - link "Chronograph No. 7 Explore Chronograph No. 7 Swiss movement, sapphire crystal" [ref=e164] [cursor=pointer]:
+          - /url: /picks/8
+          - generic [ref=e165]:
+            - img "Chronograph No. 7" [ref=e166]
+            - generic [ref=e168]: Explore
+          - heading "Chronograph No. 7" [level=3] [ref=e169]
+          - paragraph [ref=e171]: Swiss movement, sapphire crystal
+    - generic [ref=e178]:
+      - generic [ref=e179]:
+        - heading "Explore Collections" [level=2] [ref=e180]
+        - paragraph [ref=e181]: Shop by Category
+      - generic [ref=e182]:
+        - link "Home home Home" [ref=e183] [cursor=pointer]:
+          - /url: /curatedhome
+          - img "Home" [ref=e184]
+          - generic [ref=e185]:
+            - generic [ref=e186]: home
+            - heading "Home" [level=3] [ref=e187]
+        - link "Tech laptop Tech" [ref=e188] [cursor=pointer]:
+          - /url: /curatedtech
+          - img "Tech" [ref=e189]
+          - generic [ref=e190]:
+            - generic [ref=e191]: laptop
+            - heading "Tech" [level=3] [ref=e192]
+        - link "Fashion checkroom Fashion" [ref=e193] [cursor=pointer]:
+          - /url: /curatedfashion
+          - img "Fashion" [ref=e194]
+          - generic [ref=e195]:
+            - generic [ref=e196]: checkroom
+            - heading "Fashion" [level=3] [ref=e197]
+        - link "Finance account_balance Finance" [ref=e198] [cursor=pointer]:
+          - /url: /curatedfinance
+          - img "Finance" [ref=e199]
+          - generic [ref=e200]:
+            - generic [ref=e201]: account_balance
+            - heading "Finance" [level=3] [ref=e202]
+    - generic [ref=e204]:
+      - generic [ref=e205]:
+        - heading "The Curator" [level=2] [ref=e206]
+        - paragraph [ref=e207]: Ebenezer Victory
+        - paragraph [ref=e208]: A multidisciplinary architect of digital experiences who finds balance in the physical world. Ebenezer's pursuit of “Quiet Luxury” is not about opulence, but about the surgical removal of the unnecessary.
+        - paragraph [ref=e209]: Vesna is the journal of that pursuit—a living archive of what remains when the noise stops.
+        - link "READ THE MONOGRAPH arrow_right_alt" [ref=e210] [cursor=pointer]:
+          - /url: /about
+          - text: READ THE MONOGRAPH
+          - generic [ref=e211]: arrow_right_alt
+      - img "Ebenezer Victory — Vesna curator" [ref=e215]
+    - generic [ref=e217]:
+      - heading "Digital Ephemera" [level=2] [ref=e218]
+      - heading "The Weekly Dispatch" [level=3] [ref=e219]
+      - paragraph [ref=e220]: A limited-entry journal on design, solitude, and the tools of the trade. Delivered every Sunday.
+      - generic [ref=e221]:
+        - generic [ref=e222]:
+          - generic [ref=e223]: check_circle
+          - generic [ref=e224]: Curated picks weekly
+        - generic [ref=e225]:
+          - generic [ref=e226]: check_circle
+          - generic [ref=e227]: No spam, ever
+        - generic [ref=e228]:
+          - generic [ref=e229]: check_circle
+          - generic [ref=e230]: Unsubscribe anytime
+      - generic [ref=e231]:
+        - textbox "Your private email address" [ref=e233]
+        - button "Join the Dispatch" [ref=e234] [cursor=pointer]
+      - paragraph [ref=e235]: Privacy is the ultimate luxury. Join 2,000+ discerning readers.
+  - contentinfo [ref=e236]:
+    - generic [ref=e237]:
+      - link "VESN Λ" [ref=e238] [cursor=pointer]:
+        - /url: /
+        - text: VESN
+        - generic [ref=e239]: Λ
+      - generic [ref=e240]:
+        - link "Privacy Policy" [ref=e241] [cursor=pointer]:
+          - /url: /privacy
+        - link "Terms of Service" [ref=e242] [cursor=pointer]:
+          - /url: /terms
+        - link "Affiliate Disclosure" [ref=e243] [cursor=pointer]:
+          - /url: /affiliate
+        - link "Contact" [ref=e244] [cursor=pointer]:
+          - /url: /contact
+        - link "Shipping & Returns" [ref=e245] [cursor=pointer]:
+          - /url: /shipping
+      - generic [ref=e246]: © 2026 VESNA. ALL RIGHTS RESERVED.
+      - generic [ref=e247]: Oracle:Atlas
+      - paragraph [ref=e248]: Vesna is a curated platform. We may earn a commission from products purchased through our links, supporting our editorial independence and high-standard curation.
+  - alert [ref=e254]
+  - generic:
+    - button "Open chat assistant" [ref=e255] [cursor=pointer]:
+      - generic [ref=e256]: auto_awesome
+      - generic [ref=e257]: Ask Venus
+    - generic [ref=e258]:
+      - generic [ref=e259]:
+        - generic [ref=e260]:
+          - generic [ref=e262]: auto_awesome
+          - generic [ref=e263]:
+            - heading "Venus AI" [level=3] [ref=e264]
+            - text: Online
+        - generic [ref=e265]:
+          - button "Fullscreen" [ref=e266] [cursor=pointer]:
+            - generic [ref=e267]: fullscreen
+          - button "Close chat" [ref=e268] [cursor=pointer]:
+            - generic [ref=e269]: close
+      - generic [ref=e271]:
+        - generic [ref=e274]: Venus Intelligence
+        - paragraph [ref=e276]: Welcome to Vesna. I'm Venus, your AI assistant. How can I help you discover exceptional objects today?
+      - generic [ref=e277]:
+        - generic [ref=e278]:
+          - textbox "Describe a mood or a silhouette..." [ref=e279]
+          - button "Ask north_east" [disabled] [ref=e280]:
+            - generic [ref=e281]: Ask
+            - generic [ref=e283]: north_east
+        - paragraph [ref=e284]: Powered by Llama 4 · Groq

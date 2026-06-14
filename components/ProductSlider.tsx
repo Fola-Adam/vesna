@@ -153,7 +153,7 @@ export default function ProductSlider() {
           {products.map((product, index) => (
             <Link
               key={product.id}
-              href={`/picks/${product.id}`}
+              href="/shop"
               className={`slider-item min-w-[200px] sm:min-w-[240px] lg:min-w-[280px] group cursor-pointer stagger-reveal stagger-${Math.min(
                 index + 1,
                 3

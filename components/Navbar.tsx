@@ -1,23 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isMenuOpenRef = useRef(false);
+
+  const closeMenu = useCallback(() => setIsMobileMenuOpen(false), []);
+
+  useEffect(() => {
+    isMenuOpenRef.current = isMobileMenuOpen;
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
+      if (isMenuOpenRef.current) closeMenu();
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [closeMenu]);
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/curated", label: "Picks" },
+    { href: "/picks", label: "Picks" },
     { href: "/journal", label: "Journal" },
     { href: "/about", label: "About" },
     { href: "/archive", label: "Archive" },
@@ -78,6 +86,7 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
+              onClick={closeMenu}
               className="block font-button-label text-sm uppercase tracking-[0.15em] text-on-surface-variant hover:text-on-background transition-colors py-4 border-b border-[#242424]/50 last:border-0"
             >
               {link.label}

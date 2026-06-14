@@ -8,6 +8,61 @@ import { createClient } from '@/lib/supabase/client'
 const CATEGORIES = ['all', 'courses', 'ebooks', 'tools', 'templates', 'apps', 'finance', 'fashion', 'tech', 'home', 'food']
 const ITEMS_PER_LOAD = 12
 
+const CATEGORY_MAP: Record<string, string> = {
+  'masterclass-digital-curation': 'courses',
+  'the-heritage-silk-scarf': 'fashion',
+  'the-heritage-silk-bag': 'fashion',
+  'quiet-luxury-interiors': 'ebooks',
+  'podcast-excellence-kit': 'tech',
+  'vesna-signature-brewer': 'home',
+  'quarterly-reset-system': 'templates',
+  'leather-weekender-bag': 'fashion',
+  'mechanical-keyboard-pro': 'tech',
+  'heritage-leather-journal': 'tools',
+  'artisan-ceramic-vessel': 'home',
+  'brass-architect-lamp': 'home',
+  'porcelain-ritual-mug': 'home',
+  'dark-academia-desk': 'home',
+  'masterclass-subscription-bundle': 'courses',
+  'vintage-aviator-sunglasses': 'fashion',
+  'handwoven-linen-throw': 'home',
+  'artisan-coffee-subscription': 'food',
+  'minimalist-wallet': 'fashion',
+  'japanese-chef-knife-set': 'home',
+  'cork-yoga-mat': 'fitness',
+  'scented-soy-candle-trio': 'home',
+  'wireless-charging-station': 'tech',
+  'the-innovation-stack': 'ebooks',
+  'italian-leather-backpack': 'fashion',
+  'smart-plant-pot': 'home',
+  'acoustic-guitar-limited': 'hobby',
+  'productivity-planner': 'tools',
+  'noise-canceling-headphones': 'tech',
+  'handmade-throw-blanket': 'home',
+  'digital-detox-kit': 'lifestyle',
+  'standing-desk-converter': 'workspace',
+  'vintage-film-camera': 'hobby',
+  'the-daily-stoic-journal': 'ebooks',
+  'kombucha-brewing-kit': 'food',
+  'wool-travel-blanket': 'fashion',
+  'blueprint-for-attention': 'courses',
+  'espresso-machine-pro': 'home',
+  'canvas-tote': 'fashion',
+  'ergonomic-foot-rest': 'workspace',
+  'saffron-starter-set': 'food',
+  'resin-art-kit': 'hobby',
+  'footwear-care-bundle': 'fashion',
+  'hard-drive-enclosure': 'tech',
+  'minimalist-desk-organizer': 'workspace',
+  'heirloom-recipe-book': 'home',
+  'indoor-herb-garden-kit': 'home',
+  'the-curators-eye': 'ebooks',
+}
+
+function toSlug(name: string) {
+  return name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
+}
+
 interface Product {
   id: string
   name: string
@@ -47,7 +102,7 @@ export default function CuratedPage() {
 
   const filteredProducts = currentCategory === 'all' 
     ? products 
-    : products.filter(p => p.item_type === currentCategory || p.categories?.[0]?.name === currentCategory)
+    : products.filter(p => p.item_type === currentCategory || p.categories?.[0]?.name === currentCategory || CATEGORY_MAP[toSlug(p.name)] === currentCategory)
 
   const displayedProducts = filteredProducts.slice(0, displayedCount)
 

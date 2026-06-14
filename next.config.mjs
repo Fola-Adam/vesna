@@ -93,8 +93,8 @@ const nextConfig = {
                 permanent: true,
             },
             {
-                source: '/picks',
-                destination: '/curated',
+                source: '/curated',
+                destination: '/picks',
                 permanent: true,
             },
         ]
@@ -102,6 +102,11 @@ const nextConfig = {
 
     // Webpack optimization
     webpack: (config, { dev, isServer }) => {
+        // Exclude native Node.js modules from server bundle
+        if (isServer) {
+            config.externals = [...(config.externals || []), 'onnxruntime-node', 'sharp']
+        }
+
         // Optimize bundle size in production
         if (!dev && !isServer) {
             config.optimization = {

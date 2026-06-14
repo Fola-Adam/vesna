@@ -240,3 +240,12 @@ body {
 .border-green-subtle {
   border-color: rgba(149, 212, 179, 0.2);
 }
+
+/* Hide scrollbars globally but keep scroll functionality */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}

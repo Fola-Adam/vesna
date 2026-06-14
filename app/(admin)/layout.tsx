@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function AdminLayout({
   children,
@@ -19,13 +22,19 @@ export default function AdminLayout({
 }
 
 function NavLink({ href, icon, children }: { href: string; icon: React.ReactNode; children: React.ReactNode }) {
+  const pathname = usePathname()
+  const isActive = pathname.startsWith(href)
+
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 px-3 py-2 text-sm text-on-surface rounded-md hover:bg-surface-container"
-      prefetch={true}
+      className={`flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
+        isActive
+          ? 'text-primary bg-primary/10 font-medium'
+          : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+      }`}
     >
-      {icon}
+      <span className={isActive ? 'text-primary' : 'text-current'}>{icon}</span>
       {children}
     </Link>
   )
@@ -65,34 +74,31 @@ function SubscribersIcon() {
 
 function AdminSidebar() {
   return (
-    <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-64 lg:bg-surface lg:border-r lg:border-outline-variant">
-      <div className="flex flex-col h-full">
-        <div className="p-6 border-b border-outline-variant">
-          <Link href="/" className="font-audiowide text-2xl text-on-background tracking-[0.3em]">
-            VESN<span className="lambda-exo2">Λ</span>
-          </Link>
-          <p className="text-xs text-on-surface-variant mt-1">Admin Dashboard</p>
-        </div>
-        
-        <nav className="flex-1 p-4 space-y-1">
-          <NavLink href="/admin/dashboard" icon={<DashboardIcon />}>Dashboard</NavLink>
-          <NavLink href="/admin/products" icon={<ProductsIcon />}>Products</NavLink>
-          <NavLink href="/admin/analytics" icon={<AnalyticsIcon />}>Analytics</NavLink>
-          <NavLink href="/admin/subscribers" icon={<SubscribersIcon />}>Subscribers</NavLink>
-        </nav>
-        
-        <div className="p-4 border-t border-outline-variant">
-          <Link
-            href="/"
-            className="flex items-center gap-3 px-3 py-2 text-sm text-on-surface-variant hover:text-on-surface"
-            prefetch={false}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to Site
-          </Link>
-        </div>
+    <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-64 lg:flex lg:flex-col lg:bg-surface lg:border-r lg:border-outline-variant">
+      <div className="p-6 border-b border-outline-variant">
+        <Link href="/" className="font-audiowide text-2xl text-on-background tracking-[0.3em]">
+          VESN<span className="lambda-exo2">Λ</span>
+        </Link>
+        <p className="font-section-header text-on-surface-variant text-xs mt-2 tracking-[0.15em]">Admin Panel</p>
+      </div>
+
+      <nav className="flex-1 p-4 space-y-1">
+        <NavLink href="/admin/dashboard" icon={<DashboardIcon />}>Dashboard</NavLink>
+        <NavLink href="/admin/products" icon={<ProductsIcon />}>Products</NavLink>
+        <NavLink href="/admin/analytics" icon={<AnalyticsIcon />}>Analytics</NavLink>
+        <NavLink href="/admin/subscribers" icon={<SubscribersIcon />}>Subscribers</NavLink>
+      </nav>
+
+      <div className="p-4 border-t border-outline-variant">
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-3 py-2 text-sm text-on-surface-variant hover:text-on-surface rounded-md hover:bg-surface-container transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Site
+        </Link>
       </div>
     </aside>
   )
@@ -102,7 +108,7 @@ function AdminHeader() {
   return (
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b border-outline-variant">
       <div className="flex items-center justify-between h-16 px-6">
-        <h1 className="text-lg font-semibold text-on-background">Admin</h1>
+        <h1 className="font-section-header text-on-surface-variant text-xs tracking-[0.2em]">Administration</h1>
       </div>
     </header>
   )

@@ -1,90 +1,109 @@
-﻿import { notFound } from 'next/navigation'
+﻿'use client'
+
+import { useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { useParams } from 'next/navigation'
+import { PICKS, toSlug } from '@/lib/shop-data'
 
-export const revalidate = 3600
+export default function ProductDetailPage() {
+  const params = useParams()
+  const slug = params.slug as string
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const supabase = createClient()
+  const product = useMemo(() => {
+    return PICKS.find((p) => toSlug(p.name) === slug) || null
+  }, [slug])
 
-  const { data: product, error } = await supabase
-    .from('products')
-    .select('id, name, slug, description, price, image_urls, item_type, is_active, why_victory, material, dimensions, categories(name)')
-    .eq('slug', params.slug)
-    .eq('is_active', true)
-    .single()
-
-  if (error || !product) {
-    notFound()
+  if (!product) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center px-5">
+        <div className="text-center">
+          <h1 className="font-audiowide text-4xl text-primary mb-4">Product Not Found</h1>
+          <p className="font-body-main text-on-surface-variant mb-8">This pick doesn&apos;t seem to exist.</p>
+          <Link href="/shop" className="border border-primary px-8 py-4 text-primary font-button-label text-xs uppercase tracking-widest hover:bg-primary hover:text-black transition-all">
+            Back to Shop
+          </Link>
+        </div>
+      </main>
+    )
   }
 
-  const { data: related } = await supabase
-    .from('products')
-    .select('id, name, slug, price, image_urls, item_type')
-    .neq('id', product.id)
-    .eq('is_active', true)
-    .limit(4)
-
-  const relatedProducts = related ?? []
-
   return (
-    <div>
-      {/* Product Hero */}
-      <section className="flex flex-col md:flex-row min-h-[600px]">
-        <div className="w-full md:w-[60%] h-[400px] md:h-auto relative overflow-hidden bg-surface-container-lowest">
-          {product.image_urls?.[0] ? (
-            <Image src={product.image_urls[0]} alt={product.name} fill className="object-cover object-center hover:scale-105 transition-transform duration-1000" priority sizes="(max-width: 768px) 100vw, 60vw" />
-          ) : (
-            <div className="w-full h-full bg-surface-container" />
-          )}
+    <main className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 mb-12 font-button-label text-[10px] uppercase tracking-widest text-outline">
+          <Link href="/shop" className="hover:text-primary transition-colors">Shop</Link>
+          <span>/</span>
+          <span className="text-primary">{product.category}</span>
         </div>
-        <div className="w-full md:w-[40%] flex flex-col justify-center px-8 md:px-16 py-16 bg-stone-950">
-          <p className="text-xs text-[#95d4b3] uppercase tracking-[0.3em] mb-4 font-[family-name:var(--font-tenor-sans)]">{product.item_type}</p>
-          <h1 className="font-audiowide text-4xl text-[#e5e2e1] mb-6">{product.name}</h1>
-          <p className="font-[family-name:var(--font-spectral)] text-[#d0c5b2] leading-relaxed mb-8">{product.description}</p>
-          <p className="text-2xl text-[#e6c364] font-medium mb-8">{product.price ? `$${product.price}` : 'Inquire'}</p>
-          <a href="#" className="inline-block border border-[#95d4b3] text-[#95d4b3] px-8 py-3 text-xs uppercase tracking-[0.3em] hover:bg-[#95d4b3] hover:text-stone-950 transition-all">View Details</a>
-        </div>
-      </section>
 
-      {/* Details */}
-      <section className="px-5 sm:px-8 lg:px-20 py-24 max-w-screen-xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-12">
-          <div>
-            <h3 className="font-[family-name:var(--font-cinzel)] text-sm uppercase tracking-[0.2em] text-[#e6c364] mb-4">Why Victory Chose This</h3>
-            <p className="font-[family-name:var(--font-spectral)] text-[#c4b9a8] leading-relaxed">{product.why_victory || 'A carefully selected piece that embodies the Vesna standard.'}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+          {/* Image */}
+          <div className="relative aspect-[4/3] overflow-hidden bg-surface-container">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-cover grayscale-[10%]"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              priority
+            />
+            {product.badge && (
+              <div className={`absolute top-4 left-4 z-10 px-3 py-1 text-[9px] font-button-label uppercase tracking-widest ${
+                product.badge === "Victory's pick" ? 'bg-primary text-black' : 'bg-secondary-container text-on-secondary-container'
+              }`}>
+                {product.badge}
+              </div>
+            )}
           </div>
-          <div>
-            <h3 className="font-[family-name:var(--font-cinzel)] text-sm uppercase tracking-[0.2em] text-[#e6c364] mb-4">Details</h3>
-            <p className="font-[family-name:var(--font-spectral)] text-[#c4b9a8] leading-relaxed">{product.material || 'Premium materials.'}</p>
-            <p className="font-[family-name:var(--font-spectral)] text-[#c4b9a8] leading-relaxed mt-2">{product.dimensions || 'Standard dimensions.'}</p>
-          </div>
-          <div>
-            <h3 className="font-[family-name:var(--font-cinzel)] text-sm uppercase tracking-[0.2em] text-[#e6c364] mb-4">Category</h3>
-            <p className="font-[family-name:var(--font-spectral)] text-[#c4b9a8] leading-relaxed">{product.categories?.[0]?.name || product.item_type}</p>
+
+          {/* Details */}
+          <div className="flex flex-col justify-center">
+            <span className="text-primary font-button-label text-[10px] uppercase tracking-widest mb-4">{product.category}</span>
+            <h1 className="font-audiowide text-2xl lg:text-3xl text-on-background mb-4">{product.name}</h1>
+
+            <div className="flex items-baseline gap-4 mb-6">
+              <span className="font-spectral text-xl text-primary">{product.price}</span>
+              {product.originalPrice && (
+                <span className="font-spectral text-sm text-outline line-through">{product.originalPrice}</span>
+              )}
+            </div>
+
+            <p className="font-playfair text-on-surface-variant text-sm italic leading-relaxed mb-8">
+              &ldquo;{product.quote}&rdquo;
+            </p>
+
+            {product.category === 'courses' && (
+              <div className="border-t border-outline-variant pt-8 mb-8">
+                <h3 className="font-button-label text-[10px] uppercase tracking-widest text-outline mb-4">What&apos;s Included</h3>
+                <ul className="space-y-3 font-body-main text-sm text-on-surface-variant">
+                  <li className="flex items-center gap-3">
+                    <span className="w-1 h-1 bg-primary rounded-full" />
+                    Lifetime access with future updates
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="w-1 h-1 bg-primary rounded-full" />
+                    Downloadable resources and templates
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="w-1 h-1 bg-primary rounded-full" />
+                    Community access
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            <button className="w-full py-5 border border-primary text-primary font-button-label uppercase text-xs tracking-[0.2em] hover:bg-primary hover:text-black transition-all duration-300">
+              Purchase &mdash; {product.price}
+            </button>
+
+            <p className="text-center text-outline/50 text-[10px] font-button-label mt-4 uppercase tracking-wider">
+              Secure checkout via affiliate partner
+            </p>
           </div>
         </div>
-      </section>
-
-      {/* Related */}
-      {relatedProducts.length > 0 && (
-        <section className="px-5 sm:px-8 lg:px-20 pb-32 max-w-screen-xl mx-auto">
-          <h2 className="font-[family-name:var(--font-cinzel)] text-2xl uppercase tracking-[0.3em] text-[#e5e2e1] mb-12">You May Also Like</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {relatedProducts.map((p) => (
-              <Link key={p.id} href={`/shop/${p.slug}`} className="group">
-                <div className="aspect-square overflow-hidden bg-surface-container mb-4">
-                  {p.image_urls?.[0] && <Image src={p.image_urls[0]} alt={p.name} fill className="object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 50vw, 25vw" />}
-                </div>
-                <p className="text-xs text-[#95d4b3] uppercase tracking-widest mb-1">{p.item_type}</p>
-                <p className="font-audiowide text-lg text-[#e5e2e1] group-hover:text-[#e6c364] transition-colors">{p.name}</p>
-                {p.price && <p className="text-sm text-[#d0c5b2] mt-1">${p.price}</p>}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
+      </div>
+    </main>
   )
 }
