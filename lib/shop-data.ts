@@ -82,12 +82,12 @@ export const PICKS = [
   },
   {
     id: 9,
-    name: "Heritage Leather Journal",
-    category: "tools",
-    price: "$149",
+    name: "Artisan Paper Bag",
+    category: "fashion",
+    price: "$38",
     image:
-      "https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&q=80",
-    quote: "Hand-dyed Tuscan leather with hand-stitched binding.",
+      "https://images.unsplash.com/photo-1597484662317-9e7f2ea0b262?w=800&q=80",
+    quote: "Heavy kraft paper with reinforced handles. Everyday carry refined.",
   },
   {
     id: 10,
