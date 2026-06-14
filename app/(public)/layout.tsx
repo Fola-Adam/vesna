@@ -3,6 +3,8 @@ import dynamic from 'next/dynamic'
 import '../globals.css'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const VenusChatWidget = dynamic(
   () => import('@/components/VenusChatWidget'),
@@ -25,6 +27,8 @@ export default function PublicLayout({
       {children}
       <Footer />
       <VenusChatWidget />
+      <Analytics />
+      <SpeedInsights />
     </>
   )
 }
