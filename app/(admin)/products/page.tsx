@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import Link from 'next/link'
 import { useDebounce } from '@/hooks/use-debounce'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+
+
 
 const ITEMS_PER_PAGE = 20
 
@@ -34,7 +36,11 @@ export default function ProductsPage() {
   const debouncedSearch = useDebounce(searchQuery, 300)
   const supabase = createClient()
   
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = async () => {
+    if (!supabase) {
+      setLoading(false)
+      return
+    }
     setLoading(true)
     
     const from = (currentPage - 1) * ITEMS_PER_PAGE
@@ -58,11 +64,12 @@ export default function ProductsPage() {
     }
     
     setLoading(false)
-  }, [debouncedSearch, currentPage, supabase])
+  }
   
   useEffect(() => {
     fetchProducts()
-  }, [fetchProducts])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, currentPage])
   
   // Reset to page 1 when search changes
   useEffect(() => {

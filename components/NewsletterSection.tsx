@@ -7,22 +7,37 @@ export default function NewsletterSection() {
   const [email, setEmail] = useState("");
   const [showError, setShowError] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const sectionRef = useRevealOnScroll();
 
   const validateEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateEmail(email)) {
       setShowError(true);
       return;
     }
     setShowError(false);
-    setIsSubmitted(true);
-    // TODO: Integrate with Brevo API
-    console.log("Newsletter signup:", email);
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: "website" }),
+      });
+      if (res.ok) {
+        setIsSubmitted(true);
+      } else {
+        setShowError(true);
+      }
+    } catch {
+      setShowError(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -106,9 +121,10 @@ export default function NewsletterSection() {
             </div>
             <button
               type="submit"
-              className="w-full sm:w-auto sm:min-w-max flex-shrink-0 bg-primary text-on-primary font-button-label text-[10px] lg:text-xs px-6 lg:px-10 py-4 lg:py-5 uppercase tracking-[0.12em] hover:bg-white hover:text-black transition-all shadow-xl btn-shimmer gold-glow"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto sm:min-w-max flex-shrink-0 bg-primary text-on-primary font-button-label text-[10px] lg:text-xs px-6 lg:px-10 py-4 lg:py-5 uppercase tracking-[0.12em] hover:bg-white hover:text-black transition-all shadow-xl btn-shimmer gold-glow disabled:opacity-60"
             >
-              Join the Dispatch
+              {isSubmitting ? "Joining…" : "Join the Dispatch"}
             </button>
           </form>
         ) : (

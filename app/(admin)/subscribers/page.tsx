@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDebounce } from '@/hooks/use-debounce'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+
+
 
 const ITEMS_PER_PAGE = 20
 
@@ -27,11 +29,16 @@ export default function SubscribersPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
+  const [error, setError] = useState<string | null>(null)
 
   const debouncedSearch = useDebounce(searchQuery, 300)
   const supabase = createClient()
 
-  const fetchSubscribers = useCallback(async () => {
+  const fetchSubscribers = async () => {
+    if (!supabase) {
+      setLoading(false)
+      return
+    }
     setLoading(true)
 
     const from = (currentPage - 1) * ITEMS_PER_PAGE
@@ -47,19 +54,21 @@ export default function SubscribersPage() {
       query = query.or(`email.ilike.%${debouncedSearch}%,first_name.ilike.%${debouncedSearch}%`)
     }
 
-    const { data, count, error } = await query
+    const { data, count, error: fetchError } = await query
 
-    if (!error) {
+    if (!fetchError) {
       setSubscribers((data as Subscriber[]) || [])
+      setError(null)
       setTotalCount(count || 0)
     }
 
     setLoading(false)
-  }, [debouncedSearch, currentPage, supabase])
+  }
 
   useEffect(() => {
     fetchSubscribers()
-  }, [fetchSubscribers])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, currentPage])
 
   useEffect(() => {
     setCurrentPage(1)

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRevealOnScroll } from "@/hooks/use-reveal-on-scroll";
 import Image from "next/image";
@@ -82,15 +82,30 @@ export default function ProductSlider() {
   const [scrollProgress, setScrollProgress] = useState(33.33);
 
 
-  const handleReveal = useCallback(() => {
-    const items = sectionRef.current?.querySelectorAll(".stagger-reveal");
-    items?.forEach((item, index) => {
-      setTimeout(() => { item.classList.add("active"); }, index * 100);
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // The hook already adds `.active` to the observed element itself; we only
+  // need to stagger its children. Declaring the callback AFTER the ref keeps
+  // a stable identity (empty deps) so the observer never re-subscribes, and
+  // fixes the previous TDZ ordering flagged by react-hooks/immutability.
+  const sectionRef = useRevealOnScroll();
 
-  const sectionRef = useRevealOnScroll({ onReveal: handleReveal });
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const items = el.querySelectorAll(".stagger-reveal");
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          items.forEach((item, index) => {
+            setTimeout(() => item.classList.add("active"), index * 100);
+          });
+          io.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [sectionRef]);
 
   const handleScroll = () => {
     if (!sliderRef.current) return;

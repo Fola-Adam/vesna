@@ -1,39 +1,53 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-export default async function AnalyticsPage() {
-  const supabase = createClient()
+/** Admin pages read live data per request — never prerender at build time. */
+export const dynamic = 'force-dynamic'
 
+
+export default async function AnalyticsPage() {
+  const supabase = await createClient()
+
+  // 90-day window — never pull the whole click_tracking table into memory.
+  const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()
+
+  // Daily counts are aggregated in Postgres via the daily_click_stats view.
   const { data: dailyStats } = await supabase
-    .from('click_tracking')
-    .select('clicked_at')
-    .order('clicked_at', { ascending: false })
+    .from('daily_click_stats')
+    .select('date, total_clicks')
+    .gte('date', since.slice(0, 10))
+    .order('date', { ascending: false })
+    .limit(90)
 
   const { data: productClicks } = await supabase
     .from('click_tracking')
-    .select('product_id, clicked_at')
+    .select('product_id')
     .not('product_id', 'is', null)
+    .gte('clicked_at', since)
+    .limit(50000)
 
   const { data: products } = await supabase
     .from('products')
     .select('id, name')
-    .in('id', Array.from(new Set(productClicks?.map(c => c.product_id) || [])))
 
   const { data: referrers } = await supabase
     .from('click_tracking')
     .select('referrer')
     .not('referrer', 'is', null)
+    .gte('clicked_at', since)
+    .limit(50000)
 
-  // Aggregate daily clicks
-  const dailyMap = new Map<string, number>()
-  dailyStats?.forEach((c) => {
-    const day = new Date(c.clicked_at).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    })
-    dailyMap.set(day, (dailyMap.get(day) || 0) + 1)
-  })
-  const dailyData = Array.from(dailyMap.entries()).slice(0, 14).reverse()
+  // Daily aggregate straight from the view (already grouped server-side)
+  const dailyData = (dailyStats ?? [])
+    .map((d) => ({
+      day: new Date(d.date).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      }),
+      clicks: d.total_clicks,
+    }))
+    .slice(0, 14)
+    .reverse()
 
   // Aggregate by product
   const productMap = new Map<string, number>()
@@ -60,8 +74,8 @@ export default async function AnalyticsPage() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
 
-  const totalClicks = dailyStats?.length || 0
-  const maxDaily = Math.max(...dailyData.map(d => d[1]), 1)
+  const totalClicks = (dailyStats ?? []).reduce((sum, d) => sum + d.total_clicks, 0)
+  const maxDaily = Math.max(...dailyData.map((d) => d.clicks), 1)
 
   return (
     <div className="space-y-8">
@@ -118,7 +132,7 @@ export default async function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {dailyData.map(([day, count]) => (
+              {dailyData.map(({ day, clicks }) => (
                 <div key={day} className="flex items-center gap-3">
                   <span className="font-section-header text-[10px] text-on-surface-variant w-16 shrink-0 tracking-[0.1em]">
                     {day}
@@ -126,11 +140,11 @@ export default async function AnalyticsPage() {
                   <div className="flex-1 h-6 bg-surface-container rounded-sm overflow-hidden">
                     <div
                       className="h-full bg-primary rounded-sm transition-all"
-                      style={{ width: `${(count / maxDaily) * 100}%` }}
+                      style={{ width: `${(clicks / maxDaily) * 100}%` }}
                     />
                   </div>
                   <span className="font-audiowide text-xs text-on-background w-6 text-right">
-                    {count}
+                    {clicks}
                   </span>
                 </div>
               ))}

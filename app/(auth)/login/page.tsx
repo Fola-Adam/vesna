@@ -14,6 +14,10 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabase) {
+      setError('Supabase is not configured (missing NEXT_PUBLIC_SUPABASE_* env vars).')
+      return
+    }
     setLoading(true)
     setError(null)
 

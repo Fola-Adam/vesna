@@ -45,8 +45,19 @@ function saveMessages(messages: Message[]) {
 export default function VenusChatWidget() {
   const [isOpen, setIsOpen] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [initialized, setInitialized] = useState(false)
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (typeof window === 'undefined') return []
+    const saved = loadMessages()
+    return saved.length > 0
+      ? saved
+      : [
+          {
+            role: 'assistant',
+            content:
+              "Welcome to Vesna. I'm Venus. How can I help you discover exceptional objects today?",
+          },
+        ]
+  })
   const [isTyping, setIsTyping] = useState(false)
   const [streamText, setStreamText] = useState('')
   const [inputValue, setInputValue] = useState('')
@@ -55,21 +66,10 @@ export default function VenusChatWidget() {
   const streamProductsRef = useRef<MatchedProduct[] | null>(null)
   const streamFlushRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  useEffect(() => {
-    const saved = loadMessages()
-    if (saved.length > 0) {
-      setMessages(saved)
-    } else {
-      setMessages([
-        {
-          role: 'assistant',
-          content:
-            "Welcome to Vesna. I'm Venus. How can I help you discover exceptional objects today?",
-        },
-      ])
-    }
-    setInitialized(true)
-  }, [])
+  // React 19: hydrate initial state lazily from localStorage instead of
+  // calling setState inside a mount effect (react-hooks/set-state-in-effect).
+  const [initialized, setInitialized] = useState(false)
+  useEffect(() => setInitialized(true), [])
 
   useEffect(() => {
     if (initialized) {
@@ -106,9 +106,10 @@ export default function VenusChatWidget() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text,
-          history: messages
-            .filter((m) => m.role !== 'assistant' || messages.indexOf(m) !== 0)
-            .map((m) => ({ role: m.role, content: m.content })),
+          // Send only the last 10 turns (server caps this too). The old
+          // filter was a no-op — it sent the entire growing history on every
+          // request, inflating token costs linearly with chat length.
+          history: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
         }),
       })
 
@@ -261,13 +262,14 @@ function ChatMessages({ messages, isTyping, streamText, messagesEndRef, isFullsc
   messagesEndRef: React.RefObject<HTMLDivElement | null>
   isFullscreen: boolean
 }) {
+  // Only mounted while typing (parent renders it conditionally), so the
+  // interval can start immediately — no sync setState on isTyping changes.
   const [dotPhase, setDotPhase] = useState(0)
 
   useEffect(() => {
-    if (!isTyping) { setDotPhase(0); return }
-    const t = setInterval(() => setDotPhase(p => (p + 1) % 4), 250)
+    const t = setInterval(() => setDotPhase((p) => (p + 1) % 4), 250)
     return () => clearInterval(t)
-  }, [isTyping])
+  }, [])
 
   return (
     <div

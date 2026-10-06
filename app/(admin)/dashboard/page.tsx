@@ -2,8 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 
+/** Admin pages read live data per request — never prerender at build time. */
+export const dynamic = 'force-dynamic'
+
+
 export default async function AdminDashboard() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { count: productsCount } = await supabase
     .from('products')

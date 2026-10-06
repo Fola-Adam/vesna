@@ -25,15 +25,88 @@ interface MatchedProduct {
 
 export const runtime = 'nodejs'
 
-export async function POST(request: Request) {
-  const { message, history = [] } = await request.json()
+const MAX_MESSAGE_LENGTH = 2000
+const MAX_HISTORY_MESSAGES = 10
 
-  if (!message) {
+// Per-IP limiter for the Groq proxy. Without this, anyone can hammer
+// /api/venus and burn your (paid or free-tier) Groq quota. In-memory map is
+// per-instance — good enough at this scale; swap for Upstash Ratelimit when
+// traffic justifies it.
+const VENUS_WINDOW_MS = 60_000
+const VENUS_MAX_PER_WINDOW = 8
+const venusHits = new Map<string, number[]>()
+
+function venusRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const recent = (venusHits.get(ip) ?? []).filter((t) => now - t < VENUS_WINDOW_MS)
+  if (recent.length >= VENUS_MAX_PER_WINDOW) return true
+  recent.push(now)
+  venusHits.set(ip, recent)
+  if (venusHits.size > 10_000) {
+    for (const [k, v] of venusHits) {
+      if (!v.some((t) => now - t < VENUS_WINDOW_MS)) venusHits.delete(k)
+    }
+  }
+  return false
+}
+
+// Only allow the roles our client actually sends — anything else is a
+// prompt-injection / API-abuse vector (e.g. spoofed "system" messages).
+const ALLOWED_ROLES = new Set(['user', 'assistant'])
+
+export async function POST(request: Request) {
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '0.0.0.0'
+  if (venusRateLimited(ip)) {
+    return new Response(
+      JSON.stringify({ error: 'Too many requests — please slow down.' }),
+      { status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '60' } },
+    )
+  }
+
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  const { message, history = [] } = (body ?? {}) as {
+    message?: unknown
+    history?: unknown
+  }
+
+  if (typeof message !== 'string' || !message.trim()) {
     return new Response(JSON.stringify({ error: 'Message is required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     })
   }
+
+  if (message.length > MAX_MESSAGE_LENGTH) {
+    return new Response(JSON.stringify({ error: 'Message too long' }), {
+      status: 413,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  // Sanitize client-supplied history: drop unknown roles, non-strings, and
+  // cap length so callers can't inflate token costs unboundedly.
+  const safeHistory = Array.isArray(history)
+    ? history
+        .filter(
+          (h): h is { role: string; content: string } =>
+            !!h &&
+            typeof h === 'object' &&
+            ALLOWED_ROLES.has((h as { role?: unknown }).role as string) &&
+            typeof (h as { content?: unknown }).content === 'string'
+        )
+        .slice(-MAX_HISTORY_MESSAGES)
+        .map((h) => ({ role: h.role, content: h.content.slice(0, MAX_MESSAGE_LENGTH) }))
+    : []
 
   if (!process.env.GROQ_API_KEY) {
     return new Response(JSON.stringify({ error: 'AI service is not configured' }), {
@@ -46,7 +119,7 @@ export async function POST(request: Request) {
   let matchedProducts: MatchedProduct[] = []
 
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     let products: RawProduct[] | null = null
 
     try {
@@ -134,12 +207,11 @@ Guidelines:
 
 Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}`
 
-  const messages = [
+  // Typed as the SDK's param union — plain `{role: string}` literals don't
+  // satisfy ChatCompletionMessageParam[] in groq-sdk v1.
+  const messages: import('groq-sdk/resources/chat/completions').ChatCompletionMessageParam[] = [
     { role: 'system', content: systemPrompt },
-    ...(history ?? []).map((h: { role: string; content: string }) => ({
-      role: h.role as string,
-      content: h.content,
-    })),
+    ...safeHistory.map((h) => ({ role: h.role as 'user' | 'assistant', content: h.content })),
     { role: 'user', content: message },
   ]
 

@@ -1,0 +1,156 @@
+'use client'
+
+import { useMemo, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import type { ProductRow } from '@/lib/data'
+import { formatPrice, effectivePricing } from '@/lib/pricing'
+
+const CATEGORIES = ['all', 'courses', 'ebooks', 'tools', 'templates', 'apps', 'finance', 'fashion', 'tech', 'home', 'food']
+const ITEMS_PER_LOAD = 12
+
+export default function PicksBrowser({ products }: { products: ProductRow[] }) {
+  const [currentCategory, setCurrentCategory] = useState('all')
+  const [displayedCount, setDisplayedCount] = useState(ITEMS_PER_LOAD)
+
+  const filteredProducts = useMemo(
+    () =>
+      currentCategory === 'all'
+        ? products
+        : products.filter(
+            (p) =>
+              p.item_type === currentCategory ||
+              p.categories?.name?.toLowerCase() === currentCategory
+          ),
+    [products, currentCategory]
+  )
+
+  const displayedProducts = filteredProducts.slice(0, displayedCount)
+
+  return (
+    <div className="pt-20">
+      {/* Hero Header */}
+      <section className="max-w-3xl mx-auto px-5 sm:px-8 lg:px-20 mb-16">
+        <h1 className="font-display-hero text-4xl sm:text-5xl lg:text-6xl text-primary mb-4 italic">
+          All picks
+        </h1>
+        <p className="font-body-main text-lg text-on-surface mb-6 opacity-70 font-light">
+          Everything Victory recommends, in one place.
+        </p>
+        <span className="font-button-label text-xs tracking-widest text-outline uppercase">
+          {products.length} picks
+        </span>
+      </section>
+
+      {/* Filter Bar */}
+      <div className="sticky top-[73px] z-40 bg-background py-6 mb-8 border-b border-outline-variant">
+        <div className="px-5 sm:px-8 lg:px-20">
+          <div className="flex items-center gap-4 overflow-x-auto hide-scrollbar">
+            {CATEGORIES.map((category) => (
+              <button
+                key={category}
+                onClick={() => {
+                  setCurrentCategory(category)
+                  setDisplayedCount(ITEMS_PER_LOAD)
+                }}
+                className={`category-btn px-6 py-2 font-button-label uppercase text-[10px] tracking-widest whitespace-nowrap transition-colors ${
+                  currentCategory === category
+                    ? 'bg-primary text-on-primary'
+                    : 'border border-outline-variant text-on-surface hover:border-primary'
+                }`}
+              >
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Results Counter */}
+      <div className="px-5 sm:px-8 lg:px-20 mb-8">
+        <p className="font-button-label text-xs text-outline uppercase tracking-widest">
+          Showing {displayedProducts.length} of {filteredProducts.length} picks
+        </p>
+      </div>
+
+      {/* Product Grid */}
+      <div className="px-5 sm:px-8 lg:px-20 mb-12">
+        {displayedProducts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {displayedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-on-surface-variant py-12">
+            No products found in this category.
+          </p>
+        )}
+      </div>
+
+      {/* Load More */}
+      {displayedCount < filteredProducts.length && (
+        <div className="flex justify-center mb-32 px-5 sm:px-8 lg:px-20">
+          <button
+            onClick={() => setDisplayedCount((prev) => prev + ITEMS_PER_LOAD)}
+            className="border border-outline-variant px-12 py-5 font-button-label uppercase tracking-[0.3em] text-[10px] hover:border-primary hover:text-primary transition-all"
+          >
+            Show more products
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ProductCard({ product }: { product: ProductRow }) {
+  const { price, strike } = effectivePricing(product)
+  return (
+    <Link href={`/shop/${product.slug}`} className="group relative block">
+      <article className={`bg-surface flex flex-col h-full ${product.is_featured ? 'border-t-2 border-primary' : ''}`}>
+        {product.is_featured && (
+          <div className="absolute top-4 left-4 z-10 bg-primary text-on-primary px-3 py-1 text-[9px] font-button-label uppercase tracking-widest">
+            Featured
+          </div>
+        )}
+        <div className="relative aspect-video overflow-hidden bg-surface-container">
+          {product.image_urls?.[0] ? (
+            <Image
+              src={product.image_urls[0]}
+              alt={product.name}
+              fill
+              className="object-cover grayscale-[20%] group-hover:scale-105 transition-transform duration-700"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full bg-surface-container" />
+          )}
+        </div>
+        <div className="p-8 flex flex-col flex-grow">
+          <div className="flex justify-between items-start mb-4">
+            <span className="text-primary font-button-label text-[10px] uppercase tracking-widest">
+              {product.categories?.name ?? product.item_type}
+            </span>
+            <div className="text-right">
+              {strike != null && (
+                <span className="text-outline line-through text-xs mr-1">{formatPrice(strike)}</span>
+              )}
+              <span className="text-primary text-sm font-medium">{formatPrice(price)}</span>
+            </div>
+          </div>
+          <h3 className="font-display-hero text-2xl text-on-surface mb-4">{product.name}</h3>
+          {product.why_victory && (
+            <p className="font-body-main text-on-surface-variant text-sm opacity-80 mb-8 line-clamp-2">
+              {'"'}
+              {product.why_victory}
+              {'"'}
+            </p>
+          )}
+          <span className="mt-auto w-full py-4 text-center border border-primary text-primary font-button-label uppercase text-[10px] tracking-[0.2em] group-hover:bg-primary group-hover:text-on-primary transition-all duration-300">
+            See this →
+          </span>
+        </div>
+      </article>
+    </Link>
+  )
+}

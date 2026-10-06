@@ -1,8 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import ProductForm from '@/components/admin/product-form'
 
+/** Admin pages read live data per request — never prerender at build time. */
+export const dynamic = 'force-dynamic'
+
+
 export default async function NewProductPage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data: categories } = await supabase
     .from('categories')
