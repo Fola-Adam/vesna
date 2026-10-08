@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
+import { ArrowUpRight, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 /** Admin pages read live data per request — never prerender at build time. */
 export const dynamic = 'force-dynamic'
@@ -70,15 +72,19 @@ export default async function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="font-section-header text-on-surface-variant text-xs tracking-[0.2em] mb-1">Overview</h2>
-        <p className="font-audiowide text-2xl text-on-background">Dashboard</p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="mb-1 font-section-header text-xs tracking-[0.2em] text-on-surface-variant">OVERVIEW</h2>
+          <p className="font-audiowide text-3xl text-on-background">Curator studio</p>
+          <p className="mt-2 text-sm text-on-surface-variant">A quick view of your collection and readership.</p>
+        </div>
+        <Button asChild><Link href="/admin/products/new"><Plus className="mr-2 h-4 w-4" />Add a product</Link></Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {stats.map((stat) => (
           <Link key={stat.label} href={stat.href}>
-            <Card className="group hover:border-primary/40 transition-colors cursor-pointer">
+          <Card className="group cursor-pointer transition-colors hover:border-primary/40">
               <CardHeader className="pb-2 flex flex-row items-center justify-between">
                 <CardTitle className="font-section-header text-xs tracking-[0.15em] text-on-surface-variant">
                   {stat.label}
@@ -110,10 +116,11 @@ export default async function AdminDashboard() {
                   className="flex items-center justify-between py-3 px-3 rounded-md hover:bg-surface-container transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded bg-surface-container flex items-center justify-center">
-                      <span className="font-audiowide text-xs text-primary">
-                        {product.name.charAt(0)}
-                      </span>
+                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded bg-surface-container">
+                    {product.image_urls?.[0] ? <img src={product.image_urls[0]} alt="" className="h-full w-full object-cover" /> :
+                    <span className="font-audiowide text-xs text-primary">
+                      {product.name.charAt(0)}
+                    </span>}
                     </div>
                     <div>
                       <p className="text-sm font-medium text-on-background">{product.name}</p>
@@ -128,6 +135,7 @@ export default async function AdminDashboard() {
                       day: 'numeric',
                     })}
                   </span>
+                  <Link aria-label={`Edit ${product.name}`} href={`/admin/products/${product.id}/edit`} className="ml-2 text-on-surface-variant hover:text-primary"><ArrowUpRight className="h-4 w-4" /></Link>
                 </div>
               )) || (
                 <p className="text-sm text-on-surface-variant py-4 text-center">

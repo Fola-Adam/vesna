@@ -1,237 +1,69 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
-import Link from 'next/link'
 import { useDebounce } from '@/hooks/use-debounce'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Search } from 'lucide-react'
 
-
-
-const ITEMS_PER_PAGE = 20
-
-interface Product {
-  id: string
-  name: string
-  slug: string
-  price: number | null
-  image_urls: string[] | null
-  item_type: string
-  is_active: boolean
-  categories: { name: string }[] | null
-}
+const PAGE_SIZE = 20
+interface Product { id: string; name: string; slug: string; price: number | null; image_urls: string[] | null; item_type: string; is_active: boolean; categories: { name: string }[] | null }
 
 export default function ProductsPage() {
   const supabase = createClient()
   const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(Boolean(supabase))
-  const [searchQuery, setSearchQuery] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalCount, setTotalCount] = useState(0)
-  
-  const debouncedSearch = useDebounce(searchQuery, 300)
-  
-  const fetchProducts = async () => {
-    if (!supabase) return
-    
-    const from = (currentPage - 1) * ITEMS_PER_PAGE
-    const to = from + ITEMS_PER_PAGE - 1
-    
-    let query = supabase
-      .from('products')
-      .select('id, name, slug, price, image_urls, item_type, is_active, categories(name)', { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .range(from, to)
-    
-    if (debouncedSearch) {
-      query = query.ilike('name', `%${debouncedSearch}%`)
-    }
-    
-    const { data, count, error } = await query
-    
-    if (!error) {
-      setProducts((data as unknown as Product[]) || [])
-      setTotalCount(count || 0)
-    }
-    
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const [status, setStatus] = useState('all')
+  const [type, setType] = useState('all')
+  const [page, setPage] = useState(1)
+  const [count, setCount] = useState(0)
+  const [updating, setUpdating] = useState<string | null>(null)
+  const search = useDebounce(query, 300)
+
+  const fetchProducts = useCallback(async () => {
+    if (!supabase) { setError('Supabase is not configured.'); setLoading(false); return }
+    setLoading(true); setError(null)
+    let request = supabase.from('products').select('id,name,slug,price,image_urls,item_type,is_active,categories(name)', { count: 'exact' }).order('created_at', { ascending: false }).range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1)
+    if (search) request = request.ilike('name', `%${search}%`)
+    if (status !== 'all') request = request.eq('is_active', status === 'active')
+    if (type !== 'all') request = request.eq('item_type', type as 'curated' | 'shop' | 'archive')
+    const { data, count: resultCount, error: requestError } = await request
+    if (requestError) setError(requestError.message)
+    else { setProducts((data as unknown as Product[]) || []); setCount(resultCount || 0) }
     setLoading(false)
+  }, [supabase, page, search, status, type])
+
+  useEffect(() => { void fetchProducts() }, [fetchProducts])
+  const pages = Math.max(1, Math.ceil(count / PAGE_SIZE))
+
+  async function togglePublished(product: Product) {
+    if (!supabase) return
+    setUpdating(product.id); setError(null)
+    const { error: updateError } = await supabase.from('products').update({ is_active: !product.is_active }).eq('id', product.id)
+    if (updateError) setError(updateError.message)
+    else setProducts((items) => items.map((item) => item.id === product.id ? { ...item, is_active: !item.is_active } : item))
+    setUpdating(null)
   }
-  
-  useEffect(() => {
-    void Promise.resolve().then(fetchProducts)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, currentPage])
-  
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
-  
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-on-background">Products</h2>
-        <Link href="/admin/products/new" prefetch={false}>
-          <Button>Add Product</Button>
-        </Link>
+
+  return <div className="space-y-6">
+    <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-on-surface-variant">Catalog</p><h1 className="mt-1 font-audiowide text-3xl text-on-background">Products</h1><p className="mt-2 text-sm text-on-surface-variant">Manage the pieces in Vesna’s collection.</p></div><Button asChild><Link href="/admin/products/new"><Plus className="mr-2 h-4 w-4" />Add product</Link></Button></div>
+    {error && <div role="alert" className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>}
+    <Card><CardContent className="p-0">
+      <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center">
+        <div className="relative min-w-0 flex-1"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant" /><Input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1) }} placeholder="Search products…" className="pl-9" /></div>
+        <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1) }} aria-label="Filter by publication status" className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">All statuses</option><option value="active">Published</option><option value="inactive">Offline</option></select>
+        <select value={type} onChange={(e) => { setType(e.target.value); setPage(1) }} aria-label="Filter by collection" className="h-10 rounded-md border border-input bg-background px-3 text-sm"><option value="all">All collections</option><option value="curated">Curated</option><option value="shop">Shop</option><option value="archive">Archive</option></select>
+        <p className="shrink-0 text-sm text-on-surface-variant" aria-live="polite">{count} {count === 1 ? 'product' : 'products'}</p>
       </div>
-      
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-4">
-            <Input
-              placeholder="Search products..."
-              className="max-w-sm"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
-                setCurrentPage(1)
-                setLoading(Boolean(supabase))
-              }}
-            />
-            {loading && <span className="text-sm text-on-surface-variant">Loading...</span>}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-outline-variant">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-on-surface-variant">Product</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-on-surface-variant">Category</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-on-surface-variant">Type</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-on-surface-variant">Price</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-on-surface-variant">Status</th>
-                  <th className="text-right py-3 px-4 text-sm font-medium text-on-surface-variant">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  // Skeleton loading state
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <tr key={i} className="border-b border-outline-variant/30">
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          <Skeleton className="w-10 h-10 rounded" />
-                          <div className="space-y-1">
-                            <Skeleton className="h-4 w-32" />
-                            <Skeleton className="h-3 w-20" />
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4"><Skeleton className="h-4 w-20" /></td>
-                      <td className="py-3 px-4"><Skeleton className="h-4 w-16" /></td>
-                      <td className="py-3 px-4"><Skeleton className="h-4 w-12" /></td>
-                      <td className="py-3 px-4"><Skeleton className="h-4 w-16" /></td>
-                      <td className="py-3 px-4 text-right"><Skeleton className="h-8 w-16 ml-auto" /></td>
-                    </tr>
-                  ))
-                ) : products.length > 0 ? (
-                  products.map((product) => (
-                    <tr
-                      key={product.id}
-                      className="border-b border-outline-variant/30 hover:bg-surface-container/50"
-                    >
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-3">
-                          {product.image_urls?.[0] ? (
-                            <div className="relative w-10 h-10 rounded overflow-hidden">
-                              <Image
-                                src={product.image_urls[0]}
-                                alt={product.name}
-                                fill
-                                className="object-cover"
-                                sizes="40px"
-                              />
-                            </div>
-                          ) : (
-                            <div className="w-10 h-10 rounded bg-surface-container" />
-                          )}
-                          <div>
-                            <p className="font-medium text-on-background">{product.name}</p>
-                            <p className="text-sm text-on-surface-variant">{product.slug}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-on-surface-variant">
-                        {product.categories?.[0]?.name || '-'}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                          {product.item_type}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-on-background">
-                        {product.price ? `$${product.price}` : '-'}
-                      </td>
-                      <td className="py-3 px-4">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            product.is_active
-                              ? 'bg-green-500/10 text-green-500'
-                              : 'bg-stone-500/10 text-stone-500'
-                          }`}
-                        >
-                          {product.is_active ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <Link href={`/admin/products/${product.id}/edit`} prefetch={false}>
-                          <Button className="h-8 px-3 text-sm">
-                            Edit
-                          </Button>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="py-8 text-center text-on-surface-variant">
-                      {debouncedSearch ? 'No products match your search.' : 'No products yet. Add your first product to get started.'}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-outline-variant">
-              <p className="text-sm text-on-surface-variant">
-                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} of {totalCount}
-              </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  className="h-8 w-8 p-0 border border-outline-variant"
-                  onClick={() => {
-                    setCurrentPage(p => Math.max(1, p - 1))
-                    setLoading(Boolean(supabase))
-                  }}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <span className="text-sm text-on-surface-variant px-2">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                  className="h-8 w-8 p-0 border border-outline-variant"
-                  onClick={() => {
-                    setCurrentPage(p => Math.min(totalPages, p + 1))
-                    setLoading(Boolean(supabase))
-                  }}
-                  disabled={currentPage === totalPages}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  )
+      <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left"><thead><tr className="border-b border-outline-variant text-xs uppercase tracking-wider text-on-surface-variant"><th className="px-4 py-3 font-medium">Product</th><th className="px-4 py-3 font-medium">Category</th><th className="px-4 py-3 font-medium">Collection</th><th className="px-4 py-3 font-medium">Price</th><th className="px-4 py-3 font-medium">Status</th><th className="px-4 py-3 text-right font-medium">Manage</th></tr></thead>
+      <tbody>{loading ? <tr><td colSpan={6} className="px-4 py-12 text-center text-sm text-on-surface-variant">Loading products…</td></tr> : products.length ? products.map((product) => <tr key={product.id} className="border-b border-outline-variant/60 last:border-0 hover:bg-surface-container/40"><td className="px-4 py-3"><div className="flex items-center gap-3">{product.image_urls?.[0] ? <div className="relative h-12 w-12 overflow-hidden rounded-md bg-background"><Image src={product.image_urls[0]} alt="" fill sizes="48px" className="object-cover" /></div> : <div className="h-12 w-12 rounded-md bg-background" />}<div><p className="font-medium text-on-background">{product.name}</p><p className="text-xs text-on-surface-variant">{product.slug}</p></div></div></td><td className="px-4 py-3 text-sm text-on-surface-variant">{product.categories?.[0]?.name || '—'}</td><td className="px-4 py-3 text-sm capitalize text-on-surface-variant">{product.item_type}</td><td className="px-4 py-3 text-sm text-on-background">{product.price == null ? '—' : `$${Number(product.price).toFixed(2)}`}</td><td className="px-4 py-3"><span className={`rounded-full px-2.5 py-1 text-xs ${product.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-700'}`}>{product.is_active ? 'Published' : 'Offline'}</span></td><td className="px-4 py-3"><div className="flex justify-end gap-2"><Button variant="outline" size="sm" disabled={updating === product.id} onClick={() => void togglePublished(product)}>{updating === product.id ? 'Saving…' : product.is_active ? 'Take offline' : 'Publish'}</Button><Button asChild size="sm"><Link href={`/admin/products/${product.id}/edit`}>Edit</Link></Button></div></td></tr>) : <tr><td colSpan={6} className="px-4 py-14 text-center"><p className="font-medium text-on-background">{count === 0 ? 'No products found' : 'No products on this page'}</p><p className="mt-1 text-sm text-on-surface-variant">Try clearing a filter or add a new product.</p></td></tr>}</tbody></table></div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant px-4 py-3"><p className="text-sm text-on-surface-variant">{count ? `Showing ${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, count)} of ${count}` : 'No results'}</p><div className="flex items-center gap-2"><Button variant="outline" size="sm" aria-label="Previous page" disabled={page <= 1 || loading} onClick={() => setPage((current) => current - 1)}><ChevronLeft className="h-4 w-4" /></Button><span className="text-sm text-on-surface-variant">{page} / {pages}</span><Button variant="outline" size="sm" aria-label="Next page" disabled={page >= pages || loading} onClick={() => setPage((current) => current + 1)}><ChevronRight className="h-4 w-4" /></Button></div></div>
+    </CardContent></Card>
+  </div>
 }

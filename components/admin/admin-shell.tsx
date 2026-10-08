@@ -9,11 +9,11 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#f4f0e8]">
       <AdminSidebar />
       <main className="lg:ml-64 min-h-screen">
         <AdminHeader />
-        <div className="p-6">
+        <div className="mx-auto max-w-[1500px] p-4 sm:p-6 lg:p-8">
           {children}
         </div>
       </main>
@@ -31,7 +31,7 @@ function NavLink({ href, icon, children }: { href: string; icon: React.ReactNode
       className={`flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
         isActive
           ? 'text-primary bg-primary/10 font-medium'
-          : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+          : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
       }`}
     >
       <span className={isActive ? 'text-primary' : 'text-current'}>{icon}</span>
@@ -74,12 +74,12 @@ function SubscribersIcon() {
 
 function AdminSidebar() {
   return (
-    <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:w-64 lg:flex lg:flex-col lg:bg-surface lg:border-r lg:border-outline-variant">
-      <div className="p-6 border-b border-outline-variant">
-        <Link href="/" className="font-audiowide text-2xl text-on-background tracking-[0.3em]">
+    <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-white/10 lg:bg-[#25231f]">
+      <div className="border-b border-white/10 p-6">
+        <Link href="/" className="font-audiowide text-2xl tracking-[0.3em] text-[#f4f0e8]">
           VESN<span className="lambda-exo2">Λ</span>
         </Link>
-        <p className="font-section-header text-on-surface-variant text-xs mt-2 tracking-[0.15em]">Admin Panel</p>
+        <p className="mt-2 font-section-header text-xs tracking-[0.15em] text-[#c3b9a8]">CURATOR STUDIO</p>
       </div>
 
       <nav className="flex-1 p-4 space-y-1">
@@ -89,10 +89,10 @@ function AdminSidebar() {
         <NavLink href="/admin/subscribers" icon={<SubscribersIcon />}>Subscribers</NavLink>
       </nav>
 
-      <div className="p-4 border-t border-outline-variant">
+      <div className="border-t border-white/10 p-4">
         <Link
           href="/"
-          className="flex items-center gap-3 px-3 py-2 text-sm text-on-surface-variant hover:text-on-surface rounded-md hover:bg-surface-container transition-colors"
+          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-[#c3b9a8] transition-colors hover:bg-white/10 hover:text-white"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -106,9 +106,9 @@ function AdminSidebar() {
 
 function AdminHeader() {
   return (
-    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b border-outline-variant">
-      <div className="flex items-center justify-between h-16 px-6">
-        <p className="font-section-header text-on-surface-variant text-xs tracking-[0.2em]">Administration</p>
+    <header className="sticky top-0 z-40 border-b border-outline-variant bg-[#f4f0e8]/90 backdrop-blur-sm">
+      <div className="flex h-16 items-center justify-between px-4 sm:px-6">
+        <p className="font-section-header text-xs tracking-[0.2em] text-on-surface-variant">VESNA / CURATOR STUDIO</p>
       </div>
       <nav aria-label="Admin navigation" className="lg:hidden flex flex-wrap gap-2 px-3 pb-3">
         <NavLink href="/admin/dashboard" icon={<DashboardIcon />}>Dashboard</NavLink>
