@@ -1,106 +1,108 @@
-﻿'use client'
-
-import { useMemo } from 'react'
-import Image from 'next/image'
+import type { Metadata } from 'next'
+import CatalogImage from '@/components/CatalogImage'
+import VenusTriggerPill from '@/components/VenusTriggerPill'
+import { sellerDetails } from '@/lib/affiliate'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
-import { PICKS, toSlug } from '@/lib/shop-data'
+import { notFound } from 'next/navigation'
+import { getProductBySlug, getProductSlugs } from '@/lib/data'
+import { formatPrice, effectivePricing } from '@/lib/pricing'
 
-export default function ProductDetailPage() {
-  const params = useParams()
-  const slug = params.slug as string
+/** ISR: catalog refreshes every 5 min; admin edits land within one revalidation cycle. */
+export const revalidate = 300
 
-  const product = useMemo(() => {
-    return PICKS.find((p) => toSlug(p.name) === slug) || null
-  }, [slug])
 
-  if (!product) {
-    return (
-      <main className="min-h-screen bg-background flex items-center justify-center px-5">
-        <div className="text-center">
-          <h1 className="font-audiowide text-4xl text-primary mb-4">Product Not Found</h1>
-          <p className="font-body-main text-on-surface-variant mb-8">This pick doesn&apos;t seem to exist.</p>
-          <Link href="/shop" className="border border-primary px-8 py-4 text-primary font-button-label text-xs uppercase tracking-widest hover:bg-primary hover:text-black transition-all">
-            Back to Shop
-          </Link>
-        </div>
-      </main>
-    )
+// Pre-render known product pages at build; new/renamed slugs render on demand + cache.
+export async function generateStaticParams() {
+  const slugs = await getProductSlugs()
+  return slugs.map((slug) => ({ slug }))
+}
+
+interface PageProps {
+  params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const product = await getProductBySlug(slug)
+  if (!product) return { title: 'Product Not Found — Vesna' }
+
+  return {
+    title: `${product.name} — Vesna Picks`,
+    description: product.why_victory ?? product.description ?? `Victory's pick: ${product.name}`,
+    alternates: { canonical: `/shop/${product.slug}` },
+    openGraph: {
+      title: product.name,
+      description: product.why_victory ?? undefined,
+      images: product.image_urls?.[0] ? [{ url: product.image_urls[0] }] : undefined,
+      type: 'website',
+    },
   }
+}
+
+export default async function ProductDetailPage({ params }: PageProps) {
+  const { slug } = await params
+  const product = await getProductBySlug(slug)
+  if (!product) notFound()
+
+  const { price, strike } = effectivePricing(product)
+  const isFallback = product.id.startsWith('fallback-')
+  const category = product.categories?.name ?? 'Collection'
+  const seller = !isFallback && product.item_type !== 'archive' ? sellerDetails(product.affiliate_link) : null
 
   return (
     <main className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 mb-12 font-button-label text-[10px] uppercase tracking-widest text-outline">
-          <Link href="/shop" className="hover:text-primary transition-colors">Shop</Link>
+        <nav className="flex items-center gap-2 mb-12 font-button-label text-[10px] uppercase tracking-widest text-outline">
+          <Link href="/picks" className="hover:text-primary transition-colors">Picks</Link>
           <span>/</span>
-          <span className="text-primary">{product.category}</span>
-        </div>
+          <span className="text-primary">{category}</span>
+        </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           {/* Image */}
           <div className="relative aspect-[4/3] overflow-hidden bg-surface-container">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              className="object-cover grayscale-[10%]"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              priority
-            />
-            {product.badge && (
-              <div className={`absolute top-4 left-4 z-10 px-3 py-1 text-[9px] font-button-label uppercase tracking-widest ${
-                product.badge === "Victory's pick" ? 'bg-primary text-black' : 'bg-secondary-container text-on-secondary-container'
-              }`}>
-                {product.badge}
+            <CatalogImage src={product.image_urls?.[0]} alt={product.name} sizes="(max-width: 1024px) 100vw, 50vw" priority />
+            {product.is_featured && (
+              <div className="absolute top-4 left-4 z-10 px-3 py-1 text-[9px] font-button-label uppercase tracking-widest bg-primary text-black">
+                Victory&apos;s pick
               </div>
             )}
           </div>
 
           {/* Details */}
           <div className="flex flex-col justify-center">
-            <span className="text-primary font-button-label text-[10px] uppercase tracking-widest mb-4">{product.category}</span>
-            <h1 className="font-audiowide text-2xl lg:text-3xl text-on-background mb-4">{product.name}</h1>
+            <span className="text-primary font-button-label text-[10px] uppercase tracking-widest mb-4">{category}</span>
+            <h1 className="font-display-hero text-3xl lg:text-4xl text-on-background mb-4">{product.name}</h1>
 
             <div className="flex items-baseline gap-4 mb-6">
-              <span className="font-spectral text-xl text-primary">{product.price}</span>
-              {product.originalPrice && (
-                <span className="font-spectral text-sm text-outline line-through">{product.originalPrice}</span>
+              <span className="font-spectral text-xl text-primary">{price == null ? 'Price not listed' : formatPrice(price)}</span>
+              {strike != null && (
+                <span className="font-spectral text-sm text-outline line-through">{formatPrice(strike)}</span>
               )}
             </div>
 
-            <p className="font-playfair text-on-surface-variant text-sm italic leading-relaxed mb-8">
-              &ldquo;{product.quote}&rdquo;
-            </p>
-
-            {product.category === 'courses' && (
-              <div className="border-t border-outline-variant pt-8 mb-8">
-                <h3 className="font-button-label text-[10px] uppercase tracking-widest text-outline mb-4">What&apos;s Included</h3>
-                <ul className="space-y-3 font-body-main text-sm text-on-surface-variant">
-                  <li className="flex items-center gap-3">
-                    <span className="w-1 h-1 bg-primary rounded-full" />
-                    Lifetime access with future updates
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="w-1 h-1 bg-primary rounded-full" />
-                    Downloadable resources and templates
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="w-1 h-1 bg-primary rounded-full" />
-                    Community access
-                  </li>
-                </ul>
-              </div>
-            )}
-
-            <button className="w-full py-5 border border-primary text-primary font-button-label uppercase text-xs tracking-[0.2em] hover:bg-primary hover:text-black transition-all duration-300">
-              Purchase &mdash; {product.price}
-            </button>
-
-            <p className="text-center text-outline/50 text-[10px] font-button-label mt-4 uppercase tracking-wider">
-              Secure checkout via affiliate partner
-            </p>
+            {isFallback && <p className="text-outline text-sm mb-6">Preview pick. Prices and seller availability have not been verified.</p>}
+            {product.why_victory && <section className="border-t border-outline-variant pt-6 mb-6">
+              <h2 className="font-spectral text-xl mb-3">Why Victory chose it</h2>
+              <p className="text-on-surface-variant font-body-main leading-relaxed">{product.why_victory}</p>
+            </section>}
+            {product.description && product.description !== product.why_victory && <section className="mb-6">
+              <h2 className="font-spectral text-xl mb-3">About this pick</h2>
+              <p className="text-on-surface-variant font-body-main leading-relaxed whitespace-pre-line">{product.description}</p>
+            </section>}
+            <div className="mb-8"><VenusTriggerPill productName={product.name} productSlug={product.slug} /></div>
+            {seller ? <>
+              <a href={`/api/track-click?productId=${encodeURIComponent(product.id)}`} rel="sponsored noopener noreferrer" target="_blank"
+                className="w-full block text-center py-5 bg-primary text-on-primary font-button-label text-xs uppercase tracking-wider hover:bg-primary/90 focus-ring">
+                Visit seller — {seller.name}
+              </a>
+              <p className="text-sm text-outline mt-4 leading-relaxed">Confirm the current price, availability, and purchase terms with the seller. Vesna may earn a commission from qualifying purchases.</p>
+            </> : <div className="border border-outline-variant p-5">
+              <p className="font-spectral text-xl mb-2">{product.item_type === 'archive' ? 'An archive piece' : 'Seller link unavailable'}</p>
+              <p className="text-on-surface-variant text-sm leading-relaxed mb-4">{product.item_type === 'archive' ? 'This piece is part of the archive and is not offered for sale here.' : 'A seller link has not been added for this pick yet.'}</p>
+              <Link href="/picks" className="text-primary underline underline-offset-4 text-sm">Explore other picks</Link>
+            </div>}
           </div>
         </div>
       </div>

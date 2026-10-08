@@ -101,6 +101,10 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
   }
 
   async function handleSubmit(e: React.FormEvent) {
+    if (!supabase) {
+      setError?.('Supabase is not configured (missing NEXT_PUBLIC_SUPABASE_* env vars).')
+      return
+    }
     e.preventDefault()
     setSaving(true)
     setError(null)

@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Tenor_Sans, Audiowide, Spectral, Cinzel, Playfair_Display } from "next/font/google";
 import "./globals.css";
 

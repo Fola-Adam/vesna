@@ -48,13 +48,13 @@ function StatItem({ end, suffix = "", decimals = 0, label, isVisible }: StatItem
   );
 }
 
-export default function StatsSection() {
+export default function StatsSection({ objectCount, categoryCount }: { objectCount: number; categoryCount: number }) {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRevealOnScroll({ onReveal: () => setIsVisible(true) });
 
   const stats = [
-    { end: 12, label: "Curated Objects" },
-    { end: 5, label: "Categories" },
+    { end: objectCount, label: "Catalog Picks" },
+    ...(categoryCount > 0 ? [{ end: categoryCount, label: "Categories" }] : []),
   ];
 
   return (
@@ -64,7 +64,7 @@ export default function StatsSection() {
     >
       <div className="max-w-screen-xl mx-auto">
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-8 lg:gap-12 mb-16 lg:mb-20">
+        <div className={`grid ${categoryCount > 0 ? "grid-cols-2" : "grid-cols-1"} gap-8 lg:gap-12`}>
           {stats.map((stat, index) => (
             <StatItem
               key={index}

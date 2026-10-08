@@ -24,7 +24,7 @@ export default function Footer() {
             <Link
               key={link.href}
               href={link.href}
-              className="font-button-label uppercase text-[10px] tracking-widest text-[#666666] hover:text-[#f0ebe0] transition-colors"
+              className="font-button-label uppercase text-xs tracking-wider text-outline hover:text-[#f0ebe0] transition-colors"
             >
               {link.label}
             </Link>
@@ -39,7 +39,7 @@ export default function Footer() {
           Oracle:Atlas
         </div>
 
-        <p className="max-w-2xl text-center text-[#666666] text-[9px] tracking-widest leading-relaxed uppercase">
+        <p className="max-w-2xl text-center text-outline text-xs tracking-widest leading-relaxed uppercase">
           Vesna is a curated platform. We may earn a commission from products
           purchased through our links, supporting our editorial independence and
           high-standard curation.

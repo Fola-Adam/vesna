@@ -1,5 +1,6 @@
 "use client";
 
+import Icon from "@/components/Icon";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -19,7 +20,6 @@ export default function HeroSection() {
             style={{ animation: "fade-hero 10s infinite" }}
           />
           <Image
-            priority
             alt="Curated workspace with warm ambient lighting"
             className="object-cover brightness-75 will-change-transform"
             src="/vesna-imgs/editorial-luxurious-workspace.webp"
@@ -44,7 +44,7 @@ export default function HeroSection() {
             href="/picks"
             className="inline-block bg-primary text-on-primary font-button-label text-xs lg:text-sm px-8 lg:px-12 py-4 lg:py-5 uppercase tracking-[0.2em] transition-all hover:bg-white hover:text-black border border-primary shadow-[0_20px_50px_rgba(230,195,100,0.2)] btn-shimmer gold-glow focus-ring"
           >
-            Enter the Sanctuary
+            Explore Victory&apos;s picks
           </Link>
         </div>
       </div>
@@ -55,8 +55,7 @@ export default function HeroSection() {
           <div className="absolute -inset-2 border border-primary/30" />
           <div className="relative z-10 w-full h-full shadow-2xl brightness-90 overflow-hidden">
             <Image
-              priority
-              alt="Editorial detail with warm tones"
+                alt="Editorial detail with warm tones"
               className="object-cover"
               src="/vesna-imgs/secondary-overlay-image.webp"
               fill
@@ -64,8 +63,7 @@ export default function HeroSection() {
               style={{ animation: "cycle-overlay 12s infinite" }}
             />
             <Image
-              priority
-              alt="Vintage dark gold workspace detail"
+                alt="Vintage dark gold workspace detail"
               className="object-cover"
               src="/vesna-imgs/vintage-workdesk-darkgold.webp"
               fill
@@ -73,8 +71,7 @@ export default function HeroSection() {
               style={{ animation: "cycle-overlay-2 12s infinite" }}
             />
             <Image
-              priority
-              alt="Minimal workspace arrangement"
+                alt="Minimal workspace arrangement"
               className="object-cover"
               src="/vesna-imgs/minimal-workdesk.webp"
               fill
@@ -88,9 +85,7 @@ export default function HeroSection() {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-6 lg:bottom-10 left-5 sm:left-8 lg:left-20 animate-bounce opacity-40 z-20">
-        <span className="material-symbols-outlined text-on-background text-2xl">
-          keyboard_double_arrow_down
-        </span>
+        <Icon name="keyboard_double_arrow_down" className="text-on-background text-2xl" />
       </div>
 
       <style jsx global>{`

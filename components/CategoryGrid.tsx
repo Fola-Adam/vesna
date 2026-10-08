@@ -1,5 +1,6 @@
 "use client";
 
+import Icon from "@/components/Icon";
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,7 +12,11 @@ const categories = [
   { name: "Finance", icon: "account_balance", image: "/vesna-imgs/luxury-watch-on-book.webp", href: "/picks" },
 ];
 
-export default function CategoryGrid() {
+export default function CategoryGrid({ categoryNames }: { categoryNames: string[] }) {
+  const catalogCategories = categoryNames.map(name => {
+    const template = categories.find(category => category.name.toLowerCase() === name.toLowerCase());
+    return { name, icon: template?.icon ?? "star", image: template?.image ?? "/vesna-imgs/minimal-workdesk.webp", href: `/picks?category=${encodeURIComponent(name.trim().toLowerCase())}` };
+  });
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -33,6 +38,8 @@ export default function CategoryGrid() {
     return () => observer.disconnect();
   }, []);
 
+  if (!catalogCategories.length) return null;
+
   return (
     <section
       ref={sectionRef}
@@ -44,30 +51,28 @@ export default function CategoryGrid() {
             Explore Collections
           </h2>
           <p className="font-display-hero text-2xl sm:text-3xl lg:text-4xl text-on-background">
-            Shop by Category
+            Browse by Category
           </p>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-          {categories.map((category) => (
+          {catalogCategories.map((category) => (
             <Link
-              key={category.name}
+              key={category.name.charAt(0).toUpperCase() + category.name.slice(1)}
               href={category.href}
               className="group relative aspect-square overflow-hidden bg-surface-container hover-lift glow-hover"
             >
               <Image
                 src={category.image}
-                alt={category.name}
+                alt={category.name.charAt(0).toUpperCase() + category.name.slice(1)}
                 className="object-cover category-image-zoom"
                 fill
                 sizes="(max-width: 768px) 50vw, 25vw"
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="material-symbols-outlined text-3xl lg:text-4xl text-primary mb-2">
-                  {category.icon}
-                </span>
+                <Icon name={category.icon} className="text-3xl lg:text-4xl text-primary mb-2" />
                 <h3 className="font-section-header text-sm lg:text-base text-on-background uppercase tracking-[0.15em]">
-                  {category.name}
+                  {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
                 </h3>
               </div>
               <div className="absolute bottom-0 left-0 w-full h-1 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />

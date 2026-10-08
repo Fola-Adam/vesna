@@ -14,6 +14,10 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!supabase) {
+      setError('Supabase is not configured (missing NEXT_PUBLIC_SUPABASE_* env vars).')
+      return
+    }
     setLoading(true)
     setError(null)
 
@@ -68,7 +72,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-surface-container border border-outline/30 px-4 py-3 text-on-background placeholder:text-outline/50 focus:outline-none focus:border-primary font-body-main"
-              placeholder="victory@vesna.ng"
+              placeholder="you@example.com"
               required
             />
           </div>

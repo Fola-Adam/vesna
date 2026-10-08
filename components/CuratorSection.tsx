@@ -1,5 +1,6 @@
 "use client";
 
+import Icon from "@/components/Icon";
 import { useRevealOnScroll } from "@/hooks/use-reveal-on-scroll";
 import Link from "next/link";
 import Image from "next/image";
@@ -35,9 +36,7 @@ export default function CuratorSection() {
             className="inline-flex items-center gap-3 lg:gap-4 font-button-label text-xs lg:text-sm text-on-background group hover:text-primary transition-colors"
           >
             READ THE MONOGRAPH
-            <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform">
-              arrow_right_alt
-            </span>
+            <Icon name="arrow_right_alt" className="group-hover:translate-x-2 transition-transform" />
           </Link>
         </div>
         <div className="order-1 md:order-2">
