@@ -2,37 +2,37 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({
-    request: { headers: request.headers },
-  })
+  const login = () => {
+    const url = new URL('/login', request.url)
+    url.searchParams.set('next', request.nextUrl.pathname)
+    const response = NextResponse.redirect(url)
+    response.headers.set('Cache-Control', 'no-store')
+    return response
+  }
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  if (!url || !key) return login()
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
+  let response = NextResponse.next({ request })
+  try {
+    const supabase = createServerClient(url, key, {
       cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string) {
-          request.cookies.set({ name, value })
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          })
-          response.cookies.set({ name, value })
-        },
-        remove(name: string) {
-          request.cookies.set({ name, value: '' })
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          })
-          response.cookies.set({ name, value: '', maxAge: 0 })
+        getAll: () => request.cookies.getAll(),
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          response = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
         },
       },
-    }
-  )
-
-  await supabase.auth.getUser()
-
-  return response
+    })
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (!user || error) return login()
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles').select('role').eq('id', user.id).single()
+    if (profileError || profile?.role !== 'admin') return login()
+    response.headers.set('Cache-Control', 'no-store')
+    return response
+  } catch {
+    return login()
+  }
 }

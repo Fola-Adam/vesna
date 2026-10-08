@@ -1,4 +1,5 @@
-import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss"
+import animate from "tailwindcss-animate";
 
 const config: Config = {
   content: [
@@ -12,6 +13,11 @@ const config: Config = {
         // Base
         background: "var(--background)",
         foreground: "var(--foreground)",
+        paper: "var(--paper)",
+        "paper-raised": "var(--paper-raised)",
+        ink: "var(--ink)",
+        "ink-muted": "var(--ink-muted)",
+        "primary-ink": "var(--primary-ink)",
         
         // Surface Colors
         surface: "var(--surface)",
@@ -83,6 +89,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 };
 export default config;

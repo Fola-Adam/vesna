@@ -38,7 +38,7 @@ export default function ScrollProgress() {
       aria-label="Page scroll progress"
     >
       <div
-        className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-100"
+        className="h-full bg-primary transition-[width] duration-100"
         style={{ width: `${progress}%` }}
       />
     </div>

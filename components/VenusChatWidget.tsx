@@ -1,395 +1,160 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
+import * as Dialog from '@radix-ui/react-dialog'
+import { ArrowUpRight, Maximize, Minimize, Sparkles, Trash2, X } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import styles from './VenusChatWidget.module.css'
+import { readVenusStream, type VenusProduct } from '@/lib/venus-stream'
+import { formatPrice } from '@/lib/pricing'
+import { useVenus } from './VenusProvider'
+import CatalogImage from './CatalogImage'
 
-interface MatchedProduct {
-  name: string
-  slug: string
-  price: number | null
-  image_urls: string[] | null
-  description: string | null
-  item_type: string
-  similarity: number
-}
-
-interface Message {
-  role: 'assistant' | 'user'
-  content: string
-  products?: MatchedProduct[]
-}
-
+interface Message { role: 'assistant' | 'user'; content: string; products?: VenusProduct[] }
 const STORAGE_KEY = 'vesna_chat_messages'
+const WELCOME_MESSAGES: Message[] = [{ role: 'assistant', content: "I'm Venus. Ask me about a pick, compare options, or describe what you're looking for." }]
 
 function loadMessages(): Message[] {
-  if (typeof window === 'undefined') return []
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
-    return JSON.parse(raw)
-  } catch {
-    return []
-  }
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')
+    return Array.isArray(saved) ? saved.filter(message => message && ['user', 'assistant'].includes(message.role) && typeof message.content === 'string').slice(-50) : []
+  } catch { return [] }
 }
-
 function saveMessages(messages: Message[]) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
-  } catch {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-50))) } catch {}
 }
 
 export default function VenusChatWidget() {
-  const [isOpen, setIsOpen] = useState(false)
+  const { isOpen, setIsOpen, draft: inputValue, setDraft: setInputValue, productSlug, openChat } = useVenus()
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [initialized, setInitialized] = useState(false)
+  const [messages, setMessages] = useState<Message[]>(WELCOME_MESSAGES)
   const [isTyping, setIsTyping] = useState(false)
   const [streamText, setStreamText] = useState('')
-  const [inputValue, setInputValue] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const streamContentRef = useRef('')
-  const streamProductsRef = useRef<MatchedProduct[] | null>(null)
+  const streamProductsRef = useRef<VenusProduct[]>([])
   const streamFlushRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const requestRef = useRef<AbortController | null>(null)
+  const messagesInitialized = useRef(false)
 
   useEffect(() => {
-    const saved = loadMessages()
-    if (saved.length > 0) {
-      setMessages(saved)
-    } else {
-      setMessages([
-        {
-          role: 'assistant',
-          content:
-            "Welcome to Vesna. I'm Venus. How can I help you discover exceptional objects today?",
-        },
-      ])
-    }
-    setInitialized(true)
-  }, [])
-
-  useEffect(() => {
-    if (initialized) {
-      saveMessages(messages)
-    }
-  }, [messages, initialized])
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, isTyping, streamText])
-
-  const toggleChat = () => {
-    setIsOpen((o) => {
-      if (!o && window.innerWidth < 768) setIsFullscreen(true)
-      return !o
+    let cancelled = false
+    void Promise.resolve().then(() => {
+      if (cancelled) return
+      const saved = loadMessages()
+      if (saved.length) setMessages(saved)
+      messagesInitialized.current = true
     })
-  }
+    return () => {
+      cancelled = true
+      requestRef.current?.abort()
+      if (streamFlushRef.current) clearInterval(streamFlushRef.current)
+    }
+  }, [])
+  useEffect(() => { if (messagesInitialized.current) saveMessages(messages) }, [messages])
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, isTyping, streamText])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
     const text = inputValue.trim()
-    if (!text || isTyping) return
-
+    if (!text || isTyping || requestRef.current) return
+    const controller = new AbortController()
+    requestRef.current = controller
     setInputValue('')
-    setMessages((prev) => [...prev, { role: 'user', content: text }])
+    setMessages(previous => [...previous, { role: 'user', content: text }])
     setIsTyping(true)
     setStreamText('')
     streamContentRef.current = ''
-    streamProductsRef.current = null
-
+    streamProductsRef.current = []
     try {
-      const res = await fetch('/api/venus', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: text,
-          history: messages
-            .filter((m) => m.role !== 'assistant' || messages.indexOf(m) !== 0)
-            .map((m) => ({ role: m.role, content: m.content })),
-        }),
+      const response = await fetch('/api/venus', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
+        body: JSON.stringify({ message: text, productSlug, history: messages.slice(-10).map(message => ({ role: message.role, content: message.content })) }),
       })
-
-      if (!res.ok) throw new Error('Request failed')
-
-      const reader = res.body!.getReader()
-      const decoder = new TextDecoder()
-
-      streamFlushRef.current = setInterval(() => {
-        if (streamContentRef.current) {
-          setStreamText(streamContentRef.current)
-        }
-      }, 80)
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-
-        const chunk = decoder.decode(value, { stream: true })
-
-        if (chunk.includes('__VENUS_PRODUCTS__')) {
-          const [textPart, productsJson] = chunk.split('__VENUS_PRODUCTS__')
-          if (textPart) streamContentRef.current += textPart
-          try {
-            streamProductsRef.current = JSON.parse(productsJson)
-          } catch {}
-        } else if (chunk.includes('__VENUS_ERROR__')) {
-          if (streamFlushRef.current) clearInterval(streamFlushRef.current)
-          const [, errorMsg] = chunk.split('__VENUS_ERROR__')
-          streamContentRef.current = ''
-          setStreamText('')
-          setMessages((prev) => [
-            ...prev,
-            {
-              role: 'assistant',
-              content: errorMsg || 'I apologize, but I am having trouble connecting right now.',
-            },
-          ])
-          setIsTyping(false)
-          return
-        } else {
-          streamContentRef.current += chunk
-        }
+      if (!response.ok) {
+        const result = await response.json().catch(() => null)
+        throw new Error(typeof result?.error === 'string' ? result.error : 'Venus is temporarily unavailable. Please try again.')
       }
-
-      if (streamFlushRef.current) clearInterval(streamFlushRef.current)
-      setStreamText('')
-
-      const finalContent = streamContentRef.current
-      if (finalContent) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: finalContent,
-            products: streamProductsRef.current || undefined,
-          },
-        ])
+      if (!response.body) throw new Error('The response was empty. Please try again.')
+      streamFlushRef.current = setInterval(() => setStreamText(streamContentRef.current), 80)
+      await readVenusStream(response.body, event => {
+        if (event.type === 'text') streamContentRef.current += event.text
+        if (event.type === 'products') streamProductsRef.current = event.products
+      })
+      const content = streamContentRef.current
+      if (content || streamProductsRef.current.length) {
+        setMessages(previous => [...previous, { role: 'assistant', content, products: streamProductsRef.current }])
       }
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: 'I apologize, but I am having trouble connecting right now. Please try again shortly.',
-        },
-      ])
+    } catch (failure) {
+      if (!controller.signal.aborted) setMessages(previous => [...previous, {
+        role: 'assistant', content: failure instanceof Error ? failure.message : 'Venus is temporarily unavailable. Please try again.',
+      }])
     } finally {
-      if (streamFlushRef.current) {
-        clearInterval(streamFlushRef.current)
-        streamFlushRef.current = null
-      }
+      if (streamFlushRef.current) clearInterval(streamFlushRef.current)
+      streamFlushRef.current = null
+      requestRef.current = null
+      setStreamText('')
       setIsTyping(false)
     }
   }
 
-  return (
-    <>
-      {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-stone-950/98 backdrop-blur-2xl flex flex-col">
-          <div className="border-b-[0.5px] border-secondary/10 px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-secondary text-sm">auto_awesome</span>
-              <h3 className="font-button-label text-[9px] text-secondary uppercase tracking-[0.15em]">Venus</h3>
-            </div>
-            <div className="flex items-center gap-1">
-              <button onClick={() => setIsFullscreen(false)} className="text-stone-600 hover:text-secondary transition-colors p-1" aria-label="Exit fullscreen">
-                <span className="material-symbols-outlined text-base">fullscreen_exit</span>
-              </button>
-              <button onClick={toggleChat} className="text-stone-600 hover:text-secondary transition-colors p-1" aria-label="Close chat">
-                <span className="material-symbols-outlined text-base">close</span>
-              </button>
-            </div>
+  return <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog.Trigger asChild>
+      <button onClick={() => openChat()} aria-label="Open chat assistant"
+        className="fixed right-4 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-40 inline-flex items-center gap-2 px-4 py-3 rounded-full bg-surface-container border border-secondary/60 text-secondary shadow-xl hover:border-primary hover:text-primary focus-ring">
+        <Sparkles aria-hidden="true" size={18} /><span className="font-button-label text-xs">Ask Venus</span>
+      </button>
+    </Dialog.Trigger>
+    <Dialog.Portal>
+      <Dialog.Overlay className="fixed inset-0 z-[60] bg-black/50" />
+      <Dialog.Content className={`fixed right-0 top-0 bottom-0 z-[70] flex flex-col bg-stone-950 border-l border-secondary/30 shadow-2xl w-full ${isFullscreen ? '' : 'sm:w-[450px] lg:w-[560px]'} focus:outline-none`}>
+        <header className="flex items-center justify-between gap-3 px-5 py-4 border-b border-secondary/20">
+          <div><Dialog.Title className="font-spectral text-xl flex gap-2 items-center"><Sparkles aria-hidden="true" size={18} />Venus</Dialog.Title>
+            <Dialog.Description className="text-xs text-on-surface-variant mt-1">Discovery help, grounded in the catalog.</Dialog.Description></div>
+          <div className="flex gap-1">
+            <button disabled={isTyping} aria-label="Clear chat history" title="Clear chat history" onClick={() => { setMessages(WELCOME_MESSAGES); saveMessages([]) }} className="p-2 hover:text-primary focus-ring disabled:opacity-40"><Trash2 aria-hidden="true" size={18} /></button>
+            <button aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'} onClick={() => setIsFullscreen(full => !full)} className="hidden sm:block p-2 hover:text-primary focus-ring">{isFullscreen ? <Minimize aria-hidden="true" size={18} /> : <Maximize aria-hidden="true" size={18} />}</button>
+            <Dialog.Close aria-label="Close chat" className="p-2 hover:text-primary focus-ring"><X aria-hidden="true" size={20} /></Dialog.Close>
           </div>
-          <ChatMessages messages={messages} isTyping={isTyping} streamText={streamText} messagesEndRef={messagesEndRef} isFullscreen={true} />
-          <ChatInput inputValue={inputValue} setInputValue={setInputValue} isTyping={isTyping} handleSubmit={handleSubmit} />
+        </header>
+        <ChatMessages messages={messages} isTyping={isTyping} streamText={streamText} messagesEndRef={messagesEndRef} />
+        <div className="px-5 pb-3 flex flex-wrap gap-2">
+          {['Help me choose a pick', 'What should I check before buying?'].map(question => <button key={question} disabled={isTyping} onClick={() => setInputValue(question)} className="text-xs border border-outline-variant rounded-full px-3 py-2 text-on-surface-variant hover:border-primary focus-ring disabled:opacity-50">{question}</button>)}
         </div>
-      )}
-
-      {/* Side panel */}
-      <div className={`fixed top-0 right-0 h-full z-50 pointer-events-none ${isFullscreen ? 'hidden' : ''}`}>
-        <button
-          onClick={toggleChat}
-          aria-label="Open chat assistant"
-          className={`pointer-events-auto absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2 pl-4 pr-3 py-3 bg-secondary/10 hover:bg-secondary/20 cursor-pointer rounded-l-full transition-all border border-secondary/20 border-r-0 ${
-            isOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
-        >
-          <span className="material-symbols-outlined text-secondary text-sm">auto_awesome</span>
-          <span className="font-button-label text-[9px] text-secondary tracking-[0.15em] uppercase whitespace-nowrap">Ask Venus</span>
-        </button>
-
-        <div
-          className={`pointer-events-auto absolute top-0 right-0 h-full bg-stone-950/98 backdrop-blur-2xl border-l-[0.5px] border-secondary/20 shadow-2xl transition-all duration-300 ${
-            isOpen ? 'translate-x-0' : 'translate-x-full'
-          } ${
-            isFullscreen
-              ? 'w-full'
-              : 'w-[400px] sm:w-[450px] md:w-[500px] lg:w-[600px]'
-          }`}
-        >
-          <div className="bg-stone-950/50 border-b-[0.5px] border-secondary/10 px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-secondary text-sm">auto_awesome</span>
-              <h3 className="font-button-label text-[9px] text-secondary uppercase tracking-[0.15em]">Venus</h3>
-            </div>
-            <div className="flex items-center gap-1">
-              <button onClick={() => setIsFullscreen((f) => !f)} className="text-stone-600 hover:text-secondary transition-colors p-1" aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}>
-                <span className="material-symbols-outlined text-base">{isFullscreen ? 'fullscreen_exit' : 'fullscreen'}</span>
-              </button>
-              <button onClick={toggleChat} className="text-stone-600 hover:text-secondary transition-colors p-1" aria-label="Close chat">
-                <span className="material-symbols-outlined text-base">close</span>
-              </button>
-            </div>
-          </div>
-
-          <ChatMessages messages={messages} isTyping={isTyping} streamText={streamText} messagesEndRef={messagesEndRef} isFullscreen={false} />
-
-          <ChatInput inputValue={inputValue} setInputValue={setInputValue} isTyping={isTyping} handleSubmit={handleSubmit} />
+        <div className="border-t border-secondary/20 px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+          <form onSubmit={handleSubmit} className="flex gap-3 items-center">
+            <label className="sr-only" htmlFor="venus-message">Message Venus</label>
+            <input id="venus-message" value={inputValue} onChange={event => setInputValue(event.target.value)} placeholder="Ask about a pick or what you need…" disabled={isTyping} maxLength={2000}
+              className="flex-1 min-w-0 bg-transparent border border-outline-variant rounded px-3 py-3 text-sm placeholder:text-outline focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary" />
+            <button type="submit" aria-label="Send message" disabled={isTyping || !inputValue.trim()} className="p-3 bg-primary text-on-primary rounded focus-ring disabled:opacity-40"><ArrowUpRight aria-hidden="true" size={20} /></button>
+          </form>
+          <p className="text-xs text-outline mt-3">Confirm prices and product claims with the seller.</p>
         </div>
+      </Dialog.Content>
+    </Dialog.Portal>
+  </Dialog.Root>
+}
+
+function ChatMessages({ messages, isTyping, streamText, messagesEndRef }: {
+  messages: Message[]; isTyping: boolean; streamText: string; messagesEndRef: React.RefObject<HTMLDivElement | null>
+}) {
+  return <div role="log" aria-label="Conversation with Venus" aria-live="polite" className="flex-1 min-h-0 overflow-y-auto px-5 py-5 space-y-5">
+    {messages.map((message, index) => <div key={index} className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
+      <p className="text-xs text-secondary mb-2">{message.role === 'user' ? 'You' : 'Venus'}</p>
+      <div className="max-w-[95%] rounded border border-secondary/20 p-4 text-sm leading-relaxed text-on-surface-variant [&_a]:text-primary [&_a]:underline [&_p]:mb-2">
+        {message.role === 'user' ? <p className="whitespace-pre-wrap">{message.content}</p> : <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>}
       </div>
-    </>
-  )
-}
-
-function ChatMessages({ messages, isTyping, streamText, messagesEndRef, isFullscreen }: {
-  messages: Message[]
-  isTyping: boolean
-  streamText: string
-  messagesEndRef: React.RefObject<HTMLDivElement | null>
-  isFullscreen: boolean
-}) {
-  const [dotPhase, setDotPhase] = useState(0)
-
-  useEffect(() => {
-    if (!isTyping) { setDotPhase(0); return }
-    const t = setInterval(() => setDotPhase(p => (p + 1) % 4), 250)
-    return () => clearInterval(t)
-  }, [isTyping])
-
-  return (
-    <div
-      className="flex-1 overflow-y-auto px-4 py-3 space-y-4"
-      style={{ height: isFullscreen ? 'calc(100vh - 100px)' : 'calc(100% - 100px)' }}
-    >
-      {messages.map((msg, i) => (
-        <div key={i} className={`flex flex-col gap-1 max-w-full ${styles.animateFadeIn} ${msg.role === 'user' ? 'items-end' : ''}`}>
-          {msg.role === 'assistant' && (
-            <div className="flex items-center gap-1.5">
-              <span className="w-0.5 h-0.5 bg-secondary rounded-full" />
-              <span className="font-button-label text-[7px] text-secondary tracking-widest uppercase">Venus</span>
-            </div>
-          )}
-          <div className={`${styles.glassPanel} border-[0.5px] border-secondary/10 px-3 py-2 rounded-sm ${msg.role === 'user' ? 'bg-secondary/5' : ''} max-w-[90%]`}>
-            {msg.role === 'user' ? (
-              <p className="font-body-main text-xs leading-relaxed text-on-surface-variant font-light">{msg.content}</p>
-            ) : (
-              <div className="font-spectral text-[13px] italic leading-relaxed text-on-surface prose prose-invert prose-a:text-secondary prose-strong:text-secondary prose-em:text-secondary/80 max-w-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {msg.content}
-                </ReactMarkdown>
-              </div>
-            )}
-          </div>
-          {msg.products && msg.products.length > 0 && (
-            <div className="grid grid-cols-2 gap-1.5 mt-1">
-              {msg.products.slice(0, 4).map((product) => (
-                <Link
-                  key={product.slug}
-                  href={`/shop/${product.slug}`}
-                  className="group block rounded-sm overflow-hidden border-[0.5px] border-secondary/10 hover:border-secondary/30 transition-colors bg-stone-900/50"
-                >
-                  {product.image_urls?.[0] && (
-                    <div className="relative w-full aspect-[4/3] overflow-hidden">
-                      <Image
-                        src={product.image_urls[0]}
-                        alt={product.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        sizes="(max-width: 768px) 50vw, 150px"
-                      />
-                    </div>
-                  )}
-                  <div className="p-1.5">
-                    <p className="font-button-label text-[8px] text-on-surface-variant uppercase tracking-[0.1em] truncate">{product.name}</p>
-                    {product.price && <p className="font-audiowide text-[10px] text-primary mt-0.5">${product.price}</p>}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
-
-      {isTyping && (
-        <div className={`flex flex-col gap-1 max-w-full ${styles.animateFadeIn}`}>
-          <div className="flex items-center gap-1.5">
-            <span className="w-0.5 h-0.5 bg-secondary rounded-full" />
-            <span className="font-button-label text-[7px] text-secondary tracking-widest uppercase">Venus</span>
-          </div>
-          <div className="border border-secondary/30 px-4 py-3 rounded-sm bg-stone-900">
-            {streamText ? (
-              <div className="font-spectral text-[13px] italic leading-relaxed text-on-surface/70">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {streamText}
-                </ReactMarkdown>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2.5">
-                {[0, 1, 2].map(i => (
-                  <div
-                    key={i}
-                    className="w-3 h-3 rounded-full"
-                    style={{
-                      background: '#e6c364',
-                      transform: dotPhase === i ? 'translateY(-8px)' : 'translateY(0)',
-                      transition: 'transform 0.15s ease',
-                    }}
-                  />
-                ))}
-                <span className="font-button-label text-[9px] text-[#e6c364] uppercase tracking-[0.15em] ml-1">
-                  Thinking
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-      <div ref={messagesEndRef as React.RefObject<HTMLDivElement>} />
-    </div>
-  )
-}
-
-function ChatInput({ inputValue, setInputValue, isTyping, handleSubmit }: {
-  inputValue: string
-  setInputValue: (v: string) => void
-  isTyping: boolean
-  handleSubmit: (e: React.FormEvent) => void
-}) {
-  return (
-    <div className="border-t-[0.5px] border-secondary/10 px-4 py-3 bg-stone-950/98">
-      <form onSubmit={handleSubmit} className="flex items-center gap-2">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Describe a mood or a silhouette..."
-          disabled={isTyping}
-          className="flex-1 bg-transparent border-none focus:ring-0 text-on-surface font-body-main placeholder:text-stone-600 text-xs font-light outline-none"
-        />
-        <button
-          type="submit"
-          disabled={isTyping || !inputValue.trim()}
-          className="flex items-center gap-1.5 text-secondary group disabled:opacity-30"
-        >
-          <span className="font-button-label text-[8px] uppercase tracking-[0.15em] group-hover:text-secondary/80 transition-colors">Ask</span>
-          <div className="w-6 h-6 rounded-full border-[0.5px] border-secondary/30 flex items-center justify-center group-hover:border-secondary group-hover:bg-secondary group-hover:text-stone-950 transition-all duration-300">
-            <span className="material-symbols-outlined text-[12px]">north_east</span>
-          </div>
-        </button>
-      </form>
-    </div>
-  )
+      {Array.isArray(message.products) && message.products.length > 0 && <div className="grid grid-cols-2 gap-3 mt-3 w-full">
+        {message.products.slice(0, 4).map(product => <Link key={product.slug} href={`/shop/${product.slug}`} className="block border border-outline-variant rounded overflow-hidden hover:border-primary focus-ring">
+          <div className="relative aspect-[4/3]"><CatalogImage src={product.image_urls?.[0]} alt={product.name} sizes="250px" /></div>
+          <div className="p-3"><p className="text-sm">{product.name}</p>{product.price != null && <p className="text-primary text-sm mt-1">{formatPrice(product.price)}</p>}</div>
+        </Link>)}
+      </div>}
+    </div>)}
+    {isTyping && <div role="status" className="text-sm text-on-surface-variant leading-relaxed border border-secondary/20 p-4 rounded">
+      {streamText ? <ReactMarkdown>{streamText}</ReactMarkdown> : 'Venus is thinking…'}
+    </div>}
+    <div ref={messagesEndRef} />
+  </div>
 }

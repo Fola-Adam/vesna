@@ -10,11 +10,11 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[#0a0a0a] border-t border-[#242424] px-6 sm:px-12 py-12 lg:py-16">
+    <footer className="border-t border-paper/15 bg-ink px-6 py-12 text-paper sm:px-12 lg:py-16">
       <div className="flex flex-col items-center gap-6 lg:gap-8 max-w-[1440px] mx-auto">
         <Link
           href="/"
-          className="font-audiowide text-2xl lg:text-3xl text-on-background tracking-[0.3em]"
+          className="font-audiowide text-2xl tracking-[0.3em] text-paper focus-ring lg:text-3xl"
         >
           VESN<span className="inline-block">Λ</span>
         </Link>
@@ -24,25 +24,19 @@ export default function Footer() {
             <Link
               key={link.href}
               href={link.href}
-              className="font-button-label uppercase text-[10px] tracking-widest text-[#666666] hover:text-[#f0ebe0] transition-colors"
+              className="font-button-label text-xs uppercase tracking-wider text-paper/80 transition-colors hover:text-paper focus-ring"
             >
               {link.label}
             </Link>
           ))}
         </div>
 
-        <div className="text-primary font-button-label text-[10px] tracking-widest uppercase">
+        <div className="font-button-label text-[10px] uppercase tracking-widest text-paper/70">
           © 2026 VESNA. ALL RIGHTS RESERVED.
         </div>
 
-        <div className="font-button-label text-[9px] tracking-widest text-[#666666]/50 uppercase">
-          Oracle:Atlas
-        </div>
-
-        <p className="max-w-2xl text-center text-[#666666] text-[9px] tracking-widest leading-relaxed uppercase">
-          Vesna is a curated platform. We may earn a commission from products
-          purchased through our links, supporting our editorial independence and
-          high-standard curation.
+        <p className="max-w-2xl text-center text-paper/75 text-xs leading-relaxed">
+          Vesna may earn a commission from qualifying purchases made through some product links. This does not change the price you pay.
         </p>
       </div>
     </footer>

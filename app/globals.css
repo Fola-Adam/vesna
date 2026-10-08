@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0");
+
 
 @tailwind base;
 @tailwind components;
@@ -6,19 +6,27 @@
 
 :root {
   /* Vesna Color System */
-  --background: #131313;
-  --foreground: #e5e2e1;
-  --surface: #131313;
-  --surface-dim: #131313;
-  --surface-container: #201f1f;
-  --surface-container-high: #2a2a2a;
-  --surface-container-low: #1a1a1a;
-  --surface-container-lowest: #0d0d0d;
+  --background: #171613;
+  --foreground: #f1ece2;
+  --surface: #171613;
+  --surface-dim: #171613;
+  --surface-container: #24221e;
+  --surface-container-high: #302d27;
+  --surface-container-low: #1d1b18;
+  --surface-container-lowest: #100f0d;
+
+  /* Warm editorial surfaces for browsing and reading */
+  --paper: #f1ece2;
+  --paper-raised: #faf7f0;
+  --ink: #292720;
+  --ink-muted: #625b50;
+  /* Use this darker gold on light surfaces; --primary is for gold fills and dark surfaces. */
+  --primary-ink: #705315;
 
   /* Primary - Gold */
-  --primary: #e6c364;
-  --primary-foreground: #3d2e00;
-  --primary-container: #d4af37;
+  --primary: #e4c06d;
+  --primary-foreground: #2c2415;
+  --primary-container: #c9a451;
   --on-primary-container: #1a1400;
   --primary-fixed: #ffe088;
   --primary-fixed-dim: #e9c349;
@@ -26,44 +34,47 @@
   --on-primary-fixed-variant: #574500;
 
   /* Secondary - Teal */
-  --secondary: #abcdcd;
-  --secondary-foreground: #143535;
-  --secondary-container: #2a4c4c;
-  --on-secondary-container: #c6e9e9;
+  --secondary: #c3aa7b;
+  --secondary-foreground: #2c2415;
+  --secondary-container: #4a4030;
+  --on-secondary-container: #f0e4ca;
 
   /* Tertiary - Silver */
-  --tertiary: #cecece;
-  --tertiary-foreground: #1d1d1d;
-  --tertiary-container: #4a4a4a;
-  --on-tertiary-container: #e5e5e5;
+  --tertiary: #cfc4b3;
+  --tertiary-foreground: #29251f;
+  --tertiary-container: #474036;
+  --on-tertiary-container: #ede4d5;
 
   /* Surface Colors */
-  --on-surface: #e5e2e1;
-  --on-surface-variant: #d0c5b2;
-  --inverse-surface: #e5e2e1;
+  --on-surface: #f1ece2;
+  --on-surface-variant: #c9c0b2;
+  --inverse-surface: #f1ece2;
   --inverse-on-surface: #313030;
   --inverse-primary: #735c00;
 
   /* Outline */
-  --outline: #99907c;
-  --outline-variant: #4d4635;
+  --outline: #a69b86;
+  --outline-variant: #514b40;
 
   /* Status */
   --error: #ffb4ab;
   --on-error: #690005;
 
   /* Shadcn overrides */
-  --card: #131313;
-  --card-foreground: #e5e2e1;
-  --popover: #201f1f;
-  --popover-foreground: #e5e2e1;
-  --muted: #2a2a2a;
-  --muted-foreground: #99907c;
+  --card: #1d1b18;
+  --card-foreground: #f1ece2;
+  --popover: #24221e;
+  --popover-foreground: #f1ece2;
+  --muted: #302d27;
+  --muted-foreground: #c9c0b2;
   --destructive: #ffb4ab;
   --destructive-foreground: #690005;
-  --border: #4d4635;
-  --input: #4d4635;
-  --ring: #e6c364;
+  --border: #514b40;
+  --input: #514b40;
+  --ring: #e4c06d;
+  --motion-fast: 140ms;
+  --motion-base: 220ms;
+  --motion-ease: cubic-bezier(0.2, 0.65, 0.3, 1);
   --radius: 0.25rem;
 }
 
@@ -72,6 +83,8 @@ html {
 }
 
 body {
+  --font-tenor-sans: var(--font-button-label);
+  --font-dm-serif: var(--font-playfair);
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-tenor-sans);
@@ -94,7 +107,7 @@ body {
 
 /* Display/Hero Font */
 .font-display-hero {
-  font-family: var(--font-audiowide);
+  font-family: var(--font-playfair), Georgia, serif;
 }
 
 /* Body Font */
@@ -129,7 +142,7 @@ body {
   bottom: -2px;
   left: 50%;
   background-color: var(--primary);
-  transition: all 0.5s ease;
+  transition: width var(--motion-base) var(--motion-ease);
   transform: translateX(-50%);
 }
 
@@ -167,6 +180,8 @@ body {
     @apply border-border;
   }
   body {
+  --font-tenor-sans: var(--font-button-label);
+  --font-dm-serif: var(--font-playfair);
     @apply bg-background text-foreground;
   }
 }
@@ -193,21 +208,32 @@ body {
 
 /* Focus Ring - Accessibility */
 .focus-ring:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid currentColor;
   outline-offset: 2px;
 }
 
 /* Reveal Animation */
 .reveal {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(12px);
   will-change: opacity, transform;
-  transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
-              transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: opacity 420ms var(--motion-ease),
+              transform 420ms var(--motion-ease);
 }
 .reveal.active {
   opacity: 1;
   transform: translateY(0);
+}
+
+.hero-copy > * {
+  animation: hero-enter 440ms var(--motion-ease) both;
+}
+.hero-copy > *:nth-child(2) { animation-delay: 80ms; }
+.hero-copy > *:nth-child(3) { animation-delay: 150ms; }
+.hero-copy > *:nth-child(4) { animation-delay: 220ms; }
+@keyframes hero-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Reduced Motion */
@@ -225,20 +251,27 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  .category-image-zoom,
+  .group:hover .category-image-zoom,
+  .hover-lift:hover,
+  .article-card:hover,
+  .article-card:hover img {
+    transform: none !important;
+  }
 }
 
 /* Shared Gradient Button */
 .btn-gold-gradient {
-  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  background: var(--primary);
 }
 
-/* Green wash backgrounds */
+/* Warm, low-contrast decorative wash */
 .bg-green-wash {
-  background-color: rgba(149, 212, 179, 0.08);
+  background-color: rgba(195, 170, 123, 0.055);
 }
 
 .border-green-subtle {
-  border-color: rgba(149, 212, 179, 0.2);
+  border-color: rgba(195, 170, 123, 0.24);
 }
 
 /* Hide scrollbars globally but keep scroll functionality */
