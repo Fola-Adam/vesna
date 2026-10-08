@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import HeroSection from "@/components/HeroSection";
-import PhilosophySection from "@/components/PhilosophySection";
-import StatsSection from "@/components/StatsSection";
 import ProductSlider from "@/components/ProductSlider";
-import CategoryGrid from "@/components/CategoryGrid";
 import CuratorSection from "@/components/CuratorSection";
+import RecentStories from "@/components/RecentStories";
 import NewsletterSection from "@/components/NewsletterSection";
 import BackToTop from "@/components/BackToTop";
 import { getProducts } from "@/lib/data";
@@ -35,16 +33,13 @@ export const revalidate = 300;
 
 export default async function HomePage() {
   const products = await getProducts();
-  const categoryNames = [...new Set(products.map(p => p.categories?.name).filter((name): name is string => !!name))];
   return (
     <main>
       <ScrollProgress />
       <HeroSection />
-      <PhilosophySection />
-      <StatsSection objectCount={products.length} categoryCount={categoryNames.length} />
       <ProductSlider products={products} />
-      <CategoryGrid categoryNames={categoryNames} />
       <CuratorSection />
+      <RecentStories />
       <NewsletterSection />
       <BackToTop />
     </main>

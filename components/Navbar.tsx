@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import Icon from './Icon'
 
 const navLinks = [
@@ -11,6 +12,7 @@ const navLinks = [
 ]
 
 export default function Navbar() {
+  const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -58,13 +60,19 @@ export default function Navbar() {
     <nav aria-label="Main navigation" className={`fixed top-0 left-0 right-0 z-50 transition-colors ${isScrolled || isMobileMenuOpen ? 'bg-[#0a0a0a] border-b border-outline-variant' : 'bg-transparent'}`}>
       <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-20 flex items-center justify-between h-16 lg:h-20">
         <Link href="/" className="font-audiowide text-xl lg:text-2xl tracking-[0.3em] hover:text-primary focus-ring" onClick={() => setIsMobileMenuOpen(false)}>VESNΛ</Link>
-        <div className="hidden lg:flex items-center gap-8">{navLinks.map(link => <Link key={link.href} href={link.href} className="font-button-label text-xs uppercase tracking-widest hover:text-primary focus-ring">{link.label}</Link>)}</div>
+        <div className="hidden lg:flex items-center gap-8">{navLinks.map(link => {
+          const active = pathname === link.href || (link.href === '/picks' && pathname.startsWith('/shop'))
+          return <Link key={link.href} href={link.href} aria-current={active ? 'page' : undefined} className={`nav-underline-anim font-button-label text-xs uppercase tracking-widest transition-colors hover:text-primary focus-ring ${active ? 'text-primary' : ''}`}>{link.label}</Link>
+        })}</div>
         <button ref={buttonRef} data-mobile-toggle aria-label="Toggle menu" aria-expanded={isMobileMenuOpen} aria-controls="mobile-navigation"
           onClick={() => setIsMobileMenuOpen(open => !open)} className="lg:hidden p-2 text-2xl focus-ring"><Icon name={isMobileMenuOpen ? 'close' : 'menu'} /></button>
       </div>
       <div ref={menuRef} id="mobile-navigation" aria-hidden={!isMobileMenuOpen} inert={!isMobileMenuOpen}
         className={`lg:hidden fixed top-16 bottom-0 left-0 right-0 bg-[#0a0a0a] overflow-y-auto px-6 py-6 ${isMobileMenuOpen ? 'visible' : 'invisible'}`}>
-        {navLinks.map(link => <Link key={link.href} href={link.href} onClick={() => setIsMobileMenuOpen(false)} className="block font-button-label text-sm uppercase tracking-widest py-5 border-b border-outline-variant hover:text-primary focus-ring">{link.label}</Link>)}
+        {navLinks.map(link => {
+          const active = pathname === link.href || (link.href === '/picks' && pathname.startsWith('/shop'))
+          return <Link key={link.href} href={link.href} aria-current={active ? 'page' : undefined} onClick={() => setIsMobileMenuOpen(false)} className={`block border-b border-outline-variant py-5 font-button-label text-sm uppercase tracking-widest hover:text-primary focus-ring ${active ? 'text-primary' : ''}`}>{link.label}</Link>
+        })}
       </div>
     </nav>
   )

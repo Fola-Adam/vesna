@@ -1,156 +1,46 @@
-"use client";
-
-import Icon from "@/components/Icon";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen w-full flex items-center overflow-hidden bg-surface-dim">
-      {/* Animated Background */}
-      <div className="absolute inset-0 w-full h-full z-0">
-        <div className="hero-mask w-full h-full relative overflow-hidden">
-          <Image
-            priority
-            alt="Luxurious editorial workspace with dark moody lighting"
-            className="object-cover brightness-75 will-change-transform"
-            src="/vesna-imgs/20_high_end_editorial_photography.webp"
-            fill
-            sizes="100vw"
-            style={{ animation: "fade-hero 10s infinite" }}
-          />
-          <Image
-            alt="Curated workspace with warm ambient lighting"
-            className="object-cover brightness-75 will-change-transform"
-            src="/vesna-imgs/editorial-luxurious-workspace.webp"
-            fill
-            sizes="100vw"
-            style={{ animation: "fade-hero-reverse 10s infinite" }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-neutral-950/70 via-neutral-950/40 to-transparent" />
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="relative z-20 w-full px-5 sm:px-8 lg:px-20 pt-24 lg:pt-0">
-        <div className="max-w-3xl">
-          <h1 className="font-display-hero text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[72px] text-on-background mb-6 leading-[1.05]">
-            The Art of <span className="block">Intentional Living.</span>
+    <section className="relative flex min-h-[88svh] items-center overflow-hidden bg-surface-dim">
+      <Image
+        priority
+        alt="A thoughtfully arranged workspace in warm, natural light"
+        className="object-cover object-center"
+        src="/vesna-imgs/20_high_end_editorial_photography.webp"
+        fill
+        sizes="100vw"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-gradient-to-r from-neutral-950/85 via-neutral-950/55 to-neutral-950/10"
+      />
+      <div className="relative z-10 mx-auto w-full max-w-screen-2xl px-5 pb-16 pt-28 sm:px-8 lg:px-20">
+        <div className="max-w-3xl hero-copy">
+          <p className="font-section-header mb-5 text-primary">Curated by Victory Ebenezer</p>
+          <h1 className="font-display-hero mb-6 text-4xl leading-[1.08] text-white sm:text-5xl md:text-6xl lg:text-7xl">
+            The art of <span className="block">intentional living.</span>
           </h1>
-          <p className="font-body-main text-base sm:text-lg lg:text-xl text-on-surface-variant mb-10 lg:mb-12 max-w-lg leading-relaxed">
-            A curated monograph of objects and insights for the discerning professional.
+          <p className="font-body-main mb-9 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg lg:text-xl">
+            Objects and stories chosen with care for the spaces and rituals that make a life.
           </p>
-          <Link
-            href="/picks"
-            className="inline-block bg-primary text-on-primary font-button-label text-xs lg:text-sm px-8 lg:px-12 py-4 lg:py-5 uppercase tracking-[0.2em] transition-all hover:bg-white hover:text-black border border-primary shadow-[0_20px_50px_rgba(230,195,100,0.2)] btn-shimmer gold-glow focus-ring"
-          >
-            Explore Victory&apos;s picks
-          </Link>
-        </div>
-      </div>
-
-      {/* Animated Detail Images */}
-      <div className="absolute bottom-8 lg:bottom-12 right-4 sm:right-8 lg:right-20 z-30 w-40 sm:w-56 md:w-64 lg:w-72 hidden sm:block">
-        <div className="relative h-48 md:h-72 lg:h-96">
-          <div className="absolute -inset-2 border border-primary/30" />
-          <div className="relative z-10 w-full h-full shadow-2xl brightness-90 overflow-hidden">
-            <Image
-                alt="Editorial detail with warm tones"
-              className="object-cover"
-              src="/vesna-imgs/secondary-overlay-image.webp"
-              fill
-              sizes="(max-width: 768px) 100vw, 30vw"
-              style={{ animation: "cycle-overlay 12s infinite" }}
-            />
-            <Image
-                alt="Vintage dark gold workspace detail"
-              className="object-cover"
-              src="/vesna-imgs/vintage-workdesk-darkgold.webp"
-              fill
-              sizes="(max-width: 768px) 100vw, 30vw"
-              style={{ animation: "cycle-overlay-2 12s infinite" }}
-            />
-            <Image
-                alt="Minimal workspace arrangement"
-              className="object-cover"
-              src="/vesna-imgs/minimal-workdesk.webp"
-              fill
-              sizes="(max-width: 768px) 100vw, 30vw"
-              style={{ animation: "cycle-overlay-3 12s infinite" }}
-            />
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            <Link
+              href="/picks"
+              className="inline-flex min-h-12 items-center border border-primary bg-primary px-7 py-3 font-button-label text-xs uppercase tracking-[0.18em] text-on-primary transition-colors hover:bg-primary-fixed focus-ring"
+            >
+              Explore Victory&apos;s picks
+            </Link>
+            <Link
+              href="/journal"
+              className="inline-flex min-h-12 items-center gap-2 border-b border-white/50 font-button-label text-xs uppercase tracking-[0.16em] text-white transition-colors hover:border-primary hover:text-primary focus-ring"
+            >
+              Read the journal <span aria-hidden="true">→</span>
+            </Link>
           </div>
-          <div className="absolute inset-0 bg-neutral-950/10 z-20" />
         </div>
       </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-6 lg:bottom-10 left-5 sm:left-8 lg:left-20 animate-bounce opacity-40 z-20">
-        <Icon name="keyboard_double_arrow_down" className="text-on-background text-2xl" />
-      </div>
-
-      <style jsx global>{`
-        .hero-mask {
-          clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
-        }
-        @media (max-width: 1024px) {
-          .hero-mask {
-            clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%);
-          }
-        }
-        @media (max-width: 768px) {
-          .hero-mask {
-            clip-path: none;
-          }
-        }
-        @keyframes fade-hero {
-          0%, 45% { opacity: 1; }
-          50%, 95% { opacity: 0; }
-          100% { opacity: 1; }
-        }
-        @keyframes fade-hero-reverse {
-          0%, 45% { opacity: 0; }
-          50%, 95% { opacity: 1; }
-          100% { opacity: 0; }
-        }
-        @keyframes cycle-overlay {
-          0%, 30% { opacity: 1; transform: scale(1); }
-          33%, 63% { opacity: 0; transform: scale(1.05); }
-          66%, 96% { opacity: 0; transform: scale(1.05); }
-          100% { opacity: 1; transform: scale(1); }
-        }
-        @keyframes cycle-overlay-2 {
-          0%, 30% { opacity: 0; transform: scale(1.05); }
-          33%, 63% { opacity: 1; transform: scale(1); }
-          66%, 96% { opacity: 0; transform: scale(1.05); }
-          100% { opacity: 0; transform: scale(1.05); }
-        }
-        @keyframes cycle-overlay-3 {
-          0%, 30% { opacity: 0; transform: scale(1.05); }
-          33%, 63% { opacity: 0; transform: scale(1.05); }
-          66%, 96% { opacity: 1; transform: scale(1); }
-          100% { opacity: 0; transform: scale(1.05); }
-        }
-        .btn-shimmer {
-          position: relative;
-          overflow: hidden;
-        }
-        .btn-shimmer::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-          transition: left 0.5s ease;
-        }
-        .btn-shimmer:hover::after {
-          left: 100%;
-        }
-        .gold-glow:hover {
-          box-shadow: 0 0 30px rgba(230, 195, 100, 0.3);
-        }
-      `}</style>
     </section>
   );
 }

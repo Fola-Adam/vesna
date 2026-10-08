@@ -13,6 +13,11 @@ const config: Config = {
         // Base
         background: "var(--background)",
         foreground: "var(--foreground)",
+        paper: "var(--paper)",
+        "paper-raised": "var(--paper-raised)",
+        ink: "var(--ink)",
+        "ink-muted": "var(--ink-muted)",
+        "primary-ink": "var(--primary-ink)",
         
         // Surface Colors
         surface: "var(--surface)",

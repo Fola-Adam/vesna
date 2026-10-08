@@ -15,6 +15,13 @@
   --surface-container-low: #1a1a1a;
   --surface-container-lowest: #0d0d0d;
 
+  /* Warm editorial surfaces for browsing and reading */
+  --paper: #eee9df;
+  --paper-raised: #f7f3eb;
+  --ink: #29251f;
+  --ink-muted: #625b51;
+  --primary-ink: #806018;
+
   /* Primary - Gold */
   --primary: #e6c364;
   --primary-foreground: #3d2e00;
@@ -212,6 +219,17 @@ body {
 .reveal.active {
   opacity: 1;
   transform: translateY(0);
+}
+
+.hero-copy > * {
+  animation: hero-enter 650ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.hero-copy > *:nth-child(2) { animation-delay: 80ms; }
+.hero-copy > *:nth-child(3) { animation-delay: 150ms; }
+.hero-copy > *:nth-child(4) { animation-delay: 220ms; }
+@keyframes hero-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Reduced Motion */

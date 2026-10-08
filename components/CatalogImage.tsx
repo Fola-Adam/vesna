@@ -15,5 +15,5 @@ export default function CatalogImage({ src, alt, sizes, priority = false }: {
     </div>
   )
   return <Image src={src} alt={alt} fill sizes={sizes} priority={priority}
-    onError={() => setFailedSource(src)} className="object-cover group-hover:scale-105 transition-transform duration-500" />
+    onError={() => setFailedSource(src)} className="object-cover transition-transform duration-500 group-hover:scale-[1.03] group-focus-within:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none" />
 }
