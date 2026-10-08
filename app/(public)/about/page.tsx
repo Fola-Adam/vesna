@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import AboutBrowser from "./about-browser";
 
 export const metadata: Metadata = {
-  title: "About — Ebenezer Victory, Curator",
+  title: "About Vesna — Victory Ebenezer",
   description:
-    "The story behind Vesna: architect of spaces, collector of objects, and advocate for the intentional life.",
+    "Meet Vesna, an editorial guide to useful, thoughtfully designed products curated by Victory Ebenezer.",
 };
 
 export default function AboutPage() {

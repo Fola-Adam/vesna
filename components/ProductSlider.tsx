@@ -5,8 +5,7 @@ import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { ProductRow } from '@/lib/data'
 import { useRevealOnScroll } from '@/hooks/use-reveal-on-scroll'
-import CatalogImage from './CatalogImage'
-import { effectivePricing, formatPrice } from '@/lib/pricing'
+import CatalogProductCard from './CatalogProductCard'
 
 export default function ProductSlider({ products }: { products: ProductRow[] }) {
   const sliderRef = useRef<HTMLDivElement>(null)
@@ -16,7 +15,7 @@ export default function ProductSlider({ products }: { products: ProductRow[] }) 
   if (!selected.length) return null
   const scrollByCard = (direction: -1 | 1) => {
     const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
-    sliderRef.current?.scrollBy({ left: direction * 320, behavior })
+    sliderRef.current?.scrollBy({ left: direction * (sliderRef.current.clientWidth * 0.82), behavior })
   }
   return (
     <section ref={sectionRef} className="reveal bg-paper px-5 py-16 text-ink sm:px-8 lg:px-20 lg:py-20">
@@ -28,15 +27,8 @@ export default function ProductSlider({ products }: { products: ProductRow[] }) 
             <button aria-label="Next picks" className="border border-ink/25 p-3 text-ink transition-colors hover:border-primary-ink hover:text-primary-ink focus-ring" onClick={() => scrollByCard(1)}><ChevronRight aria-hidden="true" size={20} /></button>
           </div>
         </div>
-        <div ref={sliderRef} className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory">
-          {selected.map(product => <Link key={product.id} href={`/shop/${product.slug}`} className="group w-64 flex-shrink-0 snap-start sm:w-72 focus-ring">
-            <div className="relative mb-4 aspect-[4/3] overflow-hidden bg-paper-raised"><CatalogImage src={product.image_urls?.[0]} alt={product.name} sizes="288px" /></div>
-            <p className="font-section-header mb-2 text-ink-muted">{product.categories?.name ?? 'Selected object'}</p>
-            <h3 className="font-display-hero mb-2 text-2xl text-ink transition-colors group-hover:text-primary-ink">{product.name}</h3>
-            <p className="mb-2 text-sm text-primary-ink">{formatPrice(effectivePricing(product).price)}</p>
-            {product.why_victory && <p className="font-body-main text-sm leading-relaxed text-ink-muted line-clamp-3">{product.why_victory}</p>}
-            <p className="mt-3 text-sm text-primary-ink">View the pick <span aria-hidden="true">→</span></p>
-          </Link>)}
+        <div ref={sliderRef} className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-6 sm:gap-6">
+          {selected.map(product => <div key={product.id} className="w-[min(84vw,21rem)] flex-shrink-0 snap-start sm:w-[min(48vw,22rem)] lg:w-[calc((100%_-_3rem)_/_3)]"><CatalogProductCard product={product} /></div>)}
         </div>
         <Link href="/picks" className="inline-block mt-5 border-b border-ink/40 pb-1 text-sm text-ink hover:border-primary-ink hover:text-primary-ink focus-ring">Explore all picks <span aria-hidden="true">→</span></Link>
       </div>

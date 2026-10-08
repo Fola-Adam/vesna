@@ -1,13 +1,12 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import { PICKS, toSlug } from '@/lib/shop-data'
 import { cache } from 'react'
 
 /**
  * Server-side data access layer.
  *
  * All public product reads go through here so pages render on the server
- * (SEO metadata, streaming, no client waterfalls) and Supabase outages
- * degrade gracefully to the bundled fallback instead of 500-ing.
+ * (SEO metadata, streaming, no client waterfalls). Supabase outages return
+ * an empty result instead of exposing retired bundled catalog content.
  *
  * Caching: standard ISR (`export const revalidate = 300` on the pages that
  * consume this layer) plus per-request memoization via React `cache()` so a
@@ -62,7 +61,7 @@ function normalize(row: Record<string, unknown>): ProductRow {
   }
 }
 
-/** Active products (both curated + shop), newest first. Memoized per request. */
+/** Active non-archive products, newest first. Memoized per request. */
 export const getProducts = cache(async (): Promise<ProductRow[]> => {
   try {
     const supabase = createPublicClient()
@@ -70,14 +69,34 @@ export const getProducts = cache(async (): Promise<ProductRow[]> => {
       .from('products')
       .select(SELECT_FIELDS)
       .eq('is_active', true)
+      .neq('item_type', 'archive')
       .order('created_at', { ascending: false })
       .limit(200)
 
     if (error || !data) throw error ?? new Error('No data')
     return data.map(normalize)
   } catch (e) {
-    console.error('[data] getProducts failed, using fallback:', (e as Error).message)
-    return fallbackProducts()
+    console.error('[data] getProducts failed:', (e as Error).message)
+    return []
+  }
+})
+
+/** Archived items are shown only when an administrator has explicitly marked them archived. */
+export const getArchivedProducts = cache(async (): Promise<ProductRow[]> => {
+  try {
+    const supabase = createPublicClient()
+    const { data, error } = await supabase
+      .from('products')
+      .select(SELECT_FIELDS)
+      .eq('is_active', true)
+      .eq('item_type', 'archive')
+      .order('created_at', { ascending: false })
+      .limit(200)
+    if (error || !data) throw error ?? new Error('No data')
+    return data.map(normalize)
+  } catch (e) {
+    console.error('[data] getArchivedProducts failed:', (e as Error).message)
+    return []
   }
 })
 
@@ -95,9 +114,9 @@ export const getProductBySlug = cache(async (slug: string): Promise<ProductRow |
     if (error) throw error
     return data ? normalize(data as Record<string, unknown>) : null
   } catch (e) {
-    console.error('[data] getProductBySlug failed, using fallback:', (e as Error).message)
+    console.error('[data] getProductBySlug failed:', (e as Error).message)
+    return null
   }
-  return fallbackProducts().find((p) => p.slug === slug) ?? null
 })
 
 /** Seller redirects require a live, active listing; never use demonstration data. */
@@ -112,26 +131,4 @@ export async function getProductById(id: string): Promise<ProductRow | null> {
 export async function getProductSlugs(): Promise<string[]> {
   const products = await getProducts()
   return products.map((p) => p.slug)
-}
-
-// ---------------------------------------------------------------------------
-// Fallback: derived from the legacy hardcoded dataset so the site keeps
-// working even before the Supabase table is seeded (or during an outage).
-// ---------------------------------------------------------------------------
-
-function fallbackProducts(): ProductRow[] {
-  return PICKS.map((p) => ({
-    id: `fallback-${p.id}`,
-    slug: toSlug(p.name),
-    name: p.name,
-    description: p.quote,
-    price: parseFloat(p.price.replace(/[$,]/g, '')) || null,
-    sale_price: p.originalPrice ? parseFloat(p.originalPrice.replace(/[$,]/g, '')) : null,
-    affiliate_link: null,
-    image_urls: [p.image],
-    why_victory: p.quote,
-    item_type: 'curated',
-    is_featured: p.badge === "Victory's pick" || p.badge === 'Featured',
-    categories: { name: p.category },
-  }))
 }

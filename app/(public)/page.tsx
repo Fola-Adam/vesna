@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import HeroSection from "@/components/HeroSection";
 import ProductSlider from "@/components/ProductSlider";
+import CategoryGrid from "@/components/CategoryGrid";
 import CuratorSection from "@/components/CuratorSection";
 import RecentStories from "@/components/RecentStories";
 import NewsletterSection from "@/components/NewsletterSection";
@@ -33,11 +34,21 @@ export const revalidate = 300;
 
 export default async function HomePage() {
   const products = await getProducts();
+  const categories = [...products.reduce((map, product) => {
+    const name = product.categories?.name?.trim()
+    if (!name) return map
+    const current = map.get(name) ?? { name, image: null as string | null, count: 0 }
+    current.count += 1
+    current.image ??= product.image_urls?.[0] ?? null
+    map.set(name, current)
+    return map
+  }, new Map<string, { name: string; image: string | null; count: number }>()).values()]
   return (
     <main>
       <ScrollProgress />
       <HeroSection />
       <ProductSlider products={products} />
+      <CategoryGrid categories={categories} />
       <CuratorSection />
       <RecentStories />
       <NewsletterSection />

@@ -22,7 +22,7 @@ export default function RecentStories() {
         </div>
         <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           {ARTICLES.slice(0, 3).map((article) => (
-            <Link key={article.id} href="/journal" className="group focus-ring">
+            <Link key={article.slug} href={`/journal/${article.slug}`} className="group focus-ring">
               <div className="relative mb-4 aspect-[4/3] overflow-hidden bg-paper-raised">
                 <Image
                   src={article.image}

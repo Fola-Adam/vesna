@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import JournalBrowser from "./journal-browser";
 
 export const metadata: Metadata = {
-  title: "The Journal — Essays on Intentional Living",
+  title: "The Journal — Vesna",
   description:
-    "Curator's notes, essays, and field observations from Ebenezer Victory on objects, spaces, and the practice of choosing less.",
+    "Notes on useful objects, thoughtful spaces, and choosing with care.",
 };
 
 export default function JournalPage() {
