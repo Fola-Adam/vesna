@@ -13,6 +13,7 @@ const navLinks = [
 
 export default function Navbar() {
   const pathname = usePathname()
+  const paperPage = pathname === '/picks'
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -57,7 +58,7 @@ export default function Navbar() {
   }, [isMobileMenuOpen])
 
   return (
-    <nav aria-label="Main navigation" className={`fixed top-0 left-0 right-0 z-50 transition-colors ${isScrolled || isMobileMenuOpen ? 'bg-[#0a0a0a] border-b border-outline-variant' : 'bg-transparent'}`}>
+    <nav aria-label="Main navigation" className={`fixed top-0 left-0 right-0 z-50 transition-colors ${isScrolled || isMobileMenuOpen || paperPage ? 'bg-[#0a0a0a] border-b border-outline-variant' : 'bg-transparent'}`}>
       <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-20 flex items-center justify-between h-16 lg:h-20">
         <Link href="/" className="font-audiowide text-xl lg:text-2xl tracking-[0.3em] hover:text-primary focus-ring" onClick={() => setIsMobileMenuOpen(false)}>VESNΛ</Link>
         <div className="hidden lg:flex items-center gap-8">{navLinks.map(link => {
