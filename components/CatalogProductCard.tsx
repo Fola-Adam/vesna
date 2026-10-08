@@ -7,8 +7,8 @@ import VenusTriggerPill from './VenusTriggerPill'
 export default function CatalogProductCard({ product }: { product: ProductRow }) {
   const { price, strike } = effectivePricing(product)
   return (
-    <article className="group flex h-full flex-col border border-ink/10 bg-paper-raised text-ink transition-colors hover:border-primary-ink/45">
-      <Link href={`/shop/${product.slug}`} className="group flex flex-col flex-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
+    <article className="group flex h-full flex-col border border-ink/10 bg-paper-raised text-ink transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-primary-ink/45 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none">
+      <Link href={`/shop/${product.slug}`} className="group flex flex-col flex-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary-ink">
         <div className="relative aspect-[4/3] overflow-hidden bg-paper">
           <CatalogImage src={product.image_urls?.[0]} alt={product.name} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           {product.is_featured && <span className="absolute top-4 left-4 bg-primary text-on-primary px-3 py-1 font-button-label text-xs">Featured</span>}

@@ -70,7 +70,7 @@ export default function TestimonialsCarousel() {
         <div className="relative">
           <div className="overflow-hidden">
             <div
-              className="flex transition-transform duration-500 ease-out"
+              className="flex transition-transform duration-300 ease-out motion-reduce:transition-none"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
               {testimonials.map((testimonial, index) => (
@@ -141,7 +141,7 @@ export default function TestimonialsCarousel() {
 
       <style jsx global>{`
         .bg-green-wash {
-          background: linear-gradient(135deg, rgba(149, 212, 179, 0.03), transparent);
+          background: linear-gradient(135deg, rgba(195, 170, 123, 0.035), transparent);
         }
       `}</style>
     </section>

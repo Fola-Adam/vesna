@@ -29,7 +29,7 @@ export default function RecentStories() {
                   alt=""
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.03] group-focus-visible:scale-[1.03]"
+                  className="object-cover transition-transform duration-300 group-hover:scale-[1.025] group-focus-visible:scale-[1.025] motion-reduce:transform-none motion-reduce:transition-none"
                 />
               </div>
               <p className="font-section-header mb-2 text-ink-muted">{article.categoryLabel}</p>

@@ -83,27 +83,27 @@ export default function CategoryGrid({ categoryNames }: { categoryNames: string[
 
       <style jsx global>{`
         .category-image-zoom {
-          transition: transform 1s cubic-bezier(0.25, 0.1, 0.25, 1),
-                      opacity 0.8s ease;
+          transition: transform 280ms var(--motion-ease),
+                      opacity 220ms var(--motion-ease);
           opacity: 0.6;
         }
         .group:hover .category-image-zoom {
-          transform: scale(1.08);
-          opacity: 0.85;
+          transform: scale(1.035);
+          opacity: 0.78;
         }
         .hover-lift {
-          transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-                      box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: transform 200ms var(--motion-ease),
+                      box-shadow 200ms var(--motion-ease);
         }
         .hover-lift:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 25px 50px rgba(149, 212, 179, 0.2);
+          transform: translateY(-3px);
+          box-shadow: 0 12px 28px rgba(23, 22, 19, 0.18);
         }
         .glow-hover {
-          transition: box-shadow 0.3s ease;
+          transition: box-shadow 200ms var(--motion-ease);
         }
         .glow-hover:hover {
-          box-shadow: 0 0 20px rgba(149, 212, 179, 0.15);
+          box-shadow: 0 8px 24px rgba(23, 22, 19, 0.16);
         }
       `}</style>
     </section>

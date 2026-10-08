@@ -82,8 +82,8 @@ export default async function AnalyticsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="font-section-header text-on-surface-variant text-xs tracking-[0.2em] mb-1">Insights</h2>
-        <p className="font-audiowide text-2xl text-on-background">Analytics</p>
+        <h2 className="font-section-header text-ink-muted text-xs tracking-[0.2em] mb-1">Insights</h2>
+        <p className="font-audiowide text-2xl text-ink">Analytics</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

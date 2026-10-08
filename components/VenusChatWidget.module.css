@@ -14,7 +14,7 @@
 
 .typingDot {
   animation: bounceDot 0.5s ease-in-out infinite;
-  background: #e6c364;
+  background: var(--primary);
   border-radius: 9999px;
 }
 
@@ -27,6 +27,6 @@
 }
 
 .glassPanel {
-  background: rgba(47, 79, 79, 0.08);
+  background: rgba(195, 170, 123, 0.08);
   backdrop-filter: blur(20px);
 }

@@ -74,9 +74,9 @@ export default async function AdminDashboard() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="mb-1 font-section-header text-xs tracking-[0.2em] text-on-surface-variant">OVERVIEW</h2>
-          <p className="font-audiowide text-3xl text-on-background">Curator studio</p>
-          <p className="mt-2 text-sm text-on-surface-variant">A quick view of your collection and readership.</p>
+          <h2 className="mb-1 font-section-header text-xs tracking-[0.2em] text-ink-muted">OVERVIEW</h2>
+          <p className="font-audiowide text-3xl text-ink">Curator studio</p>
+          <p className="mt-2 text-sm text-ink-muted">A quick view of your collection and readership.</p>
         </div>
         <Button asChild><Link href="/admin/products/new"><Plus className="mr-2 h-4 w-4" />Add a product</Link></Button>
       </div>

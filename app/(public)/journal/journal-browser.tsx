@@ -28,26 +28,26 @@ export default function JournalPage() {
       
       <style jsx global>{`
         .article-card {
-          transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: transform 200ms var(--motion-ease);
         }
         .article-card:hover {
-          transform: translateY(-8px);
+          transform: translateY(-3px);
         }
         .article-card img {
-          transition: transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+          transition: transform 280ms var(--motion-ease);
         }
         .article-card:hover img {
-          transform: scale(1.05);
+          transform: scale(1.025);
         }
         .bg-green-wash {
           background: linear-gradient(
             135deg,
-            rgba(149, 212, 179, 0.03),
+            rgba(195, 170, 123, 0.035),
             transparent
           );
         }
         .border-green-subtle {
-          border: 1px solid rgba(149, 212, 179, 0.15);
+          border: 1px solid rgba(195, 170, 123, 0.24);
         }
       `}</style>
 

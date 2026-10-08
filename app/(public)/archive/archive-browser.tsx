@@ -207,7 +207,7 @@ export default function ArchivePage() {
           }
         }
         .border-green-subtle {
-          border: 1px solid rgba(149, 212, 179, 0.15);
+          border: 1px solid rgba(195, 170, 123, 0.24);
         }
       `}</style>
 
@@ -278,7 +278,7 @@ export default function ArchivePage() {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <button
                       className="font-[family-name:var(--font-tenor-sans)] text-xs uppercase tracking-[0.2em] px-10 py-4 transition-all text-primary-foreground"
-                      style={{ background: "linear-gradient(90deg, #e6c364, #95d4b3)" }}
+                      style={{ background: "var(--primary)" }}
                     >
                       Inquire to Acquire
                     </button>
@@ -384,7 +384,7 @@ export default function ArchivePage() {
                   } ${!item.available ? "opacity-75" : ""}`}
                 >
                   <div className="relative aspect-[4/5] overflow-hidden bg-surface-container">
-                    <Image alt={item.name} src={item.image} fill className={`object-cover group-hover:scale-105 transition-transform duration-700 ${!item.available ? "grayscale-[40%]" : "grayscale-[20%]"}`} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    <Image alt={item.name} src={item.image} fill className={`object-cover group-hover:scale-[1.025] transition-transform duration-300 motion-reduce:transform-none ${!item.available ? "grayscale-[40%]" : "grayscale-[20%]"}`} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     {!item.available && (
                       <div className="absolute top-4 left-4 z-10">
                         <span className="font-[family-name:var(--font-tenor-sans)] text-[10px] tracking-[0.2em] bg-surface-container-high text-on-surface px-3 py-1.5 border border-outline">
@@ -465,7 +465,7 @@ export default function ArchivePage() {
               {PAST_SPOTLIGHTS.map((item) => (
                 <article key={item.id} className="group cursor-pointer border-green-subtle">
                   <div className="relative aspect-[4/3] overflow-hidden mb-4">
-                    <Image src={item.image} alt={item.title} fill className="object-cover grayscale-[30%] group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    <Image src={item.image} alt={item.title} fill className="object-cover grayscale-[30%] group-hover:scale-[1.025] transition-transform duration-300 motion-reduce:transform-none" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                     <div className="absolute top-3 left-3">
                       {item.badgeStyle === "filled" && (
                         <span className="font-[family-name:var(--font-tenor-sans)] text-[9px] uppercase tracking-[0.2em] bg-primary/90 text-primary-foreground px-2 py-1">
@@ -517,7 +517,7 @@ export default function ArchivePage() {
             <a
               href="mailto:archive@vesna.ng"
               className="inline-block font-[family-name:var(--font-tenor-sans)] text-xs uppercase tracking-[0.2em] px-12 py-4 transition-all text-primary-foreground"
-              style={{ background: "linear-gradient(90deg, #e6c364, #95d4b3)" }}
+              style={{ background: "var(--primary)" }}
             >
               Contact the Archive
             </a>

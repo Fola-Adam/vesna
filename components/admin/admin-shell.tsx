@@ -9,7 +9,7 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-[#f4f0e8]">
+    <div className="min-h-screen bg-paper">
       <AdminSidebar />
       <main className="lg:ml-64 min-h-screen">
         <AdminHeader />
@@ -21,7 +21,7 @@ export default function AdminLayout({
   )
 }
 
-function NavLink({ href, icon, children }: { href: string; icon: React.ReactNode; children: React.ReactNode }) {
+function NavLink({ href, icon, children, lightSurface = false }: { href: string; icon: React.ReactNode; children: React.ReactNode; lightSurface?: boolean }) {
   const pathname = usePathname()
   const isActive = pathname.startsWith(href)
 
@@ -30,11 +30,11 @@ function NavLink({ href, icon, children }: { href: string; icon: React.ReactNode
       href={href}
       className={`flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
         isActive
-          ? 'text-primary bg-primary/10 font-medium'
-          : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
+          ? `${lightSurface ? 'text-primary-ink' : 'text-primary'} bg-primary/10 font-medium`
+          : lightSurface ? 'text-ink-muted hover:bg-ink/5 hover:text-ink' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
       }`}
     >
-      <span className={isActive ? 'text-primary' : 'text-current'}>{icon}</span>
+      <span className={isActive ? (lightSurface ? 'text-primary-ink' : 'text-primary') : 'text-current'}>{icon}</span>
       {children}
     </Link>
   )
@@ -74,12 +74,12 @@ function SubscribersIcon() {
 
 function AdminSidebar() {
   return (
-    <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-white/10 lg:bg-[#25231f]">
+    <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-outline-variant lg:bg-background">
       <div className="border-b border-white/10 p-6">
-        <Link href="/" className="font-audiowide text-2xl tracking-[0.3em] text-[#f4f0e8]">
+        <Link href="/" className="font-audiowide text-2xl tracking-[0.3em] text-on-surface">
           VESN<span className="lambda-exo2">Λ</span>
         </Link>
-        <p className="mt-2 font-section-header text-xs tracking-[0.15em] text-[#c3b9a8]">CURATOR STUDIO</p>
+        <p className="mt-2 font-section-header text-xs tracking-[0.15em] text-on-surface-variant">CURATOR STUDIO</p>
       </div>
 
       <nav className="flex-1 p-4 space-y-1">
@@ -92,7 +92,7 @@ function AdminSidebar() {
       <div className="border-t border-white/10 p-4">
         <Link
           href="/"
-          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-[#c3b9a8] transition-colors hover:bg-white/10 hover:text-white"
+          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -106,15 +106,15 @@ function AdminSidebar() {
 
 function AdminHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-outline-variant bg-[#f4f0e8]/90 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-ink/10 bg-paper/90 backdrop-blur-sm">
       <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-        <p className="font-section-header text-xs tracking-[0.2em] text-on-surface-variant">VESNA / CURATOR STUDIO</p>
+        <p className="font-section-header text-xs tracking-[0.2em] text-ink-muted">VESNA / CURATOR STUDIO</p>
       </div>
       <nav aria-label="Admin navigation" className="lg:hidden flex flex-wrap gap-2 px-3 pb-3">
-        <NavLink href="/admin/dashboard" icon={<DashboardIcon />}>Dashboard</NavLink>
-        <NavLink href="/admin/products" icon={<ProductsIcon />}>Products</NavLink>
-        <NavLink href="/admin/analytics" icon={<AnalyticsIcon />}>Analytics</NavLink>
-        <NavLink href="/admin/subscribers" icon={<SubscribersIcon />}>Subscribers</NavLink>
+        <NavLink lightSurface href="/admin/dashboard" icon={<DashboardIcon />}>Dashboard</NavLink>
+        <NavLink lightSurface href="/admin/products" icon={<ProductsIcon />}>Products</NavLink>
+        <NavLink lightSurface href="/admin/analytics" icon={<AnalyticsIcon />}>Analytics</NavLink>
+        <NavLink lightSurface href="/admin/subscribers" icon={<SubscribersIcon />}>Subscribers</NavLink>
       </nav>
     </header>
   )

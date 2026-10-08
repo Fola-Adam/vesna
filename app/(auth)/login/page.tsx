@@ -71,7 +71,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-surface-container border border-outline/30 px-4 py-3 text-on-background placeholder:text-outline/50 focus:outline-none focus:border-primary font-body-main"
+              className="w-full bg-surface-container border border-outline/30 px-4 py-3 text-on-background placeholder:text-on-surface-variant focus:outline-none focus:border-primary font-body-main"
               placeholder="you@example.com"
               required
             />
@@ -86,7 +86,7 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-surface-container border border-outline/30 px-4 py-3 text-on-background placeholder:text-outline/50 focus:outline-none focus:border-primary font-body-main"
+              className="w-full bg-surface-container border border-outline/30 px-4 py-3 text-on-background placeholder:text-on-surface-variant focus:outline-none focus:border-primary font-body-main"
               placeholder="••••••••"
               required
             />
@@ -100,13 +100,13 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
             className="w-full font-button-label text-xs uppercase tracking-[0.2em] px-8 py-4 transition-all text-on-primary disabled:opacity-50"
-            style={{ background: 'linear-gradient(90deg, #e6c364, #95d4b3)' }}
+            style={{ background: 'var(--primary)' }}
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <p className="text-center text-outline/50 text-xs font-button-label mt-8 uppercase tracking-widest">
+        <p className="text-center text-on-surface-variant text-xs font-button-label mt-8 uppercase tracking-widest">
           Authorized personnel only
         </p>
       </div>

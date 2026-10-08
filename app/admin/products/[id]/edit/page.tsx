@@ -28,8 +28,8 @@ export default async function EditProductPage({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="font-section-header text-on-surface-variant text-xs tracking-[0.2em] mb-1">Products</h2>
-        <p className="font-audiowide text-2xl text-on-background">Edit Product</p>
+        <h2 className="font-section-header text-ink-muted text-xs tracking-[0.2em] mb-1">Products</h2>
+        <p className="font-audiowide text-2xl text-ink">Edit Product</p>
       </div>
 
       <ProductForm

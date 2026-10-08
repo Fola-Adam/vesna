@@ -52,7 +52,7 @@ export default function ProductsPage() {
   }
 
   return <div className="space-y-6">
-    <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-on-surface-variant">Catalog</p><h1 className="mt-1 font-audiowide text-3xl text-on-background">Products</h1><p className="mt-2 text-sm text-on-surface-variant">Manage the pieces in Vesna’s collection.</p></div><Button asChild><Link href="/admin/products/new"><Plus className="mr-2 h-4 w-4" />Add product</Link></Button></div>
+    <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs uppercase tracking-[0.18em] text-ink-muted">Catalog</p><h1 className="mt-1 font-audiowide text-3xl text-ink">Products</h1><p className="mt-2 text-sm text-ink-muted">Manage the pieces in Vesna’s collection.</p></div><Button asChild><Link href="/admin/products/new"><Plus className="mr-2 h-4 w-4" />Add product</Link></Button></div>
     {error && <div role="alert" className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>}
     <Card><CardContent className="p-0">
       <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center">
