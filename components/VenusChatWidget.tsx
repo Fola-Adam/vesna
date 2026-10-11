@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import * as Dialog from '@radix-ui/react-dialog'
 import { ArrowDown, ArrowUp, ArrowUpRight, Maximize, Minimize, RotateCcw, Square, Trash2, X } from 'lucide-react'
@@ -27,6 +27,12 @@ function saveMessages(messages: Message[]) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-50).map(({ role, content, error }) => ({ role, content, error })))) } catch {}
 }
 
+function resizeComposer(element: HTMLTextAreaElement | null) {
+  if (!element) return
+  element.style.height = 'auto'
+  element.style.height = Math.min(element.scrollHeight, 144) + 'px'
+}
+
 export default function VenusChatWidget() {
   const { isOpen, setIsOpen, draft: inputValue, setDraft: setInputValue, productSlug, openChat, clearProductContext } = useVenus()
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -42,6 +48,15 @@ export default function VenusChatWidget() {
   const streamFlushRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const requestRef = useRef<AbortController | null>(null)
   const messagesInitialized = useRef(false)
+  const composerRef = useRef<HTMLTextAreaElement>(null)
+  const attachComposer = useCallback((element: HTMLTextAreaElement | null) => {
+    composerRef.current = element
+    resizeComposer(element)
+  }, [])
+
+  useEffect(() => {
+    resizeComposer(composerRef.current)
+  }, [inputValue, isFullscreen])
 
   useEffect(() => {
     let cancelled = false
@@ -173,8 +188,8 @@ export default function VenusChatWidget() {
         <footer className="shrink-0 border-t border-ink/10 bg-paper-raised px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(41,39,32,.05)] sm:px-6">
           <form onSubmit={handleSubmit} className="flex items-end gap-2 rounded-xl border border-ink/25 bg-paper p-2 transition-colors focus-within:border-primary-ink focus-within:ring-2 focus-within:ring-primary-ink/15">
             <label className="sr-only" htmlFor="venus-message">Message Venus</label>
-            <textarea id="venus-message" value={inputValue} onChange={event => setInputValue(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); if (!isTyping) event.currentTarget.form?.requestSubmit() } }} placeholder="What are you looking for?" rows={2} maxLength={2000}
-              className="max-h-36 min-h-12 min-w-0 flex-1 resize-y bg-transparent px-2 py-2 text-base font-medium leading-6 text-ink placeholder:text-ink-muted focus:outline-none sm:text-sm" />
+            <textarea ref={attachComposer} id="venus-message" value={inputValue} onChange={event => setInputValue(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); if (!isTyping) event.currentTarget.form?.requestSubmit() } }} placeholder="What are you looking for?" rows={2} maxLength={2000}
+              className="max-h-36 min-h-12 min-w-0 flex-1 resize-none overflow-y-auto bg-transparent px-2 py-2 text-base font-medium leading-6 text-ink placeholder:text-ink-muted focus:outline-none sm:text-sm" />
             {isTyping ? <button type="button" onClick={() => requestRef.current?.abort()} aria-label="Stop response" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#10382d] text-paper focus-ring"><Square aria-hidden="true" size={15} /></button> : <button type="submit" aria-label="Send message" disabled={!inputValue.trim()} className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#10382d] text-paper focus-ring disabled:opacity-35"><ArrowUp aria-hidden="true" size={20} strokeWidth={1.5} /></button>}
           </form>
           <p className="mt-3 text-center text-[11px] font-medium leading-5 text-ink-muted">Venus searches Vesna&apos;s current picks. Confirm today&apos;s price and availability with the seller.</p>
