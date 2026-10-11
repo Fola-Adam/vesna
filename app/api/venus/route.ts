@@ -12,7 +12,7 @@ const MAX_HISTORY_MESSAGES = 10
 
 // Per-IP limiter for the Groq proxy. Without this, anyone can hammer
 // /api/venus and burn your (paid or free-tier) Groq quota. In-memory map is
-// per-instance � good enough at this scale; swap for Upstash Ratelimit when
+// per-instance — good enough at this scale; swap for Upstash Ratelimit when
 // traffic justifies it.
 const VENUS_WINDOW_MS = 60_000
 const VENUS_MAX_PER_WINDOW = 8
@@ -32,7 +32,7 @@ function venusRateLimited(ip: string): boolean {
   return false
 }
 
-// Only allow the roles our client actually sends � anything else is a
+// Only allow the roles our client actually sends — anything else is a
 // prompt-injection / API-abuse vector (e.g. spoofed "system" messages).
 const ALLOWED_ROLES = new Set(['user', 'assistant'])
 
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '0.0.0.0'
   if (venusRateLimited(ip)) {
     return new Response(
-      JSON.stringify({ error: 'Too many requests � please slow down.' }),
+      JSON.stringify({ error: 'Too many requests — please slow down.' }),
       { status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '60' } },
     )
   }
@@ -114,12 +114,12 @@ export async function POST(request: Request) {
 
   const productAppendix = matchedProducts.length > 0
     ? '\n\nRelevant products in the catalog right now:\n' +
-      matchedProducts.map(p => `- ${p.name} (category: ${p.category ?? "not provided"}; page: /shop/${p.slug}; listed price: ${p.price == null ? "not provided" : `$${p.price}`}) � ${p.description?.slice(0, 300) ?? "No description provided"}; curator note: ${p.why_victory?.slice(0, 400) ?? "not provided"}`).join('\n')
+      matchedProducts.map(p => `- ${p.name} (category: ${p.category ?? "not provided"}; page: /shop/${p.slug}; listed price: ${p.price == null ? "not provided" : `$${p.price}`}) — ${p.description?.slice(0, 300) ?? "No description provided"}; curator note: ${p.why_victory?.slice(0, 400) ?? "not provided"}`).join('\n')
     : ''
   const matchedReadings = selectVenusReadings(message)
   const readingAppendix = matchedReadings.length ? '\n\nPublished Journal readings:\n' + matchedReadings.map(article => `- ${article.title}; page: /journal/${article.slug}; ${article.categoryLabel}; ${article.readTime}; summary: ${article.excerpt}`).join('\n') : ''
 
-  const systemPrompt = `You are Venus, the assistant for Vesna � a curated lifestyle platform by Ebenezer Victory.
+  const systemPrompt = `You are Venus, the assistant for Vesna — a curated lifestyle platform by Ebenezer Victory.
 
 Your personality:
 - Warm, knowledgeable, and slightly poetic
@@ -134,7 +134,7 @@ About Vesna:
 
 Guidelines:
 - Keep responses concise (2-3 sentences for simple questions)
-- When relevant products are listed below, use them to answer accurately � reference products by name and price
+- When relevant products are listed below, use them to answer accurately — reference products by name and price
 - If you don't have matching products, say so and offer general guidance
 - Don't make up product details not shown in the provided list
 - If asked about purchasing, explain that available seller links are on product detail pages; do not promise a working link or current stock
@@ -148,7 +148,7 @@ Guidelines:
 
 Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readingAppendix}`
 
-  // Typed as the SDK's param union � plain `{role: string}` literals don't
+  // Typed as the SDK's param union — plain `{role: string}` literals don't
   // satisfy ChatCompletionMessageParam[] in groq-sdk v1.
   const messages: import('groq-sdk/resources/chat/completions').ChatCompletionMessageParam[] = [
     { role: 'system', content: systemPrompt },
