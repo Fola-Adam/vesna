@@ -14,9 +14,9 @@ export default function CatalogProductCard({ product }: { product: ProductRow })
           <CatalogImage src={product.image_urls?.[0]} alt={product.name} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           {product.is_featured && <span className="absolute left-3 top-3 bg-ink px-3 py-1.5 font-button-label text-[10px] uppercase tracking-[0.12em] text-paper">Featured pick</span>}
         </div>
-        <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-6">
           <p className="mb-2 font-section-header text-ink-muted">{product.categories?.name ?? 'Selected object'}</p>
-          <h2 className="mb-3 font-display-hero text-xl leading-snug text-ink transition-colors group-hover:text-primary-ink sm:text-2xl">{product.name}</h2>
+          <h2 className="mb-3 break-words font-display-hero text-xl leading-snug text-ink transition-colors group-hover:text-primary-ink sm:text-2xl">{product.name}</h2>
           <p className="mb-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 font-button-label text-sm text-ink">
             {price == null ? 'Price not listed' : formatPrice(price)}
             {strike != null && <span className="text-xs text-ink-muted line-through">{formatPrice(strike)}</span>}

@@ -130,12 +130,12 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
       <div className="mx-auto max-w-7xl px-5 pb-20 pt-28 sm:px-8 sm:pt-32">
         <header className="mb-8 max-w-3xl sm:mb-10">
           <p className="font-section-header mb-3 text-ink-muted">The collection</p>
-          <h1 className="font-display-hero mb-4 text-4xl sm:text-5xl lg:text-6xl">Victory&apos;s picks</h1>
+          <h1 className="mb-4 break-words font-display-hero text-[clamp(2.25rem,7.5vw,3.75rem)] leading-tight">Victory&apos;s picks</h1>
           <p className="max-w-2xl font-body-main text-base leading-relaxed text-ink-muted sm:text-lg">Objects, tools, and experiences selected with intention.</p>
         </header>
         {products.some(product => product.id.startsWith('fallback-')) && <p className="mb-6 border border-ink/20 bg-paper-raised p-4 text-sm text-ink-muted">Preview collection. Prices and seller availability have not been verified.</p>}
 
-        <div className="hidden grid-cols-1 gap-4 border-y border-ink/15 py-5 sm:grid sm:grid-cols-2 lg:grid-cols-3">
+        <div className="hidden min-w-0 grid-cols-1 gap-4 border-y border-ink/15 py-5 sm:grid sm:grid-cols-2 lg:grid-cols-3">
           <FilterControls {...controls} prefix="desktop" showCategories={false} />
         </div>
 
@@ -185,7 +185,7 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
           ))}
         </div>
 
-        {filteredProducts.length ? <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        {filteredProducts.length ? <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {filteredProducts.slice(0, displayedCount).map(product => <CatalogProductCard key={product.id} product={product} />)}
         </div> : <div className="border-y border-ink/15 py-16 text-center"><h2 className="font-display-hero mb-3 text-2xl">No picks match these filters</h2><p className="mb-5 text-ink-muted">Try a broader search or a different budget.</p><button className="text-primary-ink underline underline-offset-4 focus-ring" onClick={clearFilters}>Clear filters</button></div>}
         {displayedCount < filteredProducts.length && <div className="mt-12 text-center"><button onClick={() => setPagination({ key: pageKey, count: displayedCount + ITEMS_PER_LOAD })} className="min-h-12 border border-primary-ink px-8 py-3 text-primary-ink transition-colors hover:bg-primary hover:text-on-primary focus-ring">Show more picks</button></div>}

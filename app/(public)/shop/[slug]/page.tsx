@@ -50,7 +50,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-paper text-ink">
-      <div className="mx-auto max-w-screen-xl px-5 pb-16 pt-10 sm:px-8 sm:pb-20 lg:px-20">
+      <div className="mx-auto max-w-screen-xl px-5 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-28 lg:px-20">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 font-button-label text-xs uppercase tracking-wider text-ink-muted">
           <Link href="/picks" className="transition-colors hover:text-primary-ink focus-ring">Picks</Link>
@@ -72,9 +72,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
           {/* Details */}
           <div className="flex flex-col justify-center">
             <span className="mb-3 font-section-header text-ink-muted">{category}</span>
-            <h1 className="mb-4 font-display-hero text-3xl leading-tight sm:text-4xl lg:text-5xl">{product.name}</h1>
+            <h1 className="mb-4 break-words font-display-hero text-[clamp(1.875rem,6vw,3rem)] leading-tight">{product.name}</h1>
 
-            <div className="flex items-baseline gap-4 mb-6">
+            <div className="mb-6 flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-2">
               <span className="font-button-label text-xl text-ink">{price == null ? 'Price not listed' : formatPrice(price)}</span>
               {strike != null && (
                 <span className="font-body-main text-sm text-ink-muted line-through">{formatPrice(strike)}</span>

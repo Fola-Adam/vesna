@@ -14,14 +14,14 @@ export default async function ArchivePage() {
   const products = await getArchivedProducts()
   return <main className="min-h-[65vh] bg-paper text-ink">
     <ScrollProgress />
-    <header className="border-b border-ink/10 px-5 py-14 sm:px-8 sm:py-20 lg:px-20">
+    <header className="border-b border-ink/10 px-5 pb-14 pt-24 sm:px-8 sm:pb-20 sm:pt-28 lg:px-20">
       <div className="mx-auto max-w-screen-xl">
         <p className="mb-3 font-section-header text-ink-muted">Past the present collection</p>
-        <h1 className="font-display-hero text-4xl sm:text-5xl">The archive</h1>
+        <h1 className="break-words font-display-hero text-[clamp(2.25rem,7.5vw,3.75rem)] leading-tight">The archive</h1>
         <p className="mt-4 max-w-2xl font-body-main leading-relaxed text-ink-muted">Products previously featured by Vesna. Availability and prices may have changed since they were listed.</p>
       </div>
     </header>
-    {products.length ? <section className="mx-auto grid max-w-screen-xl gap-6 px-5 py-12 sm:grid-cols-2 sm:px-8 lg:grid-cols-3 lg:px-20">
+    {products.length ? <section className="mx-auto grid min-w-0 max-w-screen-xl gap-4 px-4 py-12 sm:grid-cols-2 sm:gap-6 sm:px-8 lg:grid-cols-3 lg:px-20">
       {products.map((product) => <article key={product.id} className="overflow-hidden border border-ink/10 bg-paper-raised">
         <div className="relative aspect-[4/3] bg-paper"><Image src={product.image_urls?.[0] || '/vesna-imgs/curated-novels.webp'} alt={product.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" /></div>
         <div className="p-5"><p className="font-section-header text-ink-muted">{product.categories?.name ?? 'Collection'}</p><h2 className="mt-2 font-display-hero text-xl">{product.name}</h2>{product.description && <p className="mt-3 line-clamp-3 font-body-main text-sm leading-relaxed text-ink-muted">{product.description}</p>}</div>

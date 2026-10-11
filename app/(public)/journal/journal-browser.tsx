@@ -15,10 +15,10 @@ export default function JournalBrowser() {
   return (
     <main className="bg-paper text-ink">
       <ScrollProgress />
-      <header className="border-b border-ink/10 px-5 pb-12 pt-16 sm:px-8 sm:pb-16 sm:pt-20 lg:px-20">
+      <header className="border-b border-ink/10 px-5 pb-12 pt-24 sm:px-8 sm:pb-16 sm:pt-28 lg:px-20">
         <div className="mx-auto max-w-screen-xl">
           <p className="mb-3 font-section-header text-ink-muted">Ideas for considered living</p>
-          <h1 className="max-w-3xl font-display-hero text-4xl leading-tight sm:text-5xl lg:text-6xl">The Vesna journal</h1>
+          <h1 className="max-w-3xl break-words font-display-hero text-[clamp(2.25rem,7.5vw,3.75rem)] leading-tight">The Vesna journal</h1>
           <p className="mt-5 max-w-2xl font-body-main text-base leading-relaxed text-ink-muted sm:text-lg">Notes on useful objects, thoughtful spaces, and choosing with care.</p>
         </div>
       </header>
@@ -32,18 +32,18 @@ export default function JournalBrowser() {
 
       {lead ? <section className="px-5 pb-16 sm:px-8 lg:px-20 lg:pb-24">
         <div className="mx-auto max-w-screen-xl">
-          <Link href={`/journal/${lead.slug}`} className="group grid gap-7 border-y border-ink/10 py-7 focus-ring sm:grid-cols-5 sm:items-center sm:gap-10 sm:py-10">
+          <Link href={`/journal/${lead.slug}`} className="group grid min-w-0 gap-7 border-y border-ink/10 py-7 focus-ring sm:grid-cols-5 sm:items-center sm:gap-10 sm:py-10">
             <div className="relative aspect-[16/10] overflow-hidden bg-paper-raised sm:col-span-3">
               <Image src={lead.image} alt="" fill sizes="(max-width: 640px) 100vw, 60vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none" />
             </div>
             <div className="sm:col-span-2">
               <p className="mb-3 font-section-header text-ink-muted">{lead.categoryLabel} <span aria-hidden="true">·</span> {lead.readTime}</p>
-              <h2 className="font-display-hero text-3xl leading-tight transition-colors group-hover:text-primary-ink sm:text-4xl">{lead.title}</h2>
+              <h2 className="break-words font-display-hero text-3xl leading-tight transition-colors group-hover:text-primary-ink sm:text-4xl">{lead.title}</h2>
               <p className="mt-4 font-body-main leading-relaxed text-ink-muted">{lead.excerpt}</p>
               <span className="mt-6 inline-flex font-button-label text-xs uppercase tracking-wider text-primary-ink">Read story <span className="ml-2" aria-hidden="true">→</span></span>
             </div>
           </Link>
-          {rest.length > 0 && <div className="grid gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10">
+          {rest.length > 0 && <div className="grid min-w-0 gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10">
             {rest.map((article) => <Link key={article.slug} href={`/journal/${article.slug}`} className="group focus-ring">
               <div className="relative mb-4 aspect-[4/3] overflow-hidden bg-paper-raised"><Image src={article.image} alt="" fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition-transform duration-300 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none" /></div>
               <p className="mb-2 font-section-header text-ink-muted">{article.categoryLabel} <span aria-hidden="true">·</span> {article.readTime}</p>
