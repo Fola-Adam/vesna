@@ -75,15 +75,15 @@ export default async function AdminDashboard() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="mb-1 font-section-header text-xs tracking-[0.2em] text-ink-muted">OVERVIEW</h2>
-          <p className="font-audiowide text-3xl text-ink">Curator studio</p>
+          <p className="font-audiowide text-2xl text-ink sm:text-3xl">Curator studio</p>
           <p className="mt-2 text-sm text-ink-muted">A quick view of your collection and readership.</p>
         </div>
         <Button asChild><Link href="/admin/products/new"><Plus className="mr-2 h-4 w-4" />Add a product</Link></Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {stats.map((stat) => (
-          <Link key={stat.label} href={stat.href}>
+          <Link key={stat.label} href={stat.href} className="min-w-0 last:col-span-full lg:last:col-span-1">
           <Card className="group cursor-pointer transition-colors hover:border-primary/40">
               <CardHeader className="pb-2 flex flex-row items-center justify-between">
                 <CardTitle className="font-section-header text-xs tracking-[0.15em] text-on-surface-variant">
@@ -113,9 +113,9 @@ export default async function AdminDashboard() {
               {recentProducts?.map((product) => (
                 <div
                   key={product.id}
-                  className="flex items-center justify-between py-3 px-3 rounded-md hover:bg-surface-container transition-colors"
+                  className="flex min-w-0 items-center justify-between gap-2 rounded-md px-3 py-3 hover:bg-surface-container transition-colors"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded bg-surface-container">
                     {product.image_urls?.[0] ? <img src={product.image_urls[0]} alt="" className="h-full w-full object-cover" /> :
                     <span className="font-audiowide text-xs text-primary">
@@ -123,13 +123,13 @@ export default async function AdminDashboard() {
                     </span>}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-on-background">{product.name}</p>
+                      <p className="break-words text-sm font-medium text-on-background">{product.name}</p>
                       <p className="font-section-header text-[10px] text-on-surface-variant tracking-[0.1em]">
                         {product.item_type}
                       </p>
                     </div>
                   </div>
-                  <span className="font-section-header text-[10px] text-on-surface-variant tracking-[0.1em]">
+                  <span className="shrink-0 font-section-header text-[10px] text-on-surface-variant tracking-[0.1em]">
                     {new Date(product.created_at).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',

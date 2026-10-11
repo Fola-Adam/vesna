@@ -11,9 +11,9 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-paper">
       <AdminSidebar />
-      <main className="lg:ml-64 min-h-screen">
+      <main className="min-w-0 min-h-screen lg:ml-64">
         <AdminHeader />
-        <div className="mx-auto max-w-[1500px] p-4 sm:p-6 lg:p-8">
+        <div className="mx-auto min-w-0 max-w-[1500px] p-4 sm:p-6 lg:p-8">
           {children}
         </div>
       </main>
@@ -28,7 +28,7 @@ function NavLink({ href, icon, children, lightSurface = false }: { href: string;
   return (
     <Link
       href={href}
-      className={`flex items-center gap-3 px-3 py-2 text-sm rounded-md transition-colors ${
+      className={`flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors ${
         isActive
           ? `${lightSurface ? 'text-primary-ink' : 'text-primary'} bg-primary/10 font-medium`
           : lightSurface ? 'text-ink-muted hover:bg-ink/5 hover:text-ink' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
@@ -106,11 +106,11 @@ function AdminSidebar() {
 
 function AdminHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-ink/10 bg-paper/90 backdrop-blur-sm">
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-        <p className="font-section-header text-xs tracking-[0.2em] text-ink-muted">VESNA / CURATOR STUDIO</p>
+    <header className="sticky top-0 z-40 isolate border-b border-ink/15 bg-paper shadow-sm">
+      <div className="flex min-h-14 items-center justify-between px-4 sm:min-h-16 sm:px-6">
+        <p className="font-section-header text-[0.65rem] tracking-[0.16em] text-ink-muted sm:text-xs sm:tracking-[0.2em]">VESNA / CURATOR STUDIO</p>
       </div>
-      <nav aria-label="Admin navigation" className="lg:hidden flex flex-wrap gap-2 px-3 pb-3">
+      <nav aria-label="Admin navigation" className="grid grid-cols-2 gap-1.5 px-3 pb-3 sm:grid-cols-4 sm:gap-2 sm:px-6 lg:hidden">
         <NavLink lightSurface href="/admin/dashboard" icon={<DashboardIcon />}>Dashboard</NavLink>
         <NavLink lightSurface href="/admin/products" icon={<ProductsIcon />}>Products</NavLink>
         <NavLink lightSurface href="/admin/analytics" icon={<AnalyticsIcon />}>Analytics</NavLink>
