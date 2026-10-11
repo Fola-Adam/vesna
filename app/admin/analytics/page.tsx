@@ -83,7 +83,7 @@ export default async function AnalyticsPage() {
     <div className="space-y-8">
       <div>
         <h2 className="font-section-header text-ink-muted text-xs tracking-[0.2em] mb-1">Insights</h2>
-        <p className="font-audiowide text-2xl text-ink">Analytics</p>
+        <p className="font-display-hero text-4xl text-ink">Analytics</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -94,7 +94,7 @@ export default async function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="font-audiowide text-4xl text-primary tracking-wider">
+            <div className="font-button-label text-4xl font-medium text-primary tracking-tight">
               {String(totalClicks).padStart(2, '0')}
             </div>
           </CardContent>
@@ -106,7 +106,7 @@ export default async function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="font-audiowide text-4xl text-primary tracking-wider">
+            <div className="font-button-label text-4xl font-medium text-primary tracking-tight">
               {String(productMap.size).padStart(2, '0')}
             </div>
           </CardContent>
@@ -118,7 +118,7 @@ export default async function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="font-audiowide text-4xl text-primary tracking-wider">
+            <div className="font-button-label text-4xl font-medium text-primary tracking-tight">
               {String(Math.round(totalClicks / Math.max(dailyData.length, 1))).padStart(2, '0')}
             </div>
           </CardContent>
@@ -145,7 +145,7 @@ export default async function AnalyticsPage() {
                       style={{ width: `${(clicks / maxDaily) * 100}%` }}
                     />
                   </div>
-                  <span className="font-audiowide text-xs text-on-background w-6 text-right">
+                  <span className="font-button-label text-xs font-semibold text-on-background w-6 text-right">
                     {clicks}
                   </span>
                 </div>
@@ -167,11 +167,11 @@ export default async function AnalyticsPage() {
             <div className="space-y-2">
               {productData.map((product, i) => (
                 <div key={product.name} className="flex items-center gap-3">
-                  <span className="font-audiowide text-xs text-primary w-6 shrink-0">
+                  <span className="font-button-label text-xs font-semibold text-primary w-6 shrink-0">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <span className="text-sm text-on-background flex-1 truncate">{product.name}</span>
-                  <span className="font-audiowide text-xs text-on-surface-variant">{product.count}</span>
+                  <span className="font-button-label text-xs font-semibold text-on-surface-variant">{product.count}</span>
                 </div>
               ))}
               {productData.length === 0 && (
@@ -194,7 +194,7 @@ export default async function AnalyticsPage() {
               {referrerData.map(([referrer, count]) => (
                 <div key={referrer} className="flex items-center justify-between py-1">
                   <span className="text-sm text-on-background truncate">{referrer}</span>
-                  <span className="font-audiowide text-xs text-primary">{count}</span>
+                  <span className="font-button-label text-xs font-semibold text-primary">{count}</span>
                 </div>
               ))}
               {referrerData.length === 0 && (

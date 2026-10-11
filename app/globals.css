@@ -20,20 +20,20 @@
   --paper-raised: #faf7f0;
   --ink: #292720;
   --ink-muted: #625b50;
-  /* Use this darker gold on light surfaces; --primary is for gold fills and dark surfaces. */
-  --primary-ink: #705315;
+  /* Emerald is for action; gold is reserved for fine accents. */
+  --primary-ink: #1b5a45;
 
-  /* Primary - Gold */
-  --primary: #e4c06d;
-  --primary-foreground: #2c2415;
-  --primary-container: #c9a451;
-  --on-primary-container: #1a1400;
-  --primary-fixed: #ffe088;
-  --primary-fixed-dim: #e9c349;
-  --on-primary-fixed: #2a1f00;
-  --on-primary-fixed-variant: #574500;
+  /* Primary - Vesna emerald */
+  --primary: #1b5a45;
+  --primary-foreground: #faf7f0;
+  --primary-container: #10382d;
+  --on-primary-container: #f1ece2;
+  --primary-fixed: #cfe9d9;
+  --primary-fixed-dim: #a9d1ba;
+  --on-primary-fixed: #08261c;
+  --on-primary-fixed-variant: #174a38;
 
-  /* Secondary - Teal */
+  /* Secondary - Antique gold */
   --secondary: #c3aa7b;
   --secondary-foreground: #2c2415;
   --secondary-container: #4a4030;
@@ -71,7 +71,7 @@
   --destructive-foreground: #690005;
   --border: #514b40;
   --input: #514b40;
-  --ring: #e4c06d;
+  --ring: #77b596;
   --motion-fast: 140ms;
   --motion-base: 220ms;
   --motion-ease: cubic-bezier(0.2, 0.65, 0.3, 1);
@@ -84,8 +84,8 @@ html {
 }
 
 body {
-  --font-tenor-sans: var(--font-button-label);
-  --font-dm-serif: var(--font-playfair);
+  --font-tenor-sans: var(--font-manrope);
+  --font-button-label: var(--font-manrope);
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-tenor-sans);
@@ -95,21 +95,9 @@ body {
   min-width: 320px;
 }
 
-/* Audiowide Logo Font */
-.font-audiowide {
-  font-family: var(--font-audiowide);
-}
-
-/* Lambda symbol styling */
-.lambda-exo2 {
-  font-family: sans-serif;
-  font-weight: 400;
-  display: inline-block;
-}
-
 /* Display/Hero Font */
 .font-display-hero {
-  font-family: var(--font-playfair), Georgia, serif;
+  font-family: var(--font-cormorant), Georgia, serif;
 }
 
 /* Body Font */
@@ -143,7 +131,7 @@ body {
   height: 1px;
   bottom: -2px;
   left: 50%;
-  background-color: var(--primary);
+  background-color: var(--secondary);
   transition: width var(--motion-base) var(--motion-ease);
   transform: translateX(-50%);
 }
@@ -182,8 +170,8 @@ body {
     @apply border-border;
   }
   body {
-  --font-tenor-sans: var(--font-button-label);
-  --font-dm-serif: var(--font-playfair);
+    --font-tenor-sans: var(--font-manrope);
+    --font-button-label: var(--font-manrope);
     @apply bg-background text-foreground;
   }
 }
@@ -265,16 +253,20 @@ body {
 /* Shared Gradient Button */
 .btn-gold-gradient {
   background: var(--primary);
+  color: var(--primary-foreground);
 }
 
 /* Warm, low-contrast decorative wash */
 .bg-green-wash {
-  background-color: rgba(195, 170, 123, 0.055);
+  background-color: rgba(27, 90, 69, 0.07);
 }
 
 .border-green-subtle {
-  border-color: rgba(195, 170, 123, 0.24);
+  border-color: rgba(27, 90, 69, 0.24);
 }
+
+/* Gold remains legible for small accents on charcoal admin surfaces. */
+.dark .text-primary { color: var(--secondary); }
 
 /* Hide scrollbars globally but keep scroll functionality */
 * {

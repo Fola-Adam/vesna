@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { TriangleAlert } from 'lucide-react'
 
 export default function AdminError({
   error,
@@ -17,9 +18,7 @@ export default function AdminError({
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
       <div className="max-w-md">
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-destructive/10 flex items-center justify-center">
-          <svg className="w-8 h-8 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
+          <TriangleAlert aria-hidden="true" className="h-8 w-8 text-destructive" strokeWidth={1.5} />
         </div>
         <h2 className="font-section-header text-on-surface-variant mb-2">Something Went Wrong</h2>
         <p className="text-sm text-on-surface-variant leading-relaxed mb-8">

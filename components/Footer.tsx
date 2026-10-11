@@ -14,9 +14,9 @@ export default function Footer() {
       <div className="flex flex-col items-center gap-6 lg:gap-8 max-w-[1440px] mx-auto">
         <Link
           href="/"
-          className="font-audiowide text-2xl tracking-[0.3em] text-paper focus-ring lg:text-3xl"
+          className="font-display-hero text-3xl font-semibold tracking-[0.16em] text-paper focus-ring lg:text-4xl"
         >
-          VESN<span className="inline-block">Λ</span>
+          VESNA
         </Link>
 
         <div className="flex flex-wrap justify-center gap-6 lg:gap-8">
@@ -24,7 +24,7 @@ export default function Footer() {
             <Link
               key={link.href}
               href={link.href}
-              className="font-button-label text-xs uppercase tracking-wider text-paper/80 transition-colors hover:text-paper focus-ring"
+              className="font-button-label text-xs uppercase tracking-wider text-paper/80 transition-colors hover:text-secondary focus-ring"
             >
               {link.label}
             </Link>

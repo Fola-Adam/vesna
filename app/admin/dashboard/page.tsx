@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
-import { ArrowUpRight, Plus } from 'lucide-react'
+import Image from 'next/image'
+import { ArrowUpRight, Mail, MousePointerClick, Plus, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 /** Admin pages read live data per request — never prerender at build time. */
@@ -42,31 +43,19 @@ export default async function AdminDashboard() {
       label: 'Active Products',
       value: productsCount || 0,
       href: '/admin/products',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
-      ),
+      icon: <ShoppingBag aria-hidden="true" size={19} strokeWidth={1.5} />,
     },
     {
       label: 'Email Subscribers',
       value: subscribersCount || 0,
       href: '/admin/subscribers',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      ),
+      icon: <Mail aria-hidden="true" size={19} strokeWidth={1.5} />,
     },
     {
       label: 'Total Clicks',
       value: totalClicks || 0,
       href: '/admin/analytics',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-      ),
+      icon: <MousePointerClick aria-hidden="true" size={19} strokeWidth={1.5} />,
     },
   ]
 
@@ -75,7 +64,7 @@ export default async function AdminDashboard() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="mb-1 font-section-header text-xs tracking-[0.2em] text-ink-muted">OVERVIEW</h2>
-          <p className="font-audiowide text-2xl text-ink sm:text-3xl">Curator studio</p>
+          <p className="font-display-hero text-4xl text-ink sm:text-5xl">Curator studio</p>
           <p className="mt-2 text-sm text-ink-muted">A quick view of your collection and readership.</p>
         </div>
         <Button asChild><Link href="/admin/products/new"><Plus className="mr-2 h-4 w-4" />Add a product</Link></Button>
@@ -92,7 +81,7 @@ export default async function AdminDashboard() {
                 <span className="text-on-surface-variant group-hover:text-primary transition-colors">{stat.icon}</span>
               </CardHeader>
               <CardContent>
-                <div className="font-audiowide text-4xl text-primary tracking-wider">
+                <div className="font-button-label text-4xl font-medium text-primary tracking-tight">
                   {String(stat.value).padStart(2, '0')}
                 </div>
               </CardContent>
@@ -117,8 +106,8 @@ export default async function AdminDashboard() {
                 >
                   <div className="flex min-w-0 flex-1 items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded bg-surface-container">
-                    {product.image_urls?.[0] ? <img src={product.image_urls[0]} alt="" className="h-full w-full object-cover" /> :
-                    <span className="font-audiowide text-xs text-primary">
+                    {product.image_urls?.[0] ? <Image src={product.image_urls[0]} alt="" width={40} height={40} className="h-full w-full object-cover" /> :
+                    <span className="font-button-label text-xs font-semibold text-primary">
                       {product.name.charAt(0)}
                     </span>}
                     </div>
@@ -161,9 +150,7 @@ export default async function AdminDashboard() {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded bg-surface-container flex items-center justify-center">
-                      <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5" />
-                      </svg>
+                      <MousePointerClick aria-hidden="true" className="h-4 w-4 text-primary" strokeWidth={1.5} />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-on-background">

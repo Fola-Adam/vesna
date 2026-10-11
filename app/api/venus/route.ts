@@ -1,31 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
+import { readActiveCatalog } from '@/lib/data'
+import { selectVenusProducts } from '@/lib/venus-catalog'
 import type { VenusEvent } from '@/lib/venus-stream'
 
 const MAX_PRODUCTS = 8
-
-interface RawProduct {
-  name: string
-  slug: string
-  price: number | null
-  image_urls: string[] | null
-  description: string | null
-  item_type: string
-  why_victory?: string | null
-  affiliate_link?: string | null
-  similarity?: number
-  categories?: { name: string }[] | null
-}
-
-interface MatchedProduct {
-  name: string
-  slug: string
-  price: number | null
-  image_urls: string[] | null
-  description: string | null
-  item_type: string
-  similarity: number
-  why_victory?: string | null
-}
 
 export const runtime = 'nodejs'
 
@@ -120,73 +97,15 @@ export async function POST(request: Request) {
     })
   }
 
-  // ---- PHASE 1: Retrieve relevant products ----
-  let matchedProducts: MatchedProduct[] = []
-
+  let matchedProducts: ReturnType<typeof selectVenusProducts>
   try {
-    const supabase = await createClient()
-    let products: RawProduct[] | null = null
-
-    if (process.env.VENUS_SEMANTIC_SEARCH === 'true') try {
-      const { getEmbedding } = await import('@/lib/embeddings')
-      const queryEmbedding = await getEmbedding(message)
-      const vectorStr = `[${queryEmbedding.join(',')}]`
-
-      const { data } = await supabase.rpc('match_products', {
-        query_embedding: vectorStr,
-        match_threshold: 0.4,
-        match_count: MAX_PRODUCTS,
-      })
-
-      if (data && data.length > 0) products = data
-    } catch {}
-
-    if (typeof productSlug === 'string' && /^[a-z0-9-]{1,200}$/i.test(productSlug)) {
-      const { data: selected } = await supabase.from('products')
-        .select('name, slug, price, description, why_victory, affiliate_link, item_type, image_urls, categories(name)')
-        .eq('slug', productSlug).eq('is_active', true).maybeSingle()
-      if (selected) products = [selected]
-    }
-
-    if (!products || products.length === 0) {
-      const searchTerms = message
-        .replace(/[^\w\s]/g, '')
-        .split(/\s+/)
-        .filter((w: string) => w.length > 2 && !['tell', 'about', 'what', 'should', 'check', 'before', 'buying', 'the', 'for', 'this', 'that', 'with', 'help', 'pick', 'choose', 'does', 'who', 'and', 'under'].includes(w.toLowerCase()))
-        .slice(0, 6)
-
-      if (searchTerms.length > 0) {
-        const filters = searchTerms.flatMap((term: string) => [
-          `name.ilike.%${term}%`,
-          `description.ilike.%${term}%`,
-          `why_victory.ilike.%${term}%`,
-        ])
-
-        const { data: keywordResults } = await supabase
-          .from('products')
-          .select('name, slug, price, description, why_victory, affiliate_link, item_type, image_urls, categories(name)')
-          .eq('is_active', true)
-          .or(filters.join(','))
-          .order('is_featured', { ascending: false })
-          .limit(MAX_PRODUCTS)
-
-        products = keywordResults
-      }
-    }
-
-    if (products && products.length > 0) {
-      matchedProducts = products.map((p: RawProduct) => ({
-        name: p.name,
-        slug: p.slug,
-        price: p.price,
-        image_urls: p.image_urls,
-        description: p.description,
-        item_type: p.item_type,
-        similarity: p.similarity ?? 0,
-        why_victory: p.why_victory ?? null,
-      }))
-    }
-  } catch {}
+    const catalog = await readActiveCatalog()
+    matchedProducts = selectVenusProducts(catalog, message, safeHistory,
+      typeof productSlug === 'string' ? productSlug : null, MAX_PRODUCTS)
+  } catch {
+    console.error('Venus catalog retrieval failed')
+    return Response.json({ error: 'Venus cannot read the collection right now. Please try again shortly.' }, { status: 503 })
+  }
 
   // ---- PHASE 2: Stream from Groq ----
   const { Groq } = await import('groq-sdk')
@@ -194,7 +113,7 @@ export async function POST(request: Request) {
 
   const productAppendix = matchedProducts.length > 0
     ? '\n\nRelevant products in the catalog right now:\n' +
-      matchedProducts.map(p => `- ${p.name} (listed price: ${p.price == null ? "not provided" : `$${p.price}`}) — ${p.description?.slice(0, 300) ?? "No description provided"}; curator note: ${p.why_victory?.slice(0, 400) ?? "not provided"}`).join('\n')
+      matchedProducts.map(p => `- ${p.name} (category: ${p.category ?? "not provided"}; page: /shop/${p.slug}; listed price: ${p.price == null ? "not provided" : `$${p.price}`}) — ${p.description?.slice(0, 300) ?? "No description provided"}; curator note: ${p.why_victory?.slice(0, 400) ?? "not provided"}`).join('\n')
     : ''
 
   const systemPrompt = `You are Venus, the assistant for Vesna — a curated lifestyle platform by Ebenezer Victory.
@@ -246,14 +165,16 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}`
           stream: true,
         }, { signal: abort.signal })
 
+        let answer = ''
         for await (const chunk of completion) {
           const text = chunk.choices?.[0]?.delta?.content
           if (text) {
+            answer += text
             send({ type: 'text', text })
           }
         }
 
-        send({ type: 'products', products: matchedProducts })
+        send({ type: 'products', products: matchedProducts.filter(product => answer.toLowerCase().includes(product.name.toLowerCase()) || answer.includes(`/shop/${product.slug}`)) })
         send({ type: 'done' })
         if (!cancelled) controller.close()
       } catch {

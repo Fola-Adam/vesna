@@ -8,6 +8,7 @@ interface VenusContextValue {
   draft: string
   setDraft: (draft: string) => void
   productSlug: string | null
+  clearProductContext: () => void
   openChat: (question?: string, productSlug?: string) => void
 }
 const VenusContext = createContext<VenusContextValue | null>(null)
@@ -18,6 +19,7 @@ export function VenusProvider({ children }: { children: React.ReactNode }) {
   const [productSlug, setProductSlug] = useState<string | null>(null)
   const value = {
     isOpen, setIsOpen, draft, setDraft, productSlug,
+    clearProductContext: () => setProductSlug(null),
     openChat(question = '', slug?: string) {
       setDraft(question)
       setProductSlug(slug ?? null)

@@ -53,7 +53,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-surface-dim px-5">
       <div className="w-full max-w-md">
         <div className="text-center mb-12">
-          <h1 className="font-audiowide text-3xl text-primary tracking-[0.3em] mb-4">
+          <h1 className="font-display-hero text-5xl font-semibold text-primary tracking-[0.16em] mb-4">
             VESNΛ
           </h1>
           <p className="font-button-label text-xs text-on-surface-variant uppercase tracking-widest">

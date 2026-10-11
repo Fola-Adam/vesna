@@ -18,7 +18,7 @@ export default async function NewProductPage() {
     <div className="space-y-8">
       <div>
         <h2 className="font-section-header text-ink-muted text-xs tracking-[0.2em] mb-1">Products</h2>
-        <p className="font-audiowide text-2xl text-ink">New Product</p>
+        <p className="font-display-hero text-4xl text-ink">New Product</p>
       </div>
 
       <ProductForm categories={categories || []} />

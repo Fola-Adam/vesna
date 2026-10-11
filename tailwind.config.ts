@@ -27,7 +27,7 @@ const config: Config = {
         "surface-container-low": "var(--surface-container-low)",
         "surface-container-lowest": "var(--surface-container-lowest)",
         
-        // Primary - Gold
+        // Primary - Emerald
         primary: "var(--primary)",
         "primary-foreground": "var(--primary-foreground)",
         "primary-container": "var(--primary-container)",
@@ -37,7 +37,7 @@ const config: Config = {
         "on-primary-fixed": "var(--on-primary-fixed)",
         "on-primary-fixed-variant": "var(--on-primary-fixed-variant)",
         
-        // Secondary - Teal
+        // Secondary - Antique gold
         secondary: "var(--secondary)",
         "secondary-foreground": "var(--secondary-foreground)",
         "secondary-container": "var(--secondary-container)",
@@ -78,14 +78,10 @@ const config: Config = {
         ring: "var(--ring)",
       },
       fontFamily: {
-        audiowide: ["var(--font-audiowide)", "cursive"],
-        "display-hero": ["var(--font-audiowide)", "cursive"],
-        "body-main": ["var(--font-tenor-sans)", "sans-serif"],
-        "button-label": ["var(--font-button-label)", "sans-serif"],
-        "section-header": ["var(--font-button-label)", "sans-serif"],
-        spectral: ["var(--font-spectral)", "serif"],
-        cinzel: ["var(--font-cinzel)", "serif"],
-        playfair: ["var(--font-playfair)", "serif"],
+        "display-hero": ["var(--font-cormorant)", "serif"],
+        "body-main": ["var(--font-manrope)", "sans-serif"],
+        "button-label": ["var(--font-manrope)", "sans-serif"],
+        "section-header": ["var(--font-manrope)", "sans-serif"],
       },
     },
   },

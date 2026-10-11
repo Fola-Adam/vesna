@@ -1,4 +1,5 @@
 'use client'
+import Icon from '@/components/Icon'
 
 import Link from 'next/link'
 import CatalogImage from '@/components/CatalogImage'
@@ -15,7 +16,7 @@ export default function CategoryGrid({ categories }: { categories: CatalogCatego
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{categories.map((category) => <Link key={category.name} href={`/picks?category=${encodeURIComponent(category.name.toLowerCase())}`} className="group relative flex min-h-52 items-end overflow-hidden bg-ink p-5 focus-ring sm:min-h-64 sm:p-7">
         {category.image && <CatalogImage src={category.image} alt="" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="absolute inset-0 h-full w-full object-cover opacity-65 transition duration-300 group-hover:scale-[1.03] group-hover:opacity-75 motion-reduce:transform-none motion-reduce:transition-none" />}
         <span className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-ink/5" aria-hidden="true" />
-        <span className="relative"><span className="block font-display-hero text-2xl text-paper">{category.name}</span><span className="mt-1 block font-button-label text-xs text-paper/85">{category.count} {category.count === 1 ? 'pick' : 'picks'} <span aria-hidden="true">→</span></span></span>
+        <span className="relative"><span className="block font-display-hero text-2xl text-paper">{category.name}</span><span className="mt-1 block font-button-label text-xs text-paper/85">{category.count} {category.count === 1 ? 'pick' : 'picks'} <Icon name="arrow_forward" className="align-middle" /></span></span>
       </Link>)}</div>
     </div>
   </section>

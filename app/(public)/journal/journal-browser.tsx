@@ -1,4 +1,5 @@
 'use client'
+import Icon from '@/components/Icon'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -40,7 +41,7 @@ export default function JournalBrowser() {
               <p className="mb-3 font-section-header text-ink-muted">{lead.categoryLabel} <span aria-hidden="true">·</span> {lead.readTime}</p>
               <h2 className="break-words font-display-hero text-3xl leading-tight transition-colors group-hover:text-primary-ink sm:text-4xl">{lead.title}</h2>
               <p className="mt-4 font-body-main leading-relaxed text-ink-muted">{lead.excerpt}</p>
-              <span className="mt-6 inline-flex font-button-label text-xs uppercase tracking-wider text-primary-ink">Read story <span className="ml-2" aria-hidden="true">→</span></span>
+              <span className="mt-6 inline-flex font-button-label text-xs uppercase tracking-wider text-primary-ink">Read story <Icon name="arrow_forward" className="ml-2 align-middle" /></span>
             </div>
           </Link>
           {rest.length > 0 && <div className="grid min-w-0 gap-8 pt-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10">

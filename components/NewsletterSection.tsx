@@ -16,7 +16,7 @@ export default function NewsletterSection() {
         </p>
         <NewsletterForm />
         <p className="mt-6 text-outline font-body-main text-xs">
-          Read how we handle your email in our <Link href="/privacy" className="underline underline-offset-4 hover:text-primary">privacy notice</Link>.
+          Read how we handle your email in our <Link href="/privacy" className="underline underline-offset-4 hover:text-secondary">privacy notice</Link>.
         </p>
       </div>
     </section>

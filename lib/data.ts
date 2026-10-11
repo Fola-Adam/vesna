@@ -62,19 +62,17 @@ function normalize(row: Record<string, unknown>): ProductRow {
 }
 
 /** Active non-archive products, newest first. Memoized per request. */
+export async function readActiveCatalog(): Promise<ProductRow[]> {
+  const { data, error } = await createPublicClient().from('products').select(SELECT_FIELDS)
+    .eq('is_active', true).neq('item_type', 'archive')
+    .order('created_at', { ascending: false }).limit(200)
+  if (error || !data) throw error ?? new Error('Catalog unavailable')
+  return data.map(normalize)
+}
+
 export const getProducts = cache(async (): Promise<ProductRow[]> => {
   try {
-    const supabase = createPublicClient()
-    const { data, error } = await supabase
-      .from('products')
-      .select(SELECT_FIELDS)
-      .eq('is_active', true)
-      .neq('item_type', 'archive')
-      .order('created_at', { ascending: false })
-      .limit(200)
-
-    if (error || !data) throw error ?? new Error('No data')
-    return data.map(normalize)
+    return await readActiveCatalog()
   } catch (e) {
     console.error('[data] getProducts failed:', (e as Error).message)
     return []

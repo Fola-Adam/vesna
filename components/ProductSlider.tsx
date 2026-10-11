@@ -1,4 +1,5 @@
 'use client'
+import Icon from '@/components/Icon'
 
 import { useRef } from 'react'
 import Link from 'next/link'
@@ -30,7 +31,7 @@ export default function ProductSlider({ products }: { products: ProductRow[] }) 
         <div ref={sliderRef} className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-6 sm:gap-6">
           {selected.map(product => <div key={product.id} className="w-[min(84vw,21rem)] flex-shrink-0 snap-start sm:w-[min(48vw,22rem)] lg:w-[calc((100%_-_3rem)_/_3)]"><CatalogProductCard product={product} /></div>)}
         </div>
-        <Link href="/picks" className="inline-block mt-5 border-b border-ink/40 pb-1 text-sm text-ink hover:border-primary-ink hover:text-primary-ink focus-ring">Explore all picks <span aria-hidden="true">→</span></Link>
+        <Link href="/picks" className="inline-block mt-5 border-b border-ink/40 pb-1 text-sm text-ink hover:border-primary-ink hover:text-primary-ink focus-ring">Explore all picks <Icon name="arrow_forward" className="align-middle" /></Link>
       </div>
     </section>
   )

@@ -1,3 +1,4 @@
+import Icon from '@/components/Icon'
 import Link from 'next/link'
 import type { ProductRow } from '@/lib/data'
 import { effectivePricing, formatPrice } from '@/lib/pricing'
@@ -22,7 +23,7 @@ export default function CatalogProductCard({ product }: { product: ProductRow })
             {strike != null && <span className="text-xs text-ink-muted line-through">{formatPrice(strike)}</span>}
           </p>
           {(product.why_victory || product.description) && <p className="mb-5 line-clamp-3 font-body-main text-sm leading-relaxed text-ink-muted">{product.why_victory ?? product.description}</p>}
-          <span className="mt-auto inline-flex items-center gap-2 font-button-label text-xs uppercase tracking-wider text-primary-ink">View the pick <span aria-hidden="true">→</span></span>
+          <span className="mt-auto inline-flex items-center gap-2 font-button-label text-xs uppercase tracking-wider text-primary-ink">View the pick <Icon name="arrow_forward" className="align-middle" /></span>
         </div>
       </Link>
       <div className="border-t border-ink/10 px-5 py-3 sm:px-6"><VenusTriggerPill productName={product.name} productSlug={product.slug} className="text-ink-muted hover:text-primary-ink" /></div>

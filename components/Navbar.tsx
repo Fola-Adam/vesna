@@ -50,21 +50,21 @@ export default function Navbar() {
   }, [isMobileMenuOpen])
 
   return (
-    <nav aria-label="Main navigation" className="isolate sticky inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0a0a0a] shadow-sm">
+    <nav aria-label="Main navigation" className="isolate sticky inset-x-0 top-0 z-50 border-b border-secondary/25 bg-[#10382d] text-paper shadow-sm">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-8 lg:h-20 lg:px-20">
-        <Link href="/" className="shrink-0 font-audiowide text-lg tracking-[0.24em] hover:text-primary focus-ring sm:text-xl sm:tracking-[0.3em] lg:text-2xl" onClick={() => setIsMobileMenuOpen(false)}>VESNΛ</Link>
+        <Link href="/" aria-label="Vesna home" className="shrink-0 font-display-hero text-2xl font-semibold tracking-[0.16em] text-paper transition-colors hover:text-secondary focus-ring sm:text-3xl" onClick={() => setIsMobileMenuOpen(false)}>VESNA</Link>
         <div className="hidden lg:flex items-center gap-8">{navLinks.map(link => {
-          const active = pathname === link.href || (link.href === '/picks' && pathname.startsWith('/shop'))
-          return <Link key={link.href} href={link.href} aria-current={active ? 'page' : undefined} className={`nav-underline-anim font-button-label text-xs uppercase tracking-widest transition-colors hover:text-primary focus-ring ${active ? 'text-primary' : ''}`}>{link.label}</Link>
+          const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(`${link.href}/`)) || (link.href === '/picks' && pathname.startsWith('/shop'))
+          return <Link key={link.href} href={link.href} aria-current={active ? 'page' : undefined} className={`nav-underline-anim font-button-label text-xs uppercase tracking-widest transition-colors hover:text-secondary focus-ring ${active ? 'text-secondary' : 'text-paper/90'}`}>{link.label}</Link>
         })}</div>
         <button ref={buttonRef} data-mobile-toggle aria-label="Toggle menu" aria-expanded={isMobileMenuOpen} aria-controls="mobile-navigation"
-          onClick={() => setIsMobileMenuOpen(open => !open)} className="inline-flex min-h-11 min-w-11 items-center justify-center p-2 text-2xl focus-ring lg:hidden"><Icon name={isMobileMenuOpen ? 'close' : 'menu'} /></button>
+          onClick={() => setIsMobileMenuOpen(open => !open)} className="inline-flex min-h-11 min-w-11 items-center justify-center p-2 text-2xl text-paper focus-ring lg:hidden"><Icon name={isMobileMenuOpen ? 'close' : 'menu'} /></button>
       </div>
       <div ref={menuRef} id="mobile-navigation" aria-hidden={!isMobileMenuOpen} inert={!isMobileMenuOpen}
-        className={`fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto bg-[#0a0a0a] px-4 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:hidden ${isMobileMenuOpen ? 'visible' : 'invisible'}`}>
+        className={`fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto bg-[#10382d] px-4 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:hidden ${isMobileMenuOpen ? 'visible' : 'invisible'}`}>
         {navLinks.map(link => {
-          const active = pathname === link.href || (link.href === '/picks' && pathname.startsWith('/shop'))
-          return <Link key={link.href} href={link.href} aria-current={active ? 'page' : undefined} onClick={() => setIsMobileMenuOpen(false)} className={`block border-b border-outline-variant py-5 font-button-label text-sm uppercase tracking-widest hover:text-primary focus-ring ${active ? 'text-primary' : ''}`}>{link.label}</Link>
+          const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(`${link.href}/`)) || (link.href === '/picks' && pathname.startsWith('/shop'))
+          return <Link key={link.href} href={link.href} aria-current={active ? 'page' : undefined} onClick={() => setIsMobileMenuOpen(false)} className={`block border-b border-paper/15 py-5 font-button-label text-sm uppercase tracking-widest hover:text-secondary focus-ring ${active ? 'text-secondary' : 'text-paper/90'}`}>{link.label}</Link>
         })}
       </div>
     </nav>

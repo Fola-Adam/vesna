@@ -76,7 +76,7 @@ export default function SubscribersPage() {
     <div className="space-y-8">
       <div>
         <h2 className="font-section-header text-ink-muted text-xs tracking-[0.2em] mb-1">Audience</h2>
-        <p className="font-audiowide text-2xl text-ink">Subscribers</p>
+        <p className="font-display-hero text-4xl text-ink">Subscribers</p>
       </div>
 
       <Card>

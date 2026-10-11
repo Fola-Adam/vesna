@@ -15,5 +15,5 @@ const symbols: Record<string, LucideIcon> = {
 /** Inline SVGs render without a third-party icon stylesheet or font request. */
 export default function Icon({ name, className = '' }: { name: string; className?: string }) {
   const Symbol = symbols[name] ?? Circle
-  return <Symbol aria-hidden="true" focusable="false" width="1em" height="1em" className={`inline-block shrink-0 ${className}`} />
+  return <Symbol aria-hidden="true" focusable="false" strokeWidth={1.5} width="1em" height="1em" className={`inline-block shrink-0 ${className}`} />
 }

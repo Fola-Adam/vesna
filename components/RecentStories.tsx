@@ -1,4 +1,5 @@
 'use client'
+import Icon from '@/components/Icon'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -17,7 +18,7 @@ export default function RecentStories() {
             <h2 className="font-display-hero text-3xl sm:text-4xl">Recent stories</h2>
           </div>
           <Link href="/journal" className="hidden border-b border-ink/40 pb-1 font-button-label text-xs uppercase tracking-wider text-ink hover:border-primary focus-ring sm:inline-flex">
-            Visit the journal <span aria-hidden="true" className="ml-2">→</span>
+            Visit the journal <Icon name="arrow_forward" className="ml-2 align-middle" />
           </Link>
         </div>
         <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
@@ -39,7 +40,7 @@ export default function RecentStories() {
           ))}
         </div>
         <Link href="/journal" className="mt-8 inline-flex border-b border-ink/40 pb-1 font-button-label text-xs uppercase tracking-wider text-ink focus-ring sm:hidden">
-          Visit the journal <span aria-hidden="true" className="ml-2">→</span>
+          Visit the journal <Icon name="arrow_forward" className="ml-2 align-middle" />
         </Link>
       </div>
     </section>
