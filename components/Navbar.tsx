@@ -50,7 +50,7 @@ export default function Navbar() {
   }, [isMobileMenuOpen])
 
   return (
-    <nav aria-label="Main navigation" className="isolate fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0a0a0a] shadow-sm">
+    <nav aria-label="Main navigation" className="isolate sticky inset-x-0 top-0 z-50 border-b border-white/10 bg-[#0a0a0a] shadow-sm">
       <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-8 lg:h-20 lg:px-20">
         <Link href="/" className="shrink-0 font-audiowide text-lg tracking-[0.24em] hover:text-primary focus-ring sm:text-xl sm:tracking-[0.3em] lg:text-2xl" onClick={() => setIsMobileMenuOpen(false)}>VESNΛ</Link>
         <div className="hidden lg:flex items-center gap-8">{navLinks.map(link => {

@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export default function InformationPage({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <main className="min-h-[65vh] bg-paper px-5 pb-20 pt-24 text-ink sm:px-8 sm:pb-24 sm:pt-28">
+    <main className="min-h-[65vh] bg-paper px-5 pb-20 pt-4 text-ink sm:px-8 sm:pb-24 sm:pt-6">
       <div className="mx-auto max-w-3xl">
       <Link href="/" className="font-button-label text-xs uppercase tracking-wider text-primary-ink underline underline-offset-4 focus-ring">Back to Vesna</Link>
       <h1 className="mb-8 mt-8 break-words font-display-hero text-[clamp(2rem,7vw,3rem)] leading-tight">{title}</h1>

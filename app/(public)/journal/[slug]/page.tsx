@@ -22,7 +22,7 @@ export default async function JournalStoryPage({ params }: { params: Promise<{ s
   return <main className="bg-paper text-ink">
     <ScrollProgress />
     <article>
-      <header className="mx-auto max-w-4xl px-5 pb-10 pt-24 sm:px-8 sm:pt-28">
+      <header className="mx-auto max-w-4xl px-5 pb-10 pt-8 sm:px-8 sm:pt-12">
         <Link href="/journal" className="mb-10 inline-flex font-button-label text-xs uppercase tracking-wider text-primary-ink focus-ring">← All journal stories</Link>
         <p className="mb-4 font-section-header text-ink-muted">{article.categoryLabel} <span aria-hidden="true">·</span> {article.readTime}</p>
         <h1 className="break-words font-display-hero text-[clamp(2.25rem,7.5vw,3.75rem)] leading-tight">{article.title}</h1>

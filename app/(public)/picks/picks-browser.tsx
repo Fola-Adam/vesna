@@ -127,7 +127,7 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
 
   return (
     <main className="min-h-screen bg-paper text-ink">
-      <div className="mx-auto max-w-7xl px-5 pb-20 pt-28 sm:px-8 sm:pt-32">
+      <div className="mx-auto max-w-7xl px-4 pb-20 pt-10 sm:px-8 sm:pt-12">
         <header className="mb-8 max-w-3xl sm:mb-10">
           <p className="font-section-header mb-3 text-ink-muted">The collection</p>
           <h1 className="mb-4 break-words font-display-hero text-[clamp(2.25rem,7.5vw,3.75rem)] leading-tight">Victory&apos;s picks</h1>

@@ -50,7 +50,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-paper text-ink">
-      <div className="mx-auto max-w-screen-xl px-5 pb-16 pt-24 sm:px-8 sm:pb-20 sm:pt-28 lg:px-20">
+      <div className="mx-auto max-w-screen-xl px-5 pb-16 pt-4 sm:px-8 sm:pb-20 sm:pt-6 lg:px-20">
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="mb-8 flex items-center gap-2 font-button-label text-xs uppercase tracking-wider text-ink-muted">
           <Link href="/picks" className="transition-colors hover:text-primary-ink focus-ring">Picks</Link>

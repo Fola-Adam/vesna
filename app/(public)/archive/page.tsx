@@ -14,7 +14,7 @@ export default async function ArchivePage() {
   const products = await getArchivedProducts()
   return <main className="min-h-[65vh] bg-paper text-ink">
     <ScrollProgress />
-    <header className="border-b border-ink/10 px-5 pb-14 pt-24 sm:px-8 sm:pb-20 sm:pt-28 lg:px-20">
+    <header className="border-b border-ink/10 px-5 pb-14 pt-8 sm:px-8 sm:pb-20 sm:pt-12 lg:px-20">
       <div className="mx-auto max-w-screen-xl">
         <p className="mb-3 font-section-header text-ink-muted">Past the present collection</p>
         <h1 className="break-words font-display-hero text-[clamp(2.25rem,7.5vw,3.75rem)] leading-tight">The archive</h1>

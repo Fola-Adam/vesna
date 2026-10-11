@@ -15,7 +15,7 @@ export default function JournalBrowser() {
   return (
     <main className="bg-paper text-ink">
       <ScrollProgress />
-      <header className="border-b border-ink/10 px-5 pb-12 pt-24 sm:px-8 sm:pb-16 sm:pt-28 lg:px-20">
+      <header className="border-b border-ink/10 px-5 pb-12 pt-8 sm:px-8 sm:pb-16 sm:pt-12 lg:px-20">
         <div className="mx-auto max-w-screen-xl">
           <p className="mb-3 font-section-header text-ink-muted">Ideas for considered living</p>
           <h1 className="max-w-3xl break-words font-display-hero text-[clamp(2.25rem,7.5vw,3.75rem)] leading-tight">The Vesna journal</h1>

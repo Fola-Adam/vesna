@@ -10,7 +10,7 @@ const principles = [
 
 export default function AboutBrowser() {
   return <main className="bg-paper text-ink">
-    <header className="px-5 pb-14 pt-24 sm:px-8 sm:pb-20 sm:pt-28 lg:px-20">
+    <header className="px-5 pb-14 pt-8 sm:px-8 sm:pb-20 sm:pt-12 lg:px-20">
       <div className="mx-auto grid max-w-screen-xl items-center gap-10 md:grid-cols-5 md:gap-14">
         <div className="md:col-span-3">
           <p className="mb-4 font-section-header text-ink-muted">About Vesna</p>
