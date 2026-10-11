@@ -187,9 +187,18 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         send({ type: 'readings', readings: matchedReadings.filter(reading => answer.toLowerCase().includes(reading.title.toLowerCase()) || answer.includes(`/journal/${reading.slug}`)).slice(0, 2) })
         send({ type: 'done' })
         if (!cancelled) controller.close()
-      } catch {
-        console.error('Venus streaming failed')
-        send({ type: 'error', message: 'Venus could not complete that response. Please try again.' })
+      } catch (failure) {
+        const status = failure && typeof failure === 'object' && 'status' in failure ? failure.status : null
+        // Log only the provider status, never request headers or credentials.
+        console.error('Venus streaming failed', { status })
+        const message = status === 401 || status === 403
+          ? 'Venus cannot access its AI service right now. The service connection needs attention.'
+          : status === 429
+            ? 'Venus has reached its AI service limit. Please try again in a moment.'
+            : status === 400 || status === 404
+              ? 'Venus cannot start its AI model right now. The model configuration needs attention.'
+              : 'Venus could not complete that response. Please try again.'
+        send({ type: 'error', message })
         if (!cancelled) controller.close()
       }
     },
