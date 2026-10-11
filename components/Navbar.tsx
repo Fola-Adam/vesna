@@ -62,7 +62,7 @@ export default function Navbar() {
           onClick={() => setIsMobileMenuOpen(open => !open)} className="inline-flex min-h-11 min-w-11 items-center justify-center p-2 text-2xl text-paper focus-ring lg:hidden"><Icon name={isMobileMenuOpen ? 'close' : 'menu'} /></button>
       </div>
       <div ref={menuRef} id="mobile-navigation" aria-hidden={!isMobileMenuOpen} inert={!isMobileMenuOpen}
-        className={`fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto bg-[#10382d]/[0.98] px-4 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none sm:px-6 lg:hidden ${isMobileMenuOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'}`}>
+        className={`fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto bg-[#10382d]/[0.98] px-4 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none sm:px-6 lg:hidden ${isMobileMenuOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'}`}>
         {navLinks.map(link => {
           const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(`${link.href}/`)) || (link.href === '/picks' && pathname.startsWith('/shop'))
           return <Link key={link.href} href={link.href} aria-current={active ? 'page' : undefined} onClick={() => setIsMobileMenuOpen(false)} className={`block border-b border-paper/15 py-5 font-button-label text-sm uppercase tracking-widest hover:text-secondary focus-ring ${active ? 'text-secondary' : 'text-paper/90'}`}>{link.label}</Link>
