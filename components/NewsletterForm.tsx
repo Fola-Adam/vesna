@@ -5,6 +5,7 @@ import { Check } from 'lucide-react'
 
 export default function NewsletterForm({ source = 'website' }: { source?: 'website' | 'about' | 'journal' }) {
   const id = useId()
+  const isDarkSurface = source === 'website'
   const [email, setEmail] = useState('')
   const [pending, setPending] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -33,7 +34,7 @@ export default function NewsletterForm({ source = 'website' }: { source?: 'websi
   }
 
   if (saved) return (
-    <p role="status" className="flex items-center justify-center gap-2 text-primary font-body-main py-4">
+    <p role="status" className={`flex items-center justify-center gap-2 font-body-main py-4 ${isDarkSurface ? 'text-paper' : 'text-primary-ink'}`}>
       <Check aria-hidden="true" size={20} /> Thanks—your signup is saved.
     </p>
   )
@@ -47,15 +48,15 @@ export default function NewsletterForm({ source = 'website' }: { source?: 'websi
             value={email} onChange={event => setEmail(event.target.value)}
             placeholder="Your email address" disabled={pending}
             aria-invalid={!!error} aria-describedby={error ? `${id}-error` : undefined}
-            className="w-full bg-surface-container border border-outline/50 px-4 py-4 text-on-background placeholder:text-outline font-body-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+            className={`w-full border px-4 py-4 font-body-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${isDarkSurface ? 'border-outline/50 bg-surface-container text-on-surface placeholder:text-on-surface-variant' : 'border-ink/25 bg-paper-raised text-ink placeholder:text-ink-muted'}`}
           />
         </div>
         <button type="submit" disabled={pending}
-          className="bg-primary text-on-primary px-6 py-4 font-button-label text-xs uppercase tracking-widest hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4 disabled:opacity-60">
+          className="bg-primary text-primary-foreground px-6 py-4 font-button-label text-xs font-semibold uppercase tracking-widest transition-colors hover:bg-primary-container focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4 disabled:opacity-60">
           {pending ? 'Joining…' : 'Join the Dispatch'}
         </button>
       </div>
-      {error && <p id={`${id}-error`} role="alert" className="mt-3 text-error text-sm font-body-main">{error}</p>}
+      {error && <p id={`${id}-error`} role="alert" className={`mt-3 text-sm font-body-main ${isDarkSurface ? 'text-error' : 'text-red-800'}`}>{error}</p>}
     </form>
   )
 }

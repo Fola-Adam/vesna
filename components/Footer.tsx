@@ -1,4 +1,5 @@
 import Link from "next/link";
+import VesnaWordmark from "./VesnaWordmark";
 
 export default function Footer() {
   const footerLinks = [
@@ -14,9 +15,10 @@ export default function Footer() {
       <div className="flex flex-col items-center gap-6 lg:gap-8 max-w-[1440px] mx-auto">
         <Link
           href="/"
+          aria-label="Vesna home"
           className="font-display-hero text-3xl font-semibold tracking-[0.16em] text-paper focus-ring lg:text-4xl"
         >
-          VESNA
+          <VesnaWordmark />
         </Link>
 
         <div className="flex flex-wrap justify-center gap-6 lg:gap-8">

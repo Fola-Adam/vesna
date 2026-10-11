@@ -84,8 +84,8 @@ html {
 }
 
 body {
-  --font-tenor-sans: var(--font-manrope);
-  --font-button-label: var(--font-manrope);
+  --font-tenor-sans: var(--font-dm-sans);
+  --font-button-label: var(--font-dm-sans);
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-tenor-sans);
@@ -115,6 +115,7 @@ body {
 .font-section-header {
   font-family: var(--font-button-label);
   font-size: 0.75rem;
+  font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
 }
@@ -170,8 +171,8 @@ body {
     @apply border-border;
   }
   body {
-    --font-tenor-sans: var(--font-manrope);
-    --font-button-label: var(--font-manrope);
+    --font-tenor-sans: var(--font-dm-sans);
+    --font-button-label: var(--font-dm-sans);
     @apply bg-background text-foreground;
   }
 }

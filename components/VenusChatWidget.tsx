@@ -123,12 +123,12 @@ export default function VenusChatWidget() {
       </button>
     </Dialog.Trigger>
     <Dialog.Portal>
-      <Dialog.Overlay className="fixed inset-0 z-[60] bg-black/55 backdrop-blur-sm" />
-      <Dialog.Content className={`fixed inset-y-0 right-0 z-[70] flex w-full flex-col border-l border-primary/25 bg-paper text-ink shadow-2xl focus:outline-none ${isFullscreen ? '' : 'sm:w-[480px] lg:w-[560px]'}`}>
+      <Dialog.Overlay className="fixed inset-0 z-[60] bg-black/55 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 motion-reduce:animate-none" />
+      <Dialog.Content className={`fixed inset-y-0 right-0 z-[70] flex w-full flex-col border-l border-primary/25 bg-paper text-ink shadow-2xl focus:outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:slide-in-from-right-4 data-[state=closed]:slide-out-to-right-4 duration-300 motion-reduce:animate-none ${isFullscreen ? '' : 'sm:w-[480px] lg:w-[560px]'}`}>
         <header className="flex shrink-0 items-center justify-between gap-2 border-b border-primary/25 bg-[#10382d] px-4 py-4 text-paper sm:px-6">
           <div className="flex min-w-0 items-center gap-3"><VenusMark className="h-12 w-14 shrink-0" /><div>
-            <Dialog.Title className="font-display-hero text-2xl">Venus</Dialog.Title>
-            <Dialog.Description className="mt-1 text-xs text-paper/80">Your guide to the Vesna collection</Dialog.Description>
+            <Dialog.Title className="font-display-hero text-2xl font-semibold">Venus</Dialog.Title>
+            <Dialog.Description className="mt-1 text-xs font-medium text-paper/85">Your guide to the Vesna collection</Dialog.Description>
           </div></div>
           <div className="flex shrink-0">
             <button disabled={isTyping} aria-label="Start a new conversation" title="Start a new conversation" onClick={() => { setMessages(WELCOME_MESSAGES); saveMessages([]); clearProductContext() }} className="inline-flex h-11 w-11 items-center justify-center rounded-full hover:bg-white/10 focus-ring disabled:opacity-40"><Trash2 aria-hidden="true" size={17} strokeWidth={1.5} /></button>
@@ -138,34 +138,46 @@ export default function VenusChatWidget() {
         </header>
         {productSlug && <div className="flex items-center justify-between gap-3 border-b border-ink/10 bg-paper-raised px-5 py-3 text-xs"><span className="min-w-0 truncate">Discussing {productSlug.replaceAll('-', ' ')}</span><button onClick={clearProductContext} aria-label="Search the whole collection instead" className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full hover:bg-ink/5 focus-ring"><X size={16} aria-hidden="true" /></button></div>}
         <div ref={viewportRef} onScroll={event => { const area = event.currentTarget; pinnedRef.current = area.scrollHeight - area.scrollTop - area.clientHeight < 100; setShowLatest(!pinnedRef.current) }} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-7 sm:px-6">
-          {!hasConversation && <div className="mx-auto max-w-sm py-5 text-center"><VenusMark className="mx-auto mb-5 h-20 w-24" /><h2 className="font-display-hero text-3xl">A thoughtful place to begin.</h2><p className="mt-3 text-sm leading-7 text-ink-muted">Tell me what you need, your budget, or the ritual you want to improve. We&apos;ll find your place in the collection.</p>
-            <div className="mt-7 grid gap-2 text-left">{['Find a considered gift under $100', 'Help me refine my workspace', 'Compare two picks'].map(question => <button key={question} disabled={isTyping} onClick={() => setInputValue(question)} className="flex min-h-12 items-center justify-between gap-3 rounded-lg border border-ink/15 bg-paper-raised px-4 py-3 text-sm transition-colors hover:border-[#1b5a45]/50 focus-ring">{question}<ArrowUpRight aria-hidden="true" size={16} strokeWidth={1.5} /></button>)}</div>
+          {!hasConversation && <div className="mx-auto max-w-sm py-3 text-center">
+            <span className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-primary-ink/20 bg-green-wash"><VenusMark className="h-10 w-11" /></span>
+            <p className="font-section-header text-primary-ink">A personal guide to Vesna</p>
+            <h2 className="mt-2 font-display-hero text-3xl font-semibold leading-tight">What are you looking for?</h2>
+            <p className="mt-3 text-sm font-medium leading-7 text-ink-muted">Share a need, a budget, or a space you&apos;re shaping. Venus searches the current collection and explains why a pick may fit.</p>
+            <div className="mt-6 grid gap-2 text-left">
+              <p className="mb-1 font-button-label text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-muted">Start with a question</p>
+              {['Find a considered gift under $100', 'Help me refine my workspace', 'Compare two picks'].map(question => <button key={question} disabled={isTyping} onClick={() => setInputValue(question)} className="group flex min-h-12 items-center justify-between gap-3 rounded-sm border border-ink/15 bg-paper-raised px-4 py-3 text-sm font-medium text-ink transition-[background-color,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-primary-ink/50 hover:bg-white focus-ring disabled:opacity-50 motion-reduce:transform-none motion-reduce:transition-none">{question}<ArrowUpRight aria-hidden="true" className="shrink-0 text-primary-ink transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 motion-reduce:transform-none" size={16} strokeWidth={1.5} /></button>)}
+            </div>
           </div>}
           <div role="log" aria-label="Conversation with Venus" className="space-y-6">
             {(hasConversation ? messages : []).map((message, index) => <div key={index} className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
-              <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-ink-muted">{message.role === 'user' ? 'You' : 'Venus'}</p>
-              <div className={`max-w-full break-words text-sm leading-7 [&_a]:text-[#1b5a45] [&_a]:underline [&_a]:underline-offset-4 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 ${message.role === 'user' ? 'max-w-[90%] rounded-2xl rounded-tr-sm bg-[#10382d] px-4 py-3 text-paper' : message.error ? 'rounded-lg border border-red-800/20 bg-red-50 p-4 text-red-900' : 'text-ink'}`}>
+              <div className={`mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-muted ${message.role === 'user' ? 'mr-1' : 'ml-1'}`}>
+                {message.role === 'assistant' && <VenusMark className="h-5 w-6" />}{message.role === 'user' ? 'You' : 'Venus'}
+              </div>
+              <div className={`max-w-full break-words text-sm leading-7 [&_a]:text-primary-ink [&_a]:underline [&_a]:underline-offset-4 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 ${message.role === 'user' ? 'max-w-[90%] rounded-2xl rounded-tr-sm bg-[#10382d] px-4 py-3 text-paper shadow-sm' : message.error ? 'rounded-lg border border-red-800/20 bg-red-50 p-4 text-red-900' : 'max-w-[94%] rounded-2xl rounded-tl-sm border border-ink/10 bg-paper-raised px-4 py-3 text-ink shadow-sm'}`}>
                 {message.role === 'user' ? <p className="whitespace-pre-wrap !mb-0">{message.content}</p> : <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>}
               </div>
               {message.error && <button onClick={() => { const question = messages.slice(0, index).reverse().find(entry => entry.role === 'user'); if (question) setInputValue(question.content) }} className="mt-2 inline-flex min-h-11 items-center gap-2 text-xs text-ink-muted hover:text-ink focus-ring"><RotateCcw size={14} aria-hidden="true" />Try that question again</button>}
-              {!!message.products?.length && <div className="mt-3 grid w-full grid-cols-1 gap-3 min-[400px]:grid-cols-2">{message.products.slice(0, 3).map(product => <Link key={product.slug} href={`/shop/${encodeURIComponent(product.slug)}`} onClick={() => setIsOpen(false)} className="group overflow-hidden rounded-lg border border-ink/15 bg-paper-raised transition-colors hover:border-[#1b5a45]/50 focus-ring">
+              {!!message.products?.length && <div className="mt-3 grid w-full grid-cols-1 gap-3 min-[400px]:grid-cols-2">{message.products.slice(0, 3).map(product => <Link key={product.slug} href={`/shop/${encodeURIComponent(product.slug)}`} onClick={() => setIsOpen(false)} className="group overflow-hidden rounded-lg border border-ink/15 bg-paper-raised transition-colors hover:border-primary-ink/50 focus-ring">
                 <div className="relative aspect-[4/3]"><CatalogImage src={product.image_urls?.[0]} alt={product.name} sizes="250px" /></div>
-                <div className="p-3"><p className="text-sm leading-5">{product.name}</p><p className="mt-2 text-sm text-[#1b5a45]">{formatPrice(product.price)}</p><span className="mt-3 inline-flex items-center gap-2 text-xs text-ink-muted">Explore the pick <ArrowUpRight size={14} aria-hidden="true" strokeWidth={1.5} /></span></div>
+                <div className="p-3"><p className="text-sm font-semibold leading-5">{product.name}</p><p className="mt-2 text-sm font-semibold text-primary-ink">{formatPrice(product.price)}</p><span className="mt-3 inline-flex items-center gap-2 text-xs font-medium text-ink-muted">Explore the pick <ArrowUpRight size={14} aria-hidden="true" strokeWidth={1.5} /></span></div>
               </Link>)}</div>}
             </div>)}
-            {isTyping && <div className="text-sm leading-7 text-ink">{streamText ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{streamText}</ReactMarkdown> : <p role="status" className="text-ink-muted">Finding your place in the collection…</p>}</div>}
+            {isTyping && <div className="flex flex-col items-start">
+              <div className="mb-2 ml-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-muted"><VenusMark className="h-5 w-6" />Venus</div>
+              <div className="max-w-[94%] rounded-2xl rounded-tl-sm border border-ink/10 bg-paper-raised px-4 py-3 text-sm leading-7 text-ink shadow-sm">{streamText ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{streamText}</ReactMarkdown> : <p role="status" className="text-ink-muted">Finding your place in the collection…</p>}</div>
+            </div>}
             <div ref={messagesEndRef} />
           </div>
         </div>
         {showLatest && <button onClick={() => { pinnedRef.current = true; setShowLatest(false); messagesEndRef.current?.scrollIntoView({ behavior: 'auto' }) }} className="mx-auto mb-2 inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 bg-paper-raised px-4 text-xs text-ink focus-ring">Latest response <ArrowDown size={14} aria-hidden="true" /></button>}
-        <footer className="shrink-0 border-t border-ink/10 bg-paper-raised px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-6">
-          <form onSubmit={handleSubmit} className="flex items-end gap-2 rounded-xl border border-ink/20 bg-paper p-2 focus-within:border-[#1b5a45]/60">
+        <footer className="shrink-0 border-t border-ink/10 bg-paper-raised px-4 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(41,39,32,.05)] sm:px-6">
+          <form onSubmit={handleSubmit} className="flex items-end gap-2 rounded-xl border border-ink/25 bg-paper p-2 transition-colors focus-within:border-primary-ink focus-within:ring-2 focus-within:ring-primary-ink/15">
             <label className="sr-only" htmlFor="venus-message">Message Venus</label>
             <textarea id="venus-message" value={inputValue} onChange={event => setInputValue(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); if (!isTyping) event.currentTarget.form?.requestSubmit() } }} placeholder="What are you looking for?" rows={2} maxLength={2000}
-              className="max-h-36 min-h-12 min-w-0 flex-1 resize-y bg-transparent px-2 py-2 text-base leading-6 text-ink placeholder:text-ink-muted focus:outline-none sm:text-sm" />
+              className="max-h-36 min-h-12 min-w-0 flex-1 resize-y bg-transparent px-2 py-2 text-base font-medium leading-6 text-ink placeholder:text-ink-muted focus:outline-none sm:text-sm" />
             {isTyping ? <button type="button" onClick={() => requestRef.current?.abort()} aria-label="Stop response" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#10382d] text-paper focus-ring"><Square aria-hidden="true" size={15} /></button> : <button type="submit" aria-label="Send message" disabled={!inputValue.trim()} className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#10382d] text-paper focus-ring disabled:opacity-35"><ArrowUp aria-hidden="true" size={20} strokeWidth={1.5} /></button>}
           </form>
-          <p className="mt-3 text-center text-[11px] leading-5 text-ink-muted">Curated guidance. Confirm price and availability with the seller.</p>
+          <p className="mt-3 text-center text-[11px] font-medium leading-5 text-ink-muted">Venus searches Vesna&apos;s current picks. Confirm today&apos;s price and availability with the seller.</p>
         </footer>
       </Dialog.Content>
     </Dialog.Portal>

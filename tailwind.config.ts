@@ -79,9 +79,9 @@ const config: Config = {
       },
       fontFamily: {
         "display-hero": ["var(--font-cormorant)", "serif"],
-        "body-main": ["var(--font-manrope)", "sans-serif"],
-        "button-label": ["var(--font-manrope)", "sans-serif"],
-        "section-header": ["var(--font-manrope)", "sans-serif"],
+        "body-main": ["var(--font-dm-sans)", "sans-serif"],
+        "button-label": ["var(--font-dm-sans)", "sans-serif"],
+        "section-header": ["var(--font-dm-sans)", "sans-serif"],
       },
     },
   },

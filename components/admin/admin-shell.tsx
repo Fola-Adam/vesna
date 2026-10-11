@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowLeft, BarChart3, LayoutDashboard, Mail, ShoppingBag } from 'lucide-react'
+import VesnaWordmark from '@/components/VesnaWordmark'
 
 export default function AdminLayout({
   children,
@@ -45,8 +46,8 @@ function AdminSidebar() {
   return (
     <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-white/10 lg:bg-[#10382d]">
       <div className="border-b border-white/10 p-6">
-        <Link href="/" className="font-display-hero text-3xl font-semibold tracking-[0.16em] text-paper">
-          VESNA
+        <Link href="/" aria-label="Vesna home" className="font-display-hero text-3xl font-semibold tracking-[0.16em] text-paper">
+          <VesnaWordmark />
         </Link>
         <p className="mt-2 font-section-header text-xs tracking-[0.15em] text-on-surface-variant">CURATOR STUDIO</p>
       </div>

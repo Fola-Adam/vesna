@@ -16,17 +16,17 @@ export default function CatalogProductCard({ product }: { product: ProductRow })
           {product.is_featured && <span className="absolute left-3 top-3 bg-ink px-3 py-1.5 font-button-label text-[10px] uppercase tracking-[0.12em] text-paper">Featured pick</span>}
         </div>
         <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-6">
-          <p className="mb-2 font-section-header text-ink-muted">{product.categories?.name ?? 'Selected object'}</p>
-          <h2 className="mb-3 break-words font-display-hero text-xl leading-snug text-ink transition-colors group-hover:text-primary-ink sm:text-2xl">{product.name}</h2>
-          <p className="mb-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 font-button-label text-sm text-ink">
+          <p className="mb-2 font-section-header font-semibold text-[#514a40]">{product.categories?.name ?? 'Selected object'}</p>
+          <h2 className="mb-3 break-words font-display-hero text-xl font-semibold leading-snug text-ink transition-colors group-hover:text-primary-ink sm:text-2xl">{product.name}</h2>
+          <p className="mb-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 font-button-label text-sm font-semibold text-ink">
             {price == null ? 'Price not listed' : formatPrice(price)}
             {strike != null && <span className="text-xs text-ink-muted line-through">{formatPrice(strike)}</span>}
           </p>
-          {(product.why_victory || product.description) && <p className="mb-5 line-clamp-3 font-body-main text-sm leading-relaxed text-ink-muted">{product.why_victory ?? product.description}</p>}
-          <span className="mt-auto inline-flex items-center gap-2 font-button-label text-xs uppercase tracking-wider text-primary-ink">View the pick <Icon name="arrow_forward" className="align-middle" /></span>
+          {(product.why_victory || product.description) && <p className="mb-5 line-clamp-3 font-body-main text-sm leading-relaxed text-[#514a40]">{product.why_victory ?? product.description}</p>}
+          <span className="mt-auto inline-flex items-center gap-2 font-button-label text-xs font-semibold uppercase tracking-wider text-primary-ink">View the pick <Icon name="arrow_forward" className="align-middle" /></span>
         </div>
       </Link>
-      <div className="border-t border-ink/10 px-5 py-3 sm:px-6"><VenusTriggerPill productName={product.name} productSlug={product.slug} className="text-ink-muted hover:text-primary-ink" /></div>
+      <div className="border-t border-ink/10 px-5 py-3 sm:px-6"><VenusTriggerPill productName={product.name} productSlug={product.slug} className="w-full justify-center rounded-sm border border-primary-ink/25 bg-green-wash px-3 py-2.5 font-semibold text-primary-ink transition-colors hover:bg-primary-ink hover:text-paper" /></div>
     </article>
   )
 }
