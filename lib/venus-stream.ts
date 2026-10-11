@@ -6,11 +6,23 @@ export interface VenusProduct {
   description: string | null
   item_type: string
   similarity: number
+  category?: string | null
+  why_victory?: string | null
+}
+
+export interface VenusReading {
+  slug: string
+  title: string
+  excerpt: string
+  image: string
+  categoryLabel: string
+  readTime: string
 }
 
 export type VenusEvent =
   | { type: 'text'; text: string }
   | { type: 'products'; products: VenusProduct[] }
+  | { type: 'readings'; readings: VenusReading[] }
   | { type: 'done' }
   | { type: 'error'; message: string }
 
@@ -21,6 +33,9 @@ function parseEvent(line: string): VenusEvent {
   if (event.type === 'text' && typeof event.text === 'string') return event
   if (event.type === 'done') return event
   if (event.type === 'error' && typeof event.message === 'string') return event
+  if (event.type === 'readings' && Array.isArray(event.readings) && event.readings.length <= 3 && event.readings.every(reading =>
+    reading && ['slug', 'title', 'excerpt', 'image', 'categoryLabel', 'readTime'].every(key => typeof reading[key as keyof VenusReading] === 'string') && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(reading.slug)
+  )) return event
   if (event.type === 'products' && Array.isArray(event.products) && event.products.every(product =>
     product && typeof product.name === 'string' && typeof product.slug === 'string' &&
     (product.price === null || (typeof product.price === 'number' && Number.isFinite(product.price))) &&

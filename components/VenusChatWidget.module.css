@@ -1,32 +1,27 @@
-@keyframes bounceDot {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+.panel {
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  font-family: var(--font-dm-sans), sans-serif;
+  overflow: hidden;
 }
-
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+.overlay[data-state="open"] { animation: veilIn 300ms ease both; }
+.overlay[data-state="closed"] { animation: veilOut 250ms ease both; }
+.panel[data-state="open"] { animation: arrive 450ms cubic-bezier(.22,1,.36,1) both; }
+.panel[data-state="closed"] { animation: depart 250ms ease both; }
+.welcome { animation: reveal 500ms ease both; }
+.message { animation: reveal 250ms ease both; }
+.thinking { animation: breathe 1.8s ease-in-out infinite; }
+@media (min-width: 640px) {
+  .panel { inset: 16px 16px 16px auto; width: min(540px, calc(100vw - 32px)); height: calc(100dvh - 32px); border-radius: 20px; border: 1px solid rgba(255,255,255,.4); }
+  .fullscreen { inset: 16px; width: auto; }
 }
-
-.animateFadeIn {
-  animation: fadeIn 0.4s ease-out forwards;
-}
-
-.typingDot {
-  animation: bounceDot 0.5s ease-in-out infinite;
-  background: var(--primary);
-  border-radius: 9999px;
-}
-
-.typingDot:nth-child(2) {
-  animation-delay: 0.1s;
-}
-
-.typingDot:nth-child(3) {
-  animation-delay: 0.2s;
-}
-
-.glassPanel {
-  background: rgba(195, 170, 123, 0.08);
-  backdrop-filter: blur(20px);
+@keyframes veilIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes veilOut { to { opacity: 0; } }
+@keyframes arrive { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes depart { to { opacity: 0; transform: translateX(16px); } }
+@keyframes reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes breathe { 50% { opacity: .5; } }
+@media (prefers-reduced-motion: reduce) {
+  .panel, .overlay, .welcome, .message, .thinking { animation: none !important; }
 }
