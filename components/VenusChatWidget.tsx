@@ -58,7 +58,12 @@ export default function VenusChatWidget() {
     }
   }, [])
   useEffect(() => { if (messagesInitialized.current) saveMessages(messages) }, [messages])
-  useEffect(() => { if (isOpen && pinnedRef.current) messagesEndRef.current?.scrollIntoView({ behavior: 'auto' }) }, [isOpen, messages, isTyping, streamText])
+  useEffect(() => {
+    // Keep the welcome prompts in view on first open; only auto-scroll once a conversation exists.
+    if (isOpen && pinnedRef.current && messages.some(message => message.role === 'user')) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' })
+    }
+  }, [isOpen, messages, isTyping, streamText])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
