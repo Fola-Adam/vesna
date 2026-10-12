@@ -55,7 +55,7 @@ const PREVIEW_IMAGE_OVERRIDES: Record<string, string[]> = {
     'https://cdn.shopify.com/s/files/1/0281/7544/files/1200x1200png-S26UAllpa35LTravelPackCotopaxiBlack_A1_1200x.png?v=1770301311',
   ],
   'benq-screenbar-halo-2': [
-    'https://image.benq.com/is/image/benqco/front-lamp-1?$ResponsivePreset$',
+    'https://image.benq.com/is/image/benqco/comprehensive-lighting?$ResponsivePreset$',
   ],
 }
 
