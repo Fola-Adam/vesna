@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -33,6 +33,7 @@ export default function SubscribersPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const requestSequence = useRef(0)
 
   const [copiedId, setCopiedId] = useState<string | null>(null)
   async function copyUnsubscribeLink(subscriber: Subscriber) {
@@ -46,6 +47,8 @@ export default function SubscribersPage() {
 
   const fetchSubscribers = async () => {
     if (!supabase) return
+    const request = ++requestSequence.current
+    setLoading(true)
 
     const from = (currentPage - 1) * ITEMS_PER_PAGE
     const to = from + ITEMS_PER_PAGE - 1
@@ -65,6 +68,8 @@ export default function SubscribersPage() {
     if (status === 'pending') query = query.is('unsubscribed_at', null).not('is_verified', 'is', true)
 
     const { data, count, error: fetchError } = await query
+    // Rapid filter changes must not let an older response overwrite the result.
+    if (request !== requestSequence.current) return
 
     if (fetchError) {
       setError(fetchError.message)
