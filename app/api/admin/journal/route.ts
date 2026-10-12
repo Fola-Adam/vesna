@@ -3,7 +3,11 @@ import { STORY_FIELDS, validateStory } from '@/lib/journal-publishing'
 
 export async function POST(request: Request) {
   const origin = request.headers.get('origin')
-  if (!origin || origin !== new URL(request.url).origin) return Response.json({ error: 'Invalid request origin.' }, { status: 403 })
+  const allowedOrigins = new Set([new URL(request.url).origin])
+  for (const url of (process.env.VESNA_ALLOWED_ORIGINS ?? '').split(',')) {
+    try { allowedOrigins.add(new URL(url).origin) } catch { /* Empty/unconfigured deployment URLs are not allowed. */ }
+  }
+  if (!origin || !allowedOrigins.has(origin)) return Response.json({ error: 'Invalid request origin.' }, { status: 403 })
   if (Number(request.headers.get('content-length') ?? 0) > 100000) return Response.json({ error: 'Story is too large.' }, { status: 413 })
   const client = await createClient()
   const { data: { user }, error: authError } = await client.auth.getUser()

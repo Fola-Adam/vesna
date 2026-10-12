@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Public deployment URLs are known at build time; Netlify's internal request
+    // URL may have a different origin in the server handler. No secrets here.
+    env: {
+        VESNA_ALLOWED_ORIGINS: [process.env.URL, process.env.DEPLOY_PRIME_URL, process.env.DEPLOY_URL].filter(Boolean).join(','),
+    },
     // Turbopack is the default bundler in Next.js 16 (dev + build).
 
     // Image optimization
