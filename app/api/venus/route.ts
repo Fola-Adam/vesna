@@ -117,7 +117,7 @@ export async function POST(request: Request) {
 
   const productAppendix = matchedProducts.length > 0
     ? '\n\nRelevant products in the catalog right now:\n' +
-      matchedProducts.map(p => `- ${p.name} (category: ${p.category ?? "not provided"}; page: /shop/${p.slug}; listed price: ${p.price == null ? "not provided" : `$${p.price}`}) — ${p.description?.slice(0, 300) ?? "No description provided"}; curator note: ${p.why_victory?.slice(0, 400) ?? "not provided"}`).join('\n')
+      matchedProducts.map(p => `- ${p.name} (category: ${p.category ?? "not provided"}; page: /shop/${p.slug}; listed price: ${p.price == null ? "not provided" : `$${p.price}`}) — ${p.description?.slice(0, 300) ?? "No description provided"}; curator note: ${p.why_victory?.slice(0, 400) ?? "not provided"}; suits: ${p.best_for?.slice(0, 1000) ?? "not recorded"}; considerations: ${p.considerations?.slice(0, 1000) ?? "not recorded"}; selection basis: ${p.selection_basis ?? "not_recorded"}; specifications: ${p.specifications?.slice(0, 3000) ?? "not recorded"}`).join('\n')
     : ''
   const readingAppendix = matchedReadings.length ? '\n\nPublished Journal readings:\n' + matchedReadings.map(article => `- ${article.title}; page: /journal/${article.slug}; ${article.categoryLabel}; ${article.readTime}; summary: ${article.excerpt}`).join('\n') : ''
 
@@ -130,7 +130,7 @@ Your personality:
 
 About Vesna:
 - Vesna curates exceptional products across tech, audio, lifestyle, workspace, and travel
-- Product descriptions and curator notes are supplied by Vesna; do not claim firsthand testing unless a note explicitly says so
+- Product descriptions and curator notes are supplied by Vesna. Only selection_basis personally_used confirms curator use; researched and design do not imply hands-on testing. not_recorded means the basis is unknown
 - The platform emphasizes objects with purpose and stories worth telling
 - Current sections: Picks (the catalog), Journal, About, and Archive
 

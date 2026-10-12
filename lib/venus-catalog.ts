@@ -33,7 +33,7 @@ export function selectVenusProducts(catalog: ProductRow[], message: string, hist
   const ranked = eligible.map(product => {
     const category = product.categories?.name.toLowerCase() ?? ''
     const name = `${product.name} ${product.slug}`.toLowerCase()
-    const detail = `${product.description ?? ''} ${product.why_victory ?? ''}`.toLowerCase()
+    const detail = `${product.description ?? ''} ${product.why_victory ?? ''} ${product.best_for ?? ''} ${product.specifications ?? ''}`.toLowerCase()
     const match = (term: string) => (name.includes(term) ? 8 : 0) + (category.includes(term) ? 6 : 0) + (detail.includes(term) ? 2 : 0) + ((ALIASES[category] ?? []).includes(term) ? 6 : 0)
     const relevance = terms.reduce((score, term) => score + match(term), 0)
     const contextualRelevance = contextualTerms.reduce((score, term) => score + match(term), 0)
@@ -45,6 +45,8 @@ export function selectVenusProducts(catalog: ProductRow[], message: string, hist
     name: product.name, slug: product.slug, price: effectivePricing(product).price,
     image_urls: product.image_urls, description: product.description,
     item_type: product.item_type, why_victory: product.why_victory,
+    best_for: product.best_for, considerations: product.considerations,
+    specifications: product.specifications, selection_basis: product.selection_basis,
     category: product.categories?.name ?? null, similarity: 0,
   }))
 }

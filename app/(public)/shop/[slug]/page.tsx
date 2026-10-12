@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getProductBySlug, getProductSlugs } from '@/lib/data'
 import { formatPrice, effectivePricing } from '@/lib/pricing'
+import { SELECTION_BASES, specificationRows, type SelectionBasis } from '@/lib/product-editorial'
 
 /** ISR: catalog refreshes every 5 min; admin edits land within one revalidation cycle. */
 export const revalidate = 300
@@ -46,6 +47,9 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   const { price, strike } = effectivePricing(product)
   const category = product.categories?.name ?? 'Collection'
+  const specs = specificationRows(product.specifications)
+  const basis = product.selection_basis && product.selection_basis !== 'not_recorded'
+    ? SELECTION_BASES[product.selection_basis as SelectionBasis] : null
   const seller = product.item_type !== 'archive' ? sellerDetails(product.affiliate_link) : null
 
   return (
@@ -82,6 +86,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
               <p className="whitespace-pre-line font-body-main leading-relaxed text-ink-muted">{product.description}</p>
             </section>}
             <div className="mb-8"><VenusTriggerPill productName={product.name} productSlug={product.slug} /></div>
+            {(product.best_for || product.considerations || specs.length > 0 || basis) && <section className="mb-8 space-y-5 border-y border-ink/15 py-6">
+              {basis && <p className="text-xs font-medium uppercase tracking-wider text-primary-ink">{basis}</p>}
+              {product.best_for && <div><h2 className="mb-2 font-display-hero text-2xl">A good fit for</h2><p className="whitespace-pre-line text-sm leading-relaxed text-ink">{product.best_for}</p></div>}
+              {product.considerations && <div><h2 className="mb-2 font-display-hero text-2xl">Before you choose</h2><p className="whitespace-pre-line text-sm leading-relaxed text-ink">{product.considerations}</p></div>}
+              {specs.length > 0 && <div><h2 className="mb-3 font-display-hero text-2xl">The details</h2><dl className="divide-y divide-ink/10">{specs.map((spec, index) => <div key={index} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] gap-4 py-3 text-sm"><dt className="break-words text-ink-muted">{spec.label}</dt><dd className="break-words text-ink">{spec.value}</dd></div>)}</dl></div>}
+            </section>}
             {seller ? <>
               <a href={`/api/track-click?productId=${encodeURIComponent(product.id)}`} rel="sponsored noopener noreferrer" target="_blank"
                 className="block w-full bg-ink py-4 text-center font-button-label text-xs uppercase tracking-wider text-paper transition-colors hover:bg-primary-ink focus-ring">

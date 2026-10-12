@@ -25,6 +25,10 @@ export interface ProductRow {
   affiliate_link: string | null
   image_urls: string[] | null
   why_victory: string | null
+  best_for?: string | null
+  considerations?: string | null
+  specifications?: string | null
+  selection_basis?: string
   item_type: string
   is_featured: boolean
   categories: { name: string } | null
@@ -32,7 +36,7 @@ export interface ProductRow {
 
 const SELECT_FIELDS = `
   id, slug, name, description, price, sale_price, affiliate_link,
-  image_urls, why_victory, item_type, is_featured,
+  image_urls, why_victory, best_for, considerations, specifications, selection_basis, item_type, is_featured,
   categories ( name )
 `
 

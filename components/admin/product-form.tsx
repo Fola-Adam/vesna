@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { ImagePlus, Loader2, X } from 'lucide-react'
+import { SELECTION_BASES, validSpecifications, type SelectionBasis } from '@/lib/product-editorial'
 
 interface Category { id: string; name: string }
 interface ProductFormData {
@@ -15,6 +16,7 @@ interface ProductFormData {
   affiliate_link: string | null; category_id: string | null; image_urls: string[]
   why_victory: string | null; item_type: 'curated' | 'shop' | 'archive'
   is_featured: boolean; is_active: boolean
+  best_for: string; considerations: string; specifications: string; selection_basis: SelectionBasis
 }
 interface ProductFormProps { categories: Category[]; initialData?: ProductFormData & { id: string } }
 
@@ -43,6 +45,8 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
     category_id: initialData?.category_id || null, image_urls: initialData?.image_urls || [],
     why_victory: initialData?.why_victory || null, item_type: initialData?.item_type || 'shop',
     is_featured: initialData?.is_featured || false, is_active: initialData?.is_active ?? true,
+    best_for: initialData?.best_for || '', considerations: initialData?.considerations || '',
+    specifications: initialData?.specifications || '', selection_basis: initialData?.selection_basis || 'not_recorded',
   })
 
   function updateField<K extends keyof ProductFormData>(key: K, value: ProductFormData[K]) {
@@ -68,6 +72,10 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!supabase) { setError('Supabase is not configured.'); return }
+    if (!validSpecifications(form.specifications)) {
+      setError('Enter up to 20 specifications, one Label: value per line (label up to 80 characters; value up to 300).')
+      return
+    }
     setSaving(true)
     setError(null)
     const uploadedPaths: string[] = []
@@ -90,6 +98,8 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
         affiliate_link: form.affiliate_link || null, category_id: form.category_id || null,
         image_urls: retainedUrls.filter(Boolean), why_victory: form.why_victory || null,
         item_type: form.item_type, is_featured: form.is_featured, is_active: form.is_active,
+        best_for: form.best_for.trim() || null, considerations: form.considerations.trim() || null,
+        specifications: form.specifications.trim() || null, selection_basis: form.selection_basis,
       }
       const result = initialData
         ? await supabase.from('products').update(payload).eq('id', initialData.id)
@@ -133,6 +143,14 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
             <Field label="Affiliate link"><Input type="url" value={form.affiliate_link || ''} onChange={(e) => updateField('affiliate_link', e.target.value || null)} placeholder="https://…" /></Field>
           </div>
           <Field label="Why Victory picked it"><Textarea value={form.why_victory || ''} onChange={(e) => updateField('why_victory', e.target.value || null)} rows={3} placeholder="A personal note from the curator." /></Field>
+          <section className="space-y-5 border-t border-outline-variant pt-6">
+            <div><h2 className="font-medium text-on-background">The editorial details</h2><p className="mt-1 text-sm text-on-surface-variant">Help readers choose with confidence. Add verified facts and honest limitations. Empty fields stay hidden.</p></div>
+            <Field label="Who this suits"><Textarea maxLength={2000} rows={3} value={form.best_for} onChange={e => updateField('best_for', e.target.value)} placeholder="Describe the person or situation this pick is well suited to." /></Field>
+            <Field label="What to consider"><Textarea maxLength={2000} rows={3} value={form.considerations} onChange={e => updateField('considerations', e.target.value)} placeholder="Trade-offs, limitations, compatibility, or who should choose something else." /></Field>
+            <Field label="Basis for selection"><select aria-label="Basis for selection" value={form.selection_basis} onChange={e => updateField('selection_basis', e.target.value as SelectionBasis)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">{Object.entries(SELECTION_BASES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>
+            <p className="text-xs leading-relaxed text-on-surface-variant">Choose personally used only when the curator has used this exact product. Research and design selections do not imply testing.</p>
+            <Field label="Verified specifications"><Textarea aria-label="Verified specifications" maxLength={8000} rows={5} value={form.specifications} onChange={e => updateField('specifications', e.target.value)} placeholder={'One fact per line: Label: value\nOnly include facts checked against a reliable source.'} /></Field>
+          </section>
           <div className="flex flex-wrap gap-x-8 gap-y-3 border-t border-outline-variant pt-5">
             <Toggle checked={form.is_featured} onChange={(value) => updateField('is_featured', value)}>Feature on the home page</Toggle>
             <Toggle checked={form.is_active} onChange={(value) => updateField('is_active', value)}>Published on the site</Toggle>
