@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
-import { ImagePlus, Loader2, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ImagePlus, Loader2, X } from 'lucide-react'
 import { SELECTION_BASES, validSpecifications, type SelectionBasis } from '@/lib/product-editorial'
 
 interface Category { id: string; name: string }
@@ -36,7 +36,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
   const [error, setError] = useState<string | null>(null)
   const [manualSlug, setManualSlug] = useState(!!initialData)
   const [files, setFiles] = useState<File[]>([])
-  const [imageUrls, setImageUrls] = useState(initialData?.image_urls || [])
+    const [imageOrder, setImageOrder] = useState<string[]>(initialData?.image_urls || [])
   const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files])
   useEffect(() => () => previews.forEach(URL.revokeObjectURL), [previews])
   const [form, setForm] = useState<ProductFormData>({
@@ -44,7 +44,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
     price: initialData?.price || '', sale_price: initialData?.sale_price || '', affiliate_link: initialData?.affiliate_link || null,
     category_id: initialData?.category_id || null, image_urls: initialData?.image_urls || [],
     why_victory: initialData?.why_victory || null, item_type: initialData?.item_type || 'shop',
-    is_featured: initialData?.is_featured || false, is_active: initialData?.is_active ?? true,
+    is_featured: initialData?.is_featured || false, is_active: initialData?.is_active ?? false,
     best_for: initialData?.best_for || '', considerations: initialData?.considerations || '',
     specifications: initialData?.specifications || '', selection_basis: initialData?.selection_basis || 'not_recorded',
   })
@@ -66,7 +66,8 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
       return
     }
     setError(null)
-    setFiles((current) => [...current, ...selected])
+    setImageOrder(order => [...order, ...selected.map((_, index) => `upload:${files.length + index}`)])
+    setFiles(current => [...current, ...selected])
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -79,10 +80,12 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
     setSaving(true)
     setError(null)
     const uploadedPaths: string[] = []
-    const retainedUrls = [...imageUrls]
+    const retainedUrls: string[] = []
 
     try {
-      for (const file of files) {
+      for (const image of imageOrder) {
+        if (!image.startsWith('upload:')) { retainedUrls.push(image); continue }
+        const file = files[Number(image.slice(7))]
         const extension = file.name.split('.').pop()?.toLowerCase() || 'img'
         const path = `${crypto.randomUUID()}.${extension}`
         const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type, upsert: false })
@@ -102,8 +105,8 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
         specifications: form.specifications.trim() || null, selection_basis: form.selection_basis,
       }
       const result = initialData
-        ? await supabase.from('products').update(payload).eq('id', initialData.id)
-        : await supabase.from('products').insert(payload)
+        ? await supabase.from('products').update(payload).eq('id', initialData.id).select('id').single()
+        : await supabase.from('products').insert(payload).select('id').single()
       if (result.error) throw new Error(result.error.message)
 
       const removedUrls = (initialData?.image_urls || []).filter((url) => !retainedUrls.includes(url))
@@ -122,7 +125,15 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
     }
   }
 
-  const allImages = [...imageUrls, ...previews]
+  const allImages = imageOrder.map(key => ({ key, url: key.startsWith('upload:') ? previews[Number(key.slice(7))] : key }))
+  function moveImage(index: number, target: number) {
+    setImageOrder(current => {
+      const next = [...current]
+      const [image] = next.splice(index, 1)
+      next.splice(target, 0, image)
+      return next
+    })
+  }
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {error && <div role="alert" className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>}
@@ -163,11 +174,18 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
             <ImagePlus className="mb-2 h-6 w-6 text-primary" /><span className="text-sm font-medium">Choose image files</span><span className="mt-1 text-xs text-on-surface-variant">Images are stored in Vesna’s media library</span>
             <input type="file" accept={ALLOWED_TYPES.join(',')} multiple className="sr-only" onChange={(e) => { addFiles(e.target.files); e.currentTarget.value = '' }} />
           </label>
-          {allImages.length > 0 ? <div className="grid grid-cols-2 gap-3">{allImages.map((url, index) => <div key={`${url}-${index}`} className="group relative aspect-square overflow-hidden rounded-lg bg-background"><img src={url} alt={`Product image ${index + 1}`} className="h-full w-full object-cover" />{index < imageUrls.length ? <button type="button" onClick={() => setImageUrls((current) => current.filter((_, i) => i !== index))} aria-label={`Remove image ${index + 1}`} className="absolute right-2 top-2 rounded-full bg-black/70 p-1.5 text-white"><X className="h-4 w-4" /></button> : <button type="button" onClick={() => setFiles((current) => current.filter((_, i) => i !== index - imageUrls.length))} aria-label={`Remove selected image ${index - imageUrls.length + 1}`} className="absolute right-2 top-2 rounded-full bg-black/70 p-1.5 text-white"><X className="h-4 w-4" /></button>}{index === 0 && <span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-[10px] uppercase tracking-wider text-white">Cover</span>}</div>)}</div> : <div className="rounded-lg bg-background px-4 py-6 text-center text-sm text-on-surface-variant">No images added yet.</div>}
+          {allImages.length > 0 ? <div className="grid grid-cols-2 gap-3">{allImages.map(({key, url}, index) => <div key={key} className="overflow-hidden rounded-lg border border-outline-variant bg-background">
+            <div className="relative aspect-square"><img src={url} alt={`Product image ${index + 1}`} className="h-full w-full object-contain p-3" /><button type="button" disabled={saving} onClick={() => { setImageOrder(current => current.filter(image => image !== key)) }} aria-label={`Remove image ${index + 1}`} className="absolute right-2 top-2 rounded-full bg-black/70 p-1.5 text-white"><X className="h-4 w-4" /></button></div>
+            <div className="flex items-center justify-between gap-1 border-t border-outline-variant p-2">
+              <button type="button" disabled={index === 0 || saving} onClick={() => moveImage(index, 0)} className="text-xs font-medium text-primary disabled:text-on-surface-variant">{index === 0 ? 'Cover' : 'Set cover'}</button>
+              <div className="flex gap-1"><button type="button" disabled={index === 0 || saving} onClick={() => moveImage(index, index - 1)} aria-label={`Move image ${index + 1} earlier`} className="rounded p-1 disabled:opacity-30"><ArrowLeft className="h-4 w-4" /></button><button type="button" disabled={index === allImages.length - 1 || saving} onClick={() => moveImage(index, index + 1)} aria-label={`Move image ${index + 1} later`} className="rounded p-1 disabled:opacity-30"><ArrowRight className="h-4 w-4" /></button></div>
+            </div>
+          </div>)}</div> : <div className="rounded-lg bg-background px-4 py-6 text-center text-sm text-on-surface-variant">No images added yet.</div>}
+          <p className="text-xs leading-relaxed text-on-surface-variant">The cover appears first on cards. Use the arrows to arrange the product gallery before saving.</p>
           <p className="text-xs leading-relaxed text-on-surface-variant">Existing external image links are supported. New uploads require the reviewed Supabase storage setup.</p>
         </aside>
       </div>
-      <div className="flex flex-wrap gap-3 border-t border-outline-variant pt-5"><Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{initialData ? 'Save product' : 'Create product'}</Button><Button type="button" variant="outline" onClick={() => router.push('/admin/products')} disabled={saving}>Cancel</Button></div>
+      <div className="flex flex-wrap gap-3 border-t border-outline-variant pt-5"><Button type="submit" disabled={saving}>{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{form.is_active ? (initialData ? 'Save published product' : 'Publish product') : 'Save draft'}</Button><Button type="button" variant="outline" onClick={() => router.push('/admin/products')} disabled={saving}>Cancel</Button></div>
     </form>
   )
 }

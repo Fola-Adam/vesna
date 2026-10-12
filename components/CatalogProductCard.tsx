@@ -13,7 +13,7 @@ export default function CatalogProductCard({ product }: { product: ProductRow })
     <article className="flex h-full flex-col overflow-hidden border border-ink/10 bg-paper-raised text-ink transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-primary-ink/40 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none">
       <Link href={`/shop/${product.slug}`} className="group flex flex-1 flex-col focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-ink">
         <div className="relative aspect-[4/3] overflow-hidden bg-paper">
-          <CatalogImage src={product.image_urls?.[0]} alt={product.name} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+          <CatalogImage src={product.image_urls?.[0]} alt={product.name} className="object-contain p-5 transition-transform duration-300 group-hover:scale-[1.025] motion-reduce:transform-none motion-reduce:transition-none" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           {product.is_featured && <span className="absolute left-3 top-3 bg-ink px-3 py-1.5 font-button-label text-[10px] uppercase tracking-[0.12em] text-paper">Featured pick</span>}
         </div>
         <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-6">
