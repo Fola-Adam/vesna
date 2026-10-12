@@ -116,7 +116,7 @@ export async function POST(request: Request) {
     ? '\n\nRelevant products in the catalog right now:\n' +
       matchedProducts.map(p => `- ${p.name} (category: ${p.category ?? "not provided"}; page: /shop/${p.slug}; listed price: ${p.price == null ? "not provided" : `$${p.price}`}) — ${p.description?.slice(0, 300) ?? "No description provided"}; curator note: ${p.why_victory?.slice(0, 400) ?? "not provided"}`).join('\n')
     : ''
-  const matchedReadings = selectVenusReadings(message)
+  const matchedReadings = selectVenusReadings(message, safeHistory)
   const readingAppendix = matchedReadings.length ? '\n\nPublished Journal readings:\n' + matchedReadings.map(article => `- ${article.title}; page: /journal/${article.slug}; ${article.categoryLabel}; ${article.readTime}; summary: ${article.excerpt}`).join('\n') : ''
 
   const systemPrompt = `You are Venus, the assistant for Vesna — a curated lifestyle platform by Ebenezer Victory.

@@ -11,14 +11,24 @@ const ALIASES: Record<string, string[]> = {
 }
 const words = (text: string) => text.toLowerCase().match(/[a-z0-9]+/g) ?? []
 
+/** Explicit USD limits only; do not guess a budget from an unrelated number. */
+function budgetFor(text: string): number | null {
+  const match = text.match(/(?:under|below|less than|up to|budget(?: of)?|maximum|max)\s*\$?\s*([\d,]+(?:\.\d+)?)/i)
+    ?? text.match(/\$\s*([\d,]+(?:\.\d+)?)\s*(?:budget|maximum|max|or less)/i)
+  if (!match) return null
+  const value = Number(match[1].replaceAll(',', ''))
+  return Number.isFinite(value) && value >= 0 ? value : null
+}
+
 /** Ranking uses the same active catalog as Picks, without trusting client product data. */
 export function selectVenusProducts(catalog: ProductRow[], message: string, history: { role: string; content: string }[] = [], productSlug?: string | null, limit = 8) {
   const followup = /\b(it|this|that|these|those|them|other|another|cheaper|instead|both)\b/i.test(message)
   const context = followup ? history.slice(-4).map(entry => entry.content).join(' ') : ''
   const terms = [...new Set(words(message).filter(word => word.length > 2 && !STOP_WORDS.has(word) && !/^\d+$/.test(word)))]
   const contextualTerms = [...new Set(words(context).filter(word => word.length > 2 && !STOP_WORDS.has(word)))]
-  const budgetMatch = message.match(/(?:under|below|less than|up to|budget(?: of)?|maximum|max)\s*\$?\s*([\d,]+(?:\.\d+)?)/i)
-  const budget = budgetMatch ? Number(budgetMatch[1].replaceAll(',', '')) : null
+  const resetBudget = /\b(any budget|ignore (?:the )?budget|no budget limit|regardless of price)\b/i.test(message)
+  const lastBudget = followup ? history.filter(entry => entry.role === 'user').slice().reverse().find(entry => budgetFor(entry.content) != null || /\b(any budget|ignore (?:the )?budget|no budget limit|regardless of price)\b/i.test(entry.content)) : null
+  const budget = resetBudget ? null : budgetFor(message) ?? (lastBudget ? budgetFor(lastBudget.content) : null)
   const eligible = catalog.filter(product => product.item_type !== 'archive' && (budget == null || (effectivePricing(product).price != null && effectivePricing(product).price! <= budget)))
   const ranked = eligible.map(product => {
     const category = product.categories?.name.toLowerCase() ?? ''

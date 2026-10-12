@@ -98,7 +98,7 @@ export default function VenusChatWidget() {
     try {
       const response = await fetch('/api/venus', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-        body: JSON.stringify({ message: text, productSlug, history: messages.slice(-10).map(message => ({ role: message.role, content: message.content })) }),
+        body: JSON.stringify({ message: text, productSlug, history: messages.filter(message => !message.error).slice(-10).map(message => ({ role: message.role, content: message.content })) }),
       })
       if (!response.ok) {
         const result = await response.json().catch(() => null)
