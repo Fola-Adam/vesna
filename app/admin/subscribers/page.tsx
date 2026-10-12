@@ -34,6 +34,16 @@ export default function SubscribersPage() {
   const [totalCount, setTotalCount] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const requestSequence = useRef(0)
+  const [delivery, setDelivery] = useState<{ connected: boolean; message: string } | null>(null)
+  async function checkDelivery() {
+    try {
+      const response = await fetch('/api/admin/dispatch/status', { cache: 'no-store' })
+      const result = await response.json()
+      if (!response.ok) throw new Error('Could not check email delivery. Please sign in again or retry.')
+      setDelivery({ connected: result.connected === true, message: result.message })
+    } catch { setDelivery({ connected: false, message: 'Could not check email delivery. Please retry.' }) }
+  }
+  useEffect(() => { void Promise.resolve().then(checkDelivery) }, [])
 
   const [copiedId, setCopiedId] = useState<string | null>(null)
   async function copyUnsubscribeLink(subscriber: Subscriber) {
@@ -101,6 +111,7 @@ export default function SubscribersPage() {
       <Card>
         <CardHeader>
           <p className="mb-4 text-sm leading-relaxed text-on-surface-variant">Confirmed readers have verified their email. Pending addresses have not confirmed yet. Readers who unsubscribed must confirm a new signup before rejoining.</p>
+          <div className="mb-5 flex flex-wrap items-center gap-3 border-b border-outline-variant pb-4"><p role="status" className="flex-1 text-sm text-on-surface-variant">{delivery?.message ?? 'Checking email service connection…'}</p><Button type="button" variant="outline" size="sm" onClick={() => { setDelivery(null); void checkDelivery() }}>Check connection</Button></div>
           <div className="flex flex-wrap items-center gap-4">
             <Input
               placeholder="Search by email or name..."
