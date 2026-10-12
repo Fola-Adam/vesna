@@ -147,7 +147,7 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
           <FilterControls {...controls} prefix="desktop" showCategories={false} />
         </div>
 
-        <div className="sticky top-16 z-30 -mx-5 mb-4 flex min-h-14 items-center justify-between gap-3 border-y border-ink/15 bg-paper/95 px-5 py-2 backdrop-blur sm:static sm:mx-0 sm:mb-3 sm:border-0 sm:bg-transparent sm:px-0 sm:py-3 sm:backdrop-blur-none">
+        <div className="sticky top-16 z-30 -mx-4 mb-4 flex min-h-14 items-center justify-between gap-3 border-y border-ink/15 bg-paper/95 px-4 py-2 backdrop-blur sm:static sm:mx-0 sm:mb-3 sm:border-0 sm:bg-transparent sm:px-0 sm:py-3 sm:backdrop-blur-none">
           <p role="status" aria-live="polite" className="text-sm text-ink-muted">
             Showing <span className="font-semibold text-ink">{Math.min(displayedCount, filteredProducts.length)}</span> of <span className="font-semibold text-ink">{filteredProducts.length}</span> picks
           </p>
