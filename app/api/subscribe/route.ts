@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     source?: unknown
   }
 
-  if (typeof email !== 'string' || email.length > 254 || !EMAIL_RE.test(email)) {
+  if (typeof email !== 'string' || email.length > 254 || !EMAIL_RE.test(email.trim())) {
     return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
   }
   const safeName =
@@ -74,9 +74,8 @@ export async function POST(request: NextRequest) {
       email: normalizedEmail, first_name: safeName, source: safeSource,
     })
     if (error?.code === '23505') {
-      const { error: updateError } = await supabase.from('email_subscribers')
-        .update({ unsubscribed_at: null }).eq('email', normalizedEmail)
-      if (updateError) return unavailable()
+      // Repeated requests never reverse an unsubscribe or change existing consent.
+      return NextResponse.json({ ok: true })
     } else if (error) {
       console.error('[subscribe] Persistence failed')
       return unavailable()
@@ -90,7 +89,7 @@ export async function POST(request: NextRequest) {
   if (brevoKey) {
     try {
       await fetch('https://api.brevo.com/v3/contacts', {
-        method: 'POST',
+        method: 'POST', signal: AbortSignal.timeout(8000),
         headers: {
           'api-key': brevoKey,
           'Content-Type': 'application/json',
@@ -98,9 +97,8 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           email: normalizedEmail,
-          firstName: safeName ?? undefined,
-          attributes: { VESNA_SOURCE: safeSource },
-          updateEnabled: true,
+          attributes: { VESNA_SOURCE: safeSource, ...(safeName ? { FNAME: safeName } : {}) },
+          updateEnabled: false,
           listIds: process.env.BREVO_LIST_ID && /^\d+$/.test(process.env.BREVO_LIST_ID)
             ? [Number(process.env.BREVO_LIST_ID)] : [],
         }),

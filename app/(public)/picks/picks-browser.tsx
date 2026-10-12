@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Bookmark, SlidersHorizontal, X } from 'lucide-react'
 import { useShortlist } from '@/lib/shortlist'
+import { COLLECTIONS, inCollection } from '@/lib/catalog-collections'
 import type { ProductRow } from '@/lib/data'
 import { effectivePricing } from '@/lib/pricing'
 import CatalogProductCard from '@/components/CatalogProductCard'
@@ -78,6 +79,7 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
   const maxPrice = params.get('maxPrice') ?? ''
   const sort = params.get('sort') ?? 'recent'
   const savedOnly = params.get('saved') === '1'
+  const collection = params.get('collection') ?? ''
   const { ids: savedIds } = useShortlist()
   const savedCount = products.filter(product => savedIds.includes(product.id)).length
   const pageKey = params.toString()
@@ -93,7 +95,7 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
       const categoryMatches = currentCategory === 'all' || keyFor(product.categories?.name ?? '') === currentCategory
       const textMatches = [product.name, product.description, product.why_victory, product.categories?.name].some(text => text?.toLowerCase().includes(search))
       const price = effectivePricing(product).price
-      return (!savedOnly || savedIds.includes(product.id)) && categoryMatches && textMatches && (budget == null || (price != null && price <= budget))
+      return inCollection(product, collection) && (!savedOnly || savedIds.includes(product.id)) && categoryMatches && textMatches && (budget == null || (price != null && price <= budget))
     })
     if (sort === 'price-low' || sort === 'price-high') selected.sort((a, b) => {
       const left = effectivePricing(a).price
@@ -103,10 +105,11 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
       return sort === 'price-low' ? left - right : right - left
     })
     return selected
-  }, [products, currentCategory, query, maxPrice, sort, savedOnly, savedIds])
+  }, [products, currentCategory, query, maxPrice, sort, savedOnly, savedIds, collection])
 
   function changeFilter(name: string, value: string) {
     const next = new URLSearchParams(params.toString())
+    if (name === 'collection') next.delete('category')
     if (!value || value === 'all' || value === 'recent') next.delete(name)
     else next.set(name, value)
     const suffix = next.toString()
@@ -115,12 +118,13 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
 
   function clearFilters() {
     const next = new URLSearchParams(params.toString())
-    for (const name of ['q', 'category', 'maxPrice', 'sort']) next.delete(name)
+    for (const name of ['q', 'category', 'maxPrice', 'sort', 'collection']) next.delete(name)
     const suffix = next.toString()
     window.history.pushState(null, '', `/picks${suffix ? `?${suffix}` : ''}`)
   }
 
   const activeFilters = [
+    ...(collection ? [{ key: 'collection', label: COLLECTIONS.find(item => item.slug === collection)?.title ?? collection }] : []),
     ...(query.trim() ? [{ key: 'q', label: `Search: ${query.trim()}` }] : []),
     ...(currentCategory !== 'all' ? [{ key: 'category', label: categories.find(name => keyFor(name) === currentCategory) ?? currentCategory }] : []),
     ...(maxPrice ? [{ key: 'maxPrice', label: `Under $${maxPrice}` }] : []),
@@ -137,6 +141,16 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
           <h1 className="mb-4 break-words font-display-hero text-[clamp(2.25rem,7.5vw,3.75rem)] leading-tight">Victory&apos;s picks</h1>
           <p className="max-w-2xl font-body-main text-base leading-relaxed text-ink-muted sm:text-lg">Objects, tools, and experiences selected with intention.</p>
         </header>
+        <section aria-label="Collections by purpose" className="mb-8 grid gap-3 sm:grid-cols-3">
+          {COLLECTIONS.map(item => {
+            const count = products.filter(product => inCollection(product, item.slug)).length
+            return count > 0 && <button key={item.slug} type="button" aria-pressed={collection === item.slug} onClick={() => changeFilter('collection', collection === item.slug ? '' : item.slug)} className={`group min-w-0 border p-5 text-left transition-colors focus-ring ${collection === item.slug ? 'border-primary-ink bg-green-wash' : 'border-ink/15 bg-paper-raised hover:border-primary-ink/50'}`}>
+              <span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.16em] text-primary-ink">{count} {count === 1 ? 'pick' : 'picks'}</span>
+              <span className="block font-display-hero text-2xl leading-tight text-ink">{item.title}</span>
+              <span className="mt-2 block text-sm leading-relaxed text-ink-muted">{item.description}</span>
+            </button>
+          })}
+        </section>
         {products.some(product => product.id.startsWith('fallback-')) && <p className="mb-6 border border-ink/20 bg-paper-raised p-4 text-sm text-ink-muted">Preview collection. Prices and seller availability have not been verified.</p>}
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <button type="button" aria-pressed={savedOnly} onClick={() => changeFilter('saved', savedOnly ? '' : '1')} className={`inline-flex min-h-11 items-center gap-2 border px-4 py-2 text-sm font-medium focus-ring ${savedOnly ? 'border-primary-ink bg-primary-ink text-paper' : 'border-ink/25 text-primary-ink hover:border-primary-ink'}`}><Bookmark size={16} aria-hidden="true" />{savedOnly ? 'Showing your shortlist' : 'Your shortlist'} ({savedCount})</button>

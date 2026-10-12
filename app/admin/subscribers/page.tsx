@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDebounce } from '@/hooks/use-debounce'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Check, Copy, ChevronLeft, ChevronRight } from 'lucide-react'
 
 
 
@@ -21,6 +21,7 @@ interface Subscriber {
   is_verified: boolean
   subscribed_at: string
   unsubscribed_at: string | null
+  unsubscribe_token: string
 }
 
 export default function SubscribersPage() {
@@ -31,6 +32,14 @@ export default function SubscribersPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [error, setError] = useState<string | null>(null)
+
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+  async function copyUnsubscribeLink(subscriber: Subscriber) {
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/unsubscribe?token=${encodeURIComponent(subscriber.unsubscribe_token)}`)
+      setCopiedId(subscriber.id)
+    } catch { setError('Could not copy the link. Browser clipboard access is required.') }
+  }
 
   const debouncedSearch = useDebounce(searchQuery, 300)
 
@@ -84,6 +93,7 @@ export default function SubscribersPage() {
           <div className="flex items-center gap-4">
             <Input
               placeholder="Search by email or name..."
+              aria-label="Search subscribers"
               className="max-w-sm"
               value={searchQuery}
               onChange={(e) => {
@@ -106,6 +116,7 @@ export default function SubscribersPage() {
                   <th className="text-left py-3 px-4 font-section-header text-[10px] tracking-[0.15em] text-on-surface-variant">Source</th>
                   <th className="text-left py-3 px-4 font-section-header text-[10px] tracking-[0.15em] text-on-surface-variant">Status</th>
                   <th className="text-left py-3 px-4 font-section-header text-[10px] tracking-[0.15em] text-on-surface-variant">Date</th>
+                  <th className="text-left py-3 px-4 text-xs text-on-surface-variant">Preferences</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,11 +169,12 @@ export default function SubscribersPage() {
                           day: 'numeric',
                         })}
                       </td>
+                      <td className="py-3 px-4"><button type="button" onClick={() => void copyUnsubscribeLink(sub)} className="inline-flex min-h-10 items-center gap-2 whitespace-nowrap rounded border border-outline-variant px-3 text-xs text-on-background focus-ring">{copiedId === sub.id ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}{copiedId === sub.id ? 'Copied' : 'Copy unsubscribe link'}</button></td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-sm text-on-surface-variant">
+                    <td colSpan={6} className="py-8 text-center text-sm text-on-surface-variant">
                       {debouncedSearch ? 'No subscribers match your search.' : 'No subscribers yet.'}
                     </td>
                   </tr>
