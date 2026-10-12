@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import CatalogImage from '@/components/CatalogImage'
+import ProductGallery from '@/components/ProductGallery'
 import VenusTriggerPill from '@/components/VenusTriggerPill'
 import { sellerDetails } from '@/lib/affiliate'
 import Link from 'next/link'
@@ -59,15 +59,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
         </nav>
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-14">
-          {/* Image */}
-          <div className="relative aspect-[4/3] overflow-hidden bg-paper-raised">
-            <CatalogImage src={product.image_urls?.[0]} alt={product.name} sizes="(max-width: 1024px) 100vw, 50vw" priority />
-            {product.is_featured && (
-              <div className="absolute left-4 top-4 z-10 bg-ink px-3 py-2 font-button-label text-[10px] uppercase tracking-wider text-paper">
-                Victory&apos;s pick
-              </div>
-            )}
-          </div>
+          <ProductGallery images={product.image_urls} name={product.name} featured={product.is_featured} />
 
           {/* Details */}
           <div className="flex flex-col justify-center">

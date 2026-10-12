@@ -11,13 +11,15 @@ const config: Config = {
     extend: {
       colors: {
         // Base
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        paper: "var(--paper)",
-        "paper-raised": "var(--paper-raised)",
-        ink: "var(--ink)",
-        "ink-muted": "var(--ink-muted)",
-        "primary-ink": "var(--primary-ink)",
+        background: "rgb(var(--background-rgb) / <alpha-value>)",
+        foreground: "rgb(var(--foreground-rgb) / <alpha-value>)",
+        paper: "rgb(var(--paper-rgb) / <alpha-value>)",
+        "paper-raised": "rgb(var(--paper-raised-rgb) / <alpha-value>)",
+        ink: "rgb(var(--ink-rgb) / <alpha-value>)",
+        "ink-muted": "rgb(var(--ink-muted-rgb) / <alpha-value>)",
+        "green-wash": "#edf0e7",
+        "on-primary": "var(--primary-foreground)",
+        "primary-ink": "rgb(var(--primary-ink-rgb) / <alpha-value>)",
         
         // Surface Colors
         surface: "var(--surface)",
@@ -28,7 +30,7 @@ const config: Config = {
         "surface-container-lowest": "var(--surface-container-lowest)",
         
         // Primary - Emerald
-        primary: "var(--primary)",
+        primary: "rgb(var(--primary-rgb) / <alpha-value>)",
         "primary-foreground": "var(--primary-foreground)",
         "primary-container": "var(--primary-container)",
         "on-primary-container": "var(--on-primary-container)",
@@ -38,7 +40,7 @@ const config: Config = {
         "on-primary-fixed-variant": "var(--on-primary-fixed-variant)",
         
         // Secondary - Antique gold
-        secondary: "var(--secondary)",
+        secondary: "rgb(var(--secondary-rgb) / <alpha-value>)",
         "secondary-foreground": "var(--secondary-foreground)",
         "secondary-container": "var(--secondary-container)",
         "on-secondary-container": "var(--on-secondary-container)",

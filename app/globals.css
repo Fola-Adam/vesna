@@ -7,7 +7,9 @@
 :root {
   /* Vesna Color System */
   --background: #171613;
+  --background-rgb: 23 22 19;
   --foreground: #f1ece2;
+  --foreground-rgb: 241 236 226;
   --surface: #171613;
   --surface-dim: #171613;
   --surface-container: #24221e;
@@ -17,14 +19,20 @@
 
   /* Warm editorial surfaces for browsing and reading */
   --paper: #f1ece2;
+  --paper-rgb: 241 236 226;
   --paper-raised: #faf7f0;
+  --paper-raised-rgb: 250 247 240;
   --ink: #292720;
+  --ink-rgb: 41 39 32;
   --ink-muted: #625b50;
+  --ink-muted-rgb: 98 91 80;
   /* Emerald is for action; gold is reserved for fine accents. */
   --primary-ink: #1b5a45;
+  --primary-ink-rgb: 27 90 69;
 
   /* Primary - Vesna emerald */
   --primary: #1b5a45;
+  --primary-rgb: 27 90 69;
   --primary-foreground: #faf7f0;
   --primary-container: #10382d;
   --on-primary-container: #f1ece2;
@@ -35,6 +43,7 @@
 
   /* Secondary - Antique gold */
   --secondary: #c3aa7b;
+  --secondary-rgb: 195 170 123;
   --secondary-foreground: #2c2415;
   --secondary-container: #4a4030;
   --on-secondary-container: #f0e4ca;
