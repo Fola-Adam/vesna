@@ -6,11 +6,11 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import NewsletterForm from '@/components/NewsletterForm'
 import ScrollProgress from '@/components/ScrollProgress'
-import { ARTICLES, JOURNAL_CATEGORIES } from '@/lib/journal-data'
+import { type JournalArticle, JOURNAL_CATEGORIES } from '@/lib/journal-data'
 
-export default function JournalBrowser() {
+export default function JournalBrowser({ stories }: { stories: JournalArticle[] }) {
   const [active, setActive] = useState('all')
-  const articles = useMemo(() => active === 'all' ? ARTICLES : ARTICLES.filter((item) => item.category === active), [active])
+  const articles = useMemo(() => active === 'all' ? stories : stories.filter((item) => item.category === active), [active, stories])
   const [lead, ...rest] = articles
 
   return (

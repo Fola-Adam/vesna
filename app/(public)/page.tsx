@@ -1,3 +1,4 @@
+import { readPublishedStories } from '@/lib/journal-server';
 import type { Metadata } from "next";
 import HeroSection from "@/components/HeroSection";
 import ProductSlider from "@/components/ProductSlider";
@@ -30,10 +31,10 @@ export const metadata: Metadata = {
  * below still reveal-on-scroll, so the page keeps its motion language
  * without blocking first paint on a spinner.
  */
-export const revalidate = 300;
+export const revalidate = 0;
 
 export default async function HomePage() {
-  const products = await getProducts();
+  const [products, stories] = await Promise.all([getProducts(), readPublishedStories()]);
   const categories = [...products.reduce((map, product) => {
     const name = product.categories?.name?.trim()
     if (!name) return map
@@ -50,7 +51,7 @@ export default async function HomePage() {
       <ProductSlider products={products} />
       <CategoryGrid categories={categories} />
       <CuratorSection />
-      <RecentStories />
+      <RecentStories articles={stories} />
       <NewsletterSection />
       <BackToTop />
     </main>

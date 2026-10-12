@@ -1,0 +1,9 @@
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
+import type { JournalRecord } from '@/lib/journal-publishing'
+export const dynamic = 'force-dynamic'
+export default async function JournalAdmin() {
+  const client = await createClient()
+  const { data, error } = await client.from('journal_articles').select('id,title,slug,status,author,updated_at').order('updated_at', { ascending: false })
+  return <div className="space-y-7 text-ink"><header className="flex flex-wrap items-end justify-between gap-4"><div><p className="text-xs uppercase tracking-widest text-ink-muted">Curator studio</p><h1 className="mt-2 font-display-hero text-4xl">The Journal</h1><p className="mt-3 text-sm text-ink-muted">Write, preview, and publish stories. Drafts stay off the public Journal.</p></div><Link href="/admin/journal/new" className="inline-flex min-h-11 items-center rounded-md bg-primary-ink px-5 text-sm text-paper focus-ring">New story</Link></header>{error ? <p role="alert" className="border border-red-800/25 p-4 text-red-900">The publishing service is unavailable. Please try again shortly.</p> : <div className="space-y-3">{(data as JournalRecord[]).map(story => <Link key={story.id} href={`/admin/journal/${story.id}/edit`} className="block rounded-xl border border-ink/15 bg-paper-raised p-5 focus-ring hover:border-primary-ink/40"><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="font-display-hero text-2xl">{story.title}</h2><span className="rounded-full bg-ink/5 px-3 py-1 text-xs">{story.status === 'published' ? 'Published' : 'Draft'}</span></div><p className="mt-2 text-xs text-ink-muted">{story.author} · Updated {new Date(story.updated_at).toLocaleDateString('en-GB', { timeZone: 'UTC' })}</p></Link>)}{!data?.length && <p className="py-12 text-ink-muted">No stories yet. Start with a draft.</p>}</div>}</div>
+}

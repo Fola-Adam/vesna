@@ -3,10 +3,10 @@ import Icon from '@/components/Icon'
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ARTICLES } from '@/lib/journal-data'
+import type { JournalArticle } from '@/lib/journal-data'
 import { useRevealOnScroll } from '@/hooks/use-reveal-on-scroll'
 
-export default function RecentStories() {
+export default function RecentStories({ articles }: { articles: JournalArticle[] }) {
   const sectionRef = useRevealOnScroll()
 
   return (
@@ -22,7 +22,7 @@ export default function RecentStories() {
           </Link>
         </div>
         <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-          {ARTICLES.slice(0, 3).map((article) => (
+          {articles.slice(0, 3).map((article) => (
             <Link key={article.slug} href={`/journal/${article.slug}`} className="group focus-ring">
               <div className="relative mb-4 aspect-[4/3] overflow-hidden bg-paper-raised">
                 <Image

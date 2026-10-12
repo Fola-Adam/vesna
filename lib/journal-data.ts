@@ -6,6 +6,10 @@ export interface JournalArticle {
   excerpt: string
   image: string
   readTime: string
+  body?: string
+  author?: string
+  caption?: string
+  published_at?: string | null
   sections: { heading: string; paragraphs: string[] }[]
 }
 
