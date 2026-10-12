@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { cloneElement, isValidElement, useEffect, useId, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -173,7 +173,9 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="space-y-2"><Label className="text-xs uppercase tracking-[0.12em] text-on-surface-variant">{label}</Label>{children}</div>
+  const id = useId()
+  const control = isValidElement<{ id?: string }>(children) ? cloneElement(children, { id }) : children
+  return <div className="space-y-2"><Label htmlFor={id} className="text-xs uppercase tracking-[0.12em] text-on-surface-variant">{label}</Label>{control}</div>
 }
 function Toggle({ checked, onChange, children }: { checked: boolean; onChange: (value: boolean) => void; children: React.ReactNode }) {
   return <label className="flex cursor-pointer items-center gap-2 text-sm text-on-surface-variant"><input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4 accent-primary" />{children}</label>
