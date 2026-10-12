@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { SlidersHorizontal } from 'lucide-react'
+import { Bookmark, SlidersHorizontal, X } from 'lucide-react'
+import { useShortlist } from '@/lib/shortlist'
 import type { ProductRow } from '@/lib/data'
 import { effectivePricing } from '@/lib/pricing'
 import CatalogProductCard from '@/components/CatalogProductCard'
@@ -76,6 +77,9 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
   const query = params.get('q') ?? ''
   const maxPrice = params.get('maxPrice') ?? ''
   const sort = params.get('sort') ?? 'recent'
+  const savedOnly = params.get('saved') === '1'
+  const { ids: savedIds } = useShortlist()
+  const savedCount = products.filter(product => savedIds.includes(product.id)).length
   const pageKey = params.toString()
   const [pagination, setPagination] = useState({ key: pageKey, count: ITEMS_PER_LOAD })
   const [filterOpen, setFilterOpen] = useState(false)
@@ -89,7 +93,7 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
       const categoryMatches = currentCategory === 'all' || keyFor(product.categories?.name ?? '') === currentCategory
       const textMatches = [product.name, product.description, product.why_victory, product.categories?.name].some(text => text?.toLowerCase().includes(search))
       const price = effectivePricing(product).price
-      return categoryMatches && textMatches && (budget == null || (price != null && price <= budget))
+      return (!savedOnly || savedIds.includes(product.id)) && categoryMatches && textMatches && (budget == null || (price != null && price <= budget))
     })
     if (sort === 'price-low' || sort === 'price-high') selected.sort((a, b) => {
       const left = effectivePricing(a).price
@@ -99,7 +103,7 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
       return sort === 'price-low' ? left - right : right - left
     })
     return selected
-  }, [products, currentCategory, query, maxPrice, sort])
+  }, [products, currentCategory, query, maxPrice, sort, savedOnly, savedIds])
 
   function changeFilter(name: string, value: string) {
     const next = new URLSearchParams(params.toString())
@@ -134,6 +138,10 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
           <p className="max-w-2xl font-body-main text-base leading-relaxed text-ink-muted sm:text-lg">Objects, tools, and experiences selected with intention.</p>
         </header>
         {products.some(product => product.id.startsWith('fallback-')) && <p className="mb-6 border border-ink/20 bg-paper-raised p-4 text-sm text-ink-muted">Preview collection. Prices and seller availability have not been verified.</p>}
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <button type="button" aria-pressed={savedOnly} onClick={() => changeFilter('saved', savedOnly ? '' : '1')} className={`inline-flex min-h-11 items-center gap-2 border px-4 py-2 text-sm font-medium focus-ring ${savedOnly ? 'border-primary-ink bg-primary-ink text-paper' : 'border-ink/25 text-primary-ink hover:border-primary-ink'}`}><Bookmark size={16} aria-hidden="true" />{savedOnly ? 'Showing your shortlist' : 'Your shortlist'} ({savedCount})</button>
+          <p className="text-xs text-ink-muted">Saved in this browser. No account needed.</p>
+        </div>
 
         <div className="hidden min-w-0 grid-cols-1 gap-4 border-y border-ink/15 py-5 sm:grid sm:grid-cols-2 lg:grid-cols-3">
           <FilterControls {...controls} prefix="desktop" showCategories={false} />
@@ -171,7 +179,7 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
           <div className="mb-7 flex flex-wrap items-center gap-2" aria-label="Active filters">
             {activeFilters.map(filter => (
               <button key={filter.key} type="button" onClick={() => changeFilter(filter.key, '')} className="inline-flex min-h-9 items-center gap-2 border border-ink/20 bg-paper-raised px-3 text-sm text-ink hover:border-primary-ink focus-ring">
-                {filter.label}<span aria-hidden="true" className="text-ink-muted">×</span><span className="sr-only">Remove {filter.label} filter</span>
+                {filter.label}<X size={14} aria-hidden="true" className="text-ink-muted" /><span className="sr-only">Remove {filter.label} filter</span>
               </button>
             ))}
             <button type="button" onClick={clearFilters} className="min-h-9 px-2 text-sm text-ink-muted underline underline-offset-4 hover:text-primary-ink focus-ring">Clear all</button>
@@ -187,7 +195,7 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
 
         {filteredProducts.length ? <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {filteredProducts.slice(0, displayedCount).map(product => <CatalogProductCard key={product.id} product={product} />)}
-        </div> : <div className="border-y border-ink/15 py-16 text-center"><h2 className="font-display-hero mb-3 text-2xl">No picks match these filters</h2><p className="mb-5 text-ink-muted">Try a broader search or a different budget.</p><button className="text-primary-ink underline underline-offset-4 focus-ring" onClick={clearFilters}>Clear filters</button></div>}
+        </div> : <div className="border-y border-ink/15 py-16 text-center"><h2 className="font-display-hero mb-3 text-2xl">{savedOnly && savedCount === 0 ? 'Your shortlist is waiting' : 'No picks match these filters'}</h2><p className="mb-5 text-ink-muted">{savedOnly && savedCount === 0 ? 'Save a pick to keep it here while you consider your options.' : 'Try a broader search or a different budget.'}</p><button className="text-primary-ink underline underline-offset-4 focus-ring" onClick={() => savedOnly ? window.history.pushState(null, '', '/picks') : clearFilters()}>{savedOnly ? 'Browse all picks' : 'Clear filters'}</button></div>}
         {displayedCount < filteredProducts.length && <div className="mt-12 text-center"><button onClick={() => setPagination({ key: pageKey, count: displayedCount + ITEMS_PER_LOAD })} className="min-h-12 border border-primary-ink px-8 py-3 text-primary-ink transition-colors hover:bg-primary hover:text-on-primary focus-ring">Show more picks</button></div>}
       </div>
     </main>

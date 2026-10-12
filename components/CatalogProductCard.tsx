@@ -4,6 +4,7 @@ import type { ProductRow } from '@/lib/data'
 import { effectivePricing, formatPrice } from '@/lib/pricing'
 import CatalogImage from './CatalogImage'
 import VenusTriggerPill from './VenusTriggerPill'
+import ShortlistButton from './ShortlistButton'
 
 export default function CatalogProductCard({ product }: { product: ProductRow }) {
   const { price, strike } = effectivePricing(product)
@@ -27,6 +28,7 @@ export default function CatalogProductCard({ product }: { product: ProductRow })
         </div>
       </Link>
       <div className="border-t border-ink/10 px-5 py-3 sm:px-6"><VenusTriggerPill productName={product.name} productSlug={product.slug} className="w-full justify-center rounded-sm border border-primary-ink/25 bg-green-wash px-3 py-2.5 font-semibold text-primary-ink transition-colors hover:bg-primary-ink hover:text-paper" /></div>
+      <div className="px-5 pb-4 sm:px-6"><ShortlistButton id={product.id} name={product.name} /></div>
     </article>
   )
 }

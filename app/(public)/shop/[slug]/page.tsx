@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import ProductGallery from '@/components/ProductGallery'
+import ShortlistButton from '@/components/ShortlistButton'
 import VenusTriggerPill from '@/components/VenusTriggerPill'
 import { sellerDetails } from '@/lib/affiliate'
 import Link from 'next/link'
@@ -86,6 +87,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
               <p className="whitespace-pre-line font-body-main leading-relaxed text-ink-muted">{product.description}</p>
             </section>}
             <div className="mb-8"><VenusTriggerPill productName={product.name} productSlug={product.slug} /></div>
+            <div className="mb-6"><ShortlistButton id={product.id} name={product.name} /></div>
             {(product.best_for || product.considerations || specs.length > 0 || basis) && <section className="mb-8 space-y-5 border-y border-ink/15 py-6">
               {basis && <p className="text-xs font-medium uppercase tracking-wider text-primary-ink">{basis}</p>}
               {product.best_for && <div><h2 className="mb-2 font-display-hero text-2xl">A good fit for</h2><p className="whitespace-pre-line text-sm leading-relaxed text-ink">{product.best_for}</p></div>}
