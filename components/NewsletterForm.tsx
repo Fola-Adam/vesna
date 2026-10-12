@@ -35,7 +35,7 @@ export default function NewsletterForm({ source = 'website' }: { source?: 'websi
 
   if (saved) return (
     <p role="status" className={`flex items-center justify-center gap-2 font-body-main py-4 ${isDarkSurface ? 'text-paper' : 'text-primary-ink'}`}>
-      <Check aria-hidden="true" size={20} /> Thanks—your signup request is saved.
+      <Check aria-hidden="true" size={20} /> If confirmation is needed, a link is on its way. Check your inbox and spam folder.
     </p>
   )
 
@@ -56,7 +56,7 @@ export default function NewsletterForm({ source = 'website' }: { source?: 'websi
           {pending ? 'Joining…' : 'Join the Dispatch'}
         </button>
       </div>
-      <p className={`mt-3 text-xs leading-relaxed ${isDarkSurface ? 'text-paper/75' : 'text-ink-muted'}`}>By joining, you agree to receive occasional Vesna emails. Existing unsubscribe preferences are kept.</p>
+      <p className={`mt-3 text-xs leading-relaxed ${isDarkSurface ? 'text-paper/75' : 'text-ink-muted'}`}>We will ask you to confirm your email. Occasional letters, and an unsubscribe link in every one.</p>
       {error && <p id={`${id}-error`} role="alert" className={`mt-3 text-sm font-body-main ${isDarkSurface ? 'text-error' : 'text-red-800'}`}>{error}</p>}
     </form>
   )

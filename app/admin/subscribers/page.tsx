@@ -29,6 +29,7 @@ export default function SubscribersPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([])
   const [loading, setLoading] = useState(Boolean(supabase))
   const [searchQuery, setSearchQuery] = useState('')
+  const [status, setStatus] = useState<'all' | 'confirmed' | 'pending' | 'unsubscribed'>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalCount, setTotalCount] = useState(0)
   const [error, setError] = useState<string | null>(null)
@@ -56,8 +57,12 @@ export default function SubscribersPage() {
       .range(from, to)
 
     if (debouncedSearch) {
-      query = query.or(`email.ilike.%${debouncedSearch}%,first_name.ilike.%${debouncedSearch}%`)
+      const search = debouncedSearch.replace(/[(),]/g, '').replace(/[\\%_]/g, '\\$&')
+      query = query.or(`email.ilike.%${search}%,first_name.ilike.%${search}%`)
     }
+    if (status === 'unsubscribed') query = query.not('unsubscribed_at', 'is', null)
+    if (status === 'confirmed') query = query.is('unsubscribed_at', null).eq('is_verified', true)
+    if (status === 'pending') query = query.is('unsubscribed_at', null).not('is_verified', 'is', true)
 
     const { data, count, error: fetchError } = await query
 
@@ -77,7 +82,7 @@ export default function SubscribersPage() {
   useEffect(() => {
     void Promise.resolve().then(fetchSubscribers)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, currentPage])
+  }, [debouncedSearch, currentPage, status])
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE)
 
@@ -90,7 +95,8 @@ export default function SubscribersPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-4">
+          <p className="mb-4 text-sm leading-relaxed text-on-surface-variant">Confirmed readers have verified their email. Pending addresses have not confirmed yet. Readers who unsubscribed must confirm a new signup before rejoining.</p>
+          <div className="flex flex-wrap items-center gap-4">
             <Input
               placeholder="Search by email or name..."
               aria-label="Search subscribers"
@@ -103,6 +109,7 @@ export default function SubscribersPage() {
               }}
             />
             {loading && <span className="font-section-header text-[10px] text-on-surface-variant tracking-[0.1em]">Loading...</span>}
+            <label className="flex items-center gap-2 text-sm text-on-background">Status<select aria-label="Subscriber status" value={status} onChange={event => { setStatus(event.target.value as typeof status); setCurrentPage(1); setLoading(Boolean(supabase)) }} className="min-h-11 rounded border border-outline-variant bg-surface px-3 focus-ring"><option value="all">All readers</option><option value="confirmed">Confirmed</option><option value="pending">Pending</option><option value="unsubscribed">Unsubscribed</option></select></label>
           </div>
         </CardHeader>
         <CardContent>
@@ -154,7 +161,7 @@ export default function SubscribersPage() {
                           </span>
                         ) : sub.is_verified ? (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full font-section-header text-[10px] tracking-[0.1em] bg-green-500/10 text-green-500">
-                            Verified
+                            Confirmed
                           </span>
                         ) : (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full font-section-header text-[10px] tracking-[0.1em] bg-amber-500/10 text-amber-500">
@@ -175,7 +182,7 @@ export default function SubscribersPage() {
                 ) : (
                   <tr>
                     <td colSpan={6} className="py-8 text-center text-sm text-on-surface-variant">
-                      {debouncedSearch ? 'No subscribers match your search.' : 'No subscribers yet.'}
+                      {debouncedSearch || status !== 'all' ? 'No readers match these filters.' : 'No subscribers yet.'}
                     </td>
                   </tr>
                 )}

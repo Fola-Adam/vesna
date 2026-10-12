@@ -7,6 +7,7 @@ const nextConfig = {
         // A non-secret build-context flag lets server-side data code make
         // preview-only presentation adjustments without touching the catalog.
         VESNA_NETLIFY_CONTEXT: process.env.CONTEXT ?? '',
+        VESNA_DISPATCH_ORIGIN: process.env.DEPLOY_PRIME_URL || process.env.URL || '',
     },
     // Turbopack is the default bundler in Next.js 16 (dev + build).
 
@@ -71,6 +72,14 @@ const nextConfig = {
             },
             {
                 source: '/unsubscribe',
+                headers: [
+                    { key: 'Referrer-Policy', value: 'no-referrer' },
+                    { key: 'Cache-Control', value: 'private, no-store' },
+                    { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+                ],
+            },
+            {
+                source: '/dispatch/confirm',
                 headers: [
                     { key: 'Referrer-Policy', value: 'no-referrer' },
                     { key: 'Cache-Control', value: 'private, no-store' },

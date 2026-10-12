@@ -1,13 +1,14 @@
 import { createServiceClient } from '@/lib/supabase/service'
 import { NextResponse, type NextRequest } from 'next/server'
+import { dispatchConfiguration, sendDispatchConfirmation } from '@/lib/dispatch-email'
+import { issueConfirmation } from '@/lib/dispatch-token'
 
 /**
  * POST /api/subscribe  { email, firstName?, source? }
  *
  * Stores signups using a server-only service key; public RLS stays closed.
- * Optionally forwards to Brevo when
- * BREVO_API_KEY is configured; Supabase remains the source of truth so the
- * admin "Subscribers" page keeps working even without a Brevo account.
+ * Sends an email ownership confirmation before enabling a subscription.
+ * Pending addresses are never added to a marketing list.
  */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
@@ -34,6 +35,9 @@ function rateLimited(ip: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  if (Number(request.headers.get('content-length') ?? 0) > 2048) {
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 413 })
+  }
   let body: unknown
   try {
     body = await request.json()
@@ -67,46 +71,34 @@ export async function POST(request: NextRequest) {
     { error: 'Signup is temporarily unavailable. Please try again later.' }, { status: 503 },
   )
   const supabase = createServiceClient()
-  if (!supabase) return unavailable()
+  const config = dispatchConfiguration()
+  if (!supabase || !config?.apiKey) return unavailable()
   const normalizedEmail = email.trim().toLowerCase()
+  // The same response for existing, pending, and new addresses avoids exposing
+  // membership. A confirmed address receives no unnecessary confirmation email.
+  const accepted = () => NextResponse.json({ ok: true }, { status: 202, headers: { 'Cache-Control': 'no-store' } })
+  const fields = 'id,email,is_verified,unsubscribe_token,unsubscribed_at'
   try {
-    const { error } = await supabase.from('email_subscribers').insert({
-      email: normalizedEmail, first_name: safeName, source: safeSource,
-    })
-    if (error?.code === '23505') {
-      // Repeated requests never reverse an unsubscribe or change existing consent.
-      return NextResponse.json({ ok: true })
-    } else if (error) {
-      console.error('[subscribe] Persistence failed')
-      return unavailable()
+    const lookup = () => supabase.from('email_subscribers').select(fields).eq('email', normalizedEmail).maybeSingle()
+    let { data: subscriber, error } = await lookup()
+    if (error) return unavailable()
+    if (!subscriber) {
+      const inserted = await supabase.from('email_subscribers').insert({
+        email: normalizedEmail, first_name: safeName, source: safeSource, is_verified: false,
+      }).select(fields).single()
+      if (inserted.error?.code === '23505') {
+        // Another signup won the insert race. Reuse its row without changing consent.
+        const existing = await lookup()
+        subscriber = existing.data; error = existing.error
+      } else { subscriber = inserted.data; error = inserted.error }
     }
+    if (error || !subscriber) return unavailable()
+    if (subscriber.is_verified && !subscriber.unsubscribed_at) return accepted()
+    const token = issueConfirmation(subscriber, config.origin, config.secret)
+    await sendDispatchConfirmation(normalizedEmail, `${config.origin}/dispatch/confirm#token=${encodeURIComponent(token)}`, config.apiKey)
+    return accepted()
   } catch {
-    return unavailable()
+    console.error('[subscribe] Confirmation could not be delivered')
+    return NextResponse.json({ error: 'We could not send your confirmation email. Please try again later.' }, { status: 503 })
   }
-
-  // Best-effort sync to Brevo (never blocks/fails the signup).
-  const brevoKey = process.env.BREVO_API_KEY
-  if (brevoKey) {
-    try {
-      await fetch('https://api.brevo.com/v3/contacts', {
-        method: 'POST', signal: AbortSignal.timeout(8000),
-        headers: {
-          'api-key': brevoKey,
-          'Content-Type': 'application/json',
-          'accept-version': 'v3',
-        },
-        body: JSON.stringify({
-          email: normalizedEmail,
-          attributes: { VESNA_SOURCE: safeSource, ...(safeName ? { FNAME: safeName } : {}) },
-          updateEnabled: false,
-          listIds: process.env.BREVO_LIST_ID && /^\d+$/.test(process.env.BREVO_LIST_ID)
-            ? [Number(process.env.BREVO_LIST_ID)] : [],
-        }),
-      })
-    } catch {
-      // ignore — Supabase row is the record of truth
-    }
-  }
-
-  return NextResponse.json({ ok: true })
 }

@@ -21,6 +21,7 @@ export default async function AdminDashboard() {
     .from('email_subscribers')
     .select('*', { count: 'exact', head: true })
     .is('unsubscribed_at', null)
+    .eq('is_verified', true)
 
   const { data: recentClicks } = await supabase
     .from('click_tracking')
@@ -46,7 +47,7 @@ export default async function AdminDashboard() {
       icon: <ShoppingBag aria-hidden="true" size={19} strokeWidth={1.5} />,
     },
     {
-      label: 'Email Subscribers',
+      label: 'Confirmed Readers',
       value: subscribersCount || 0,
       href: '/admin/subscribers',
       icon: <Mail aria-hidden="true" size={19} strokeWidth={1.5} />,
