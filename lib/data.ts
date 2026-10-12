@@ -40,6 +40,25 @@ const SELECT_FIELDS = `
   categories ( name )
 `
 
+// Corrected manufacturer imagery is preview-only while the production catalog
+// remains the source of truth. Never mirror these values back to Supabase.
+const PREVIEW_IMAGE_OVERRIDES: Record<string, string[]> = {
+  'sony-wh-1000xm6': [
+    'https://d1ncau8tqf99kp.cloudfront.net/converted/128950_original_local_1200x1050_v3_converted.webp',
+  ],
+  'fellow-stagg-ekg-kettle': [
+    'https://fellowproducts.com/cdn/shop/files/Web_PDP_StaggEKGElectricKettle-Pro_Woodland_Walnut_1.png?v=1773351258&width=1200',
+  ],
+  'cotopaxi-allpa-35l': [
+    'https://cdn.shopify.com/s/files/1/0281/7544/files/1200x1200png-S26UAllpa35LTravelPackCotopaxiBlack_F_1200x.png?v=1770301311',
+    'https://cdn.shopify.com/s/files/1/0281/7544/files/1200x1200png-S26UAllpa35LTravelPackCotopaxiBlack_B_1200x.png?v=1770301311',
+    'https://cdn.shopify.com/s/files/1/0281/7544/files/1200x1200png-S26UAllpa35LTravelPackCotopaxiBlack_A1_1200x.png?v=1770301311',
+  ],
+  'benq-screenbar-halo-2': [
+    'https://image.benq.com/is/image/benqco/front-lamp-1?$ResponsivePreset$',
+  ],
+}
+
 /**
  * Public catalog reads must not depend on request cookies: these functions are
  * also called by generateStaticParams and statically rendered pages. The anon
@@ -59,8 +78,13 @@ function createPublicClient() {
 /** Normalizes a Supabase row (categories may come back as an array or object). */
 function normalize(row: Record<string, unknown>): ProductRow {
   const cats = row.categories as { name: string }[] | { name: string } | null
+  const product = row as unknown as ProductRow
+  const previewImages = process.env.VESNA_NETLIFY_CONTEXT === 'deploy-preview'
+    ? PREVIEW_IMAGE_OVERRIDES[product.slug]
+    : undefined
   return {
-    ...(row as unknown as ProductRow),
+    ...product,
+    ...(previewImages ? { image_urls: previewImages } : {}),
     categories: Array.isArray(cats) ? cats[0] ?? null : cats ?? null,
   }
 }

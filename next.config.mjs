@@ -4,6 +4,9 @@ const nextConfig = {
     // URL may have a different origin in the server handler. No secrets here.
     env: {
         VESNA_ALLOWED_ORIGINS: [process.env.URL, process.env.DEPLOY_PRIME_URL, process.env.DEPLOY_URL].filter(Boolean).join(','),
+        // A non-secret build-context flag lets server-side data code make
+        // preview-only presentation adjustments without touching the catalog.
+        VESNA_NETLIFY_CONTEXT: process.env.CONTEXT ?? '',
     },
     // Turbopack is the default bundler in Next.js 16 (dev + build).
 
@@ -26,12 +29,12 @@ const nextConfig = {
             { protocol: 'https', hostname: 'resource.logitech.com' },
             { protocol: 'https', hostname: 'cdn.shopify.com' },
             { protocol: 'https', hostname: 'www.pcrichard.com' },
+            { protocol: 'https', hostname: 'd1ncau8tqf99kp.cloudfront.net' },
             { protocol: 'https', hostname: 'media.sonos.com' },
             { protocol: 'https', hostname: 'www.hydroflask.com' },
             { protocol: 'https', hostname: 'www.hatch.co' },
             { protocol: 'https', hostname: 'image.benq.com' },
             { protocol: 'https', hostname: 'fellowproducts.com' },
-            { protocol: 'https', hostname: 'shop-orange.info' },
             { protocol: 'https', hostname: 'ember.com' },
         ],
         minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
