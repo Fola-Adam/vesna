@@ -141,10 +141,10 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
           <h1 className="mb-4 break-words font-display-hero text-[clamp(2.25rem,7.5vw,3.75rem)] leading-tight">Victory&apos;s picks</h1>
           <p className="max-w-2xl font-body-main text-base leading-relaxed text-ink-muted sm:text-lg">Objects, tools, and experiences selected with intention.</p>
         </header>
-        <section aria-label="Collections by purpose" className="mb-8 grid gap-3 sm:grid-cols-3">
+        <section aria-label="Collections by purpose" className="-mx-4 mb-8 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0">
           {COLLECTIONS.map(item => {
             const count = products.filter(product => inCollection(product, item.slug)).length
-            return count > 0 && <button key={item.slug} type="button" aria-pressed={collection === item.slug} onClick={() => changeFilter('collection', collection === item.slug ? '' : item.slug)} className={`group min-w-0 border p-5 text-left transition-colors focus-ring ${collection === item.slug ? 'border-primary-ink bg-green-wash' : 'border-ink/15 bg-paper-raised hover:border-primary-ink/50'}`}>
+            return count > 0 && <button key={item.slug} type="button" aria-pressed={collection === item.slug} onClick={() => changeFilter('collection', collection === item.slug ? '' : item.slug)} className={`group w-64 shrink-0 snap-start border p-5 text-left sm:w-auto sm:min-w-0 transition-colors focus-ring ${collection === item.slug ? 'border-primary-ink bg-green-wash' : 'border-ink/15 bg-paper-raised hover:border-primary-ink/50'}`}>
               <span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.16em] text-primary-ink">{count} {count === 1 ? 'pick' : 'picks'}</span>
               <span className="block font-display-hero text-2xl leading-tight text-ink">{item.title}</span>
               <span className="mt-2 block text-sm leading-relaxed text-ink-muted">{item.description}</span>
