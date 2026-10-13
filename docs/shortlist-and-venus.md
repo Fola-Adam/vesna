@@ -39,3 +39,12 @@ Selections and activity are not persisted across reloads; old product snapshots 
 ### Confirmation handoff correction
 
 Discovery and broad-save requests now require a structured selection result after reading the catalog. Empty results permit a factual no-match answer or clarification, not an untracked offer to save products. Informal confirmations including yes pls and yes pls, add these three to my shortlist resolve the current selection without another provider request. Legacy prose offers are recovered only when every offered item resolves unambiguously to current catalog records; otherwise the visitor is asked to refresh the set. Errors no longer need to be repeated by sending approval back to the provider.
+
+
+## Vesnaian membership and task context
+
+Shortlist now requires a confirmed, non-anonymous Supabase account. Guest browsing and Venus discovery remain available. Account-owned saved picks are stored in member_shortlist with ownership RLS, no anonymous table/RPC grants, and a SECURITY INVOKER RPC that serializes account writes and checks availability/capacity. The browser receives and verifies the committed record IDs before displaying a receipt. Undo is scoped to the current account/session. Old browser-only lists are not silently assigned to an account.
+
+Join/sign-in uses a Supabase one-time email token sent through the existing Brevo sender. Tokens travel in URL fragments, are removed from the address bar, and are consumed only on explicit confirmation. Member access never changes profile roles; Victory's admin login remains separate. Membership does not opt readers into Dispatch.
+
+Venus retains a structured brief, up to eight refinements, and selected IDs for 24 hours in session storage scoped by account. Server validation refreshes records and prices. Budget mode is explicit: per item is the default, while set/kit/setup/total requests enforce the combined price in cents. Ambiguous totals should be clarified. Account changes switch chat/task storage and cancel old requests. Task context is not yet synchronized across devices.

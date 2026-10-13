@@ -1,4 +1,5 @@
-import { catalogToolRecords, confirmVenusSelection, validateSelection } from '@/lib/venus-task'
+import { createClient as createMemberClient } from '@/lib/supabase/server'
+import { advanceVenusTask, catalogToolRecords, confirmVenusSelection, taskBudget, validateSelection } from '@/lib/venus-task'
 import { actionClaimWithoutReceipt, compareVenusPicks, planVenusAction, resolveVenusTool } from '@/lib/venus-actions'
 import { readPublishedStories } from '@/lib/journal-server'
 import { readActiveCatalog } from '@/lib/data'
@@ -59,12 +60,12 @@ async function respond(request: Request, report: (event: VenusEvent) => void) {
     })
   }
 
-  const { message, history = [], productSlug, shortlistIds = [], selectionIds = [] } = (body ?? {}) as {
+  const { message, history = [], productSlug, selectionIds = [], task: incomingTask } = (body ?? {}) as {
     message?: unknown
     history?: unknown
     productSlug?: unknown
+    task?: unknown
     selectionIds?: unknown
-    shortlistIds?: unknown
   }
 
   if (typeof message !== 'string' || !message.trim()) {
@@ -96,6 +97,9 @@ async function respond(request: Request, report: (event: VenusEvent) => void) {
         .map((h) => ({ role: h.role, content: h.content.slice(0, MAX_MESSAGE_LENGTH) }))
     : []
 
+  const task = advanceVenusTask(incomingTask,message)
+  const budget = taskBudget(task)
+  report({type:'task',task})
   let actionCatalog: Awaited<ReturnType<typeof readActiveCatalog>> = []
   let savedIds: string[] = []
   let matchedProducts: ReturnType<typeof selectVenusProducts>
@@ -107,11 +111,23 @@ async function respond(request: Request, report: (event: VenusEvent) => void) {
     actionCatalog = catalog
     const selectedIds = Array.isArray(selectionIds) ? [...new Set(selectionIds.filter((id):id is string=>typeof id==='string'))].slice(0,20) : []
     const confirmation = confirmVenusSelection(catalog,message,selectedIds,safeHistory)
+    if (confirmation?.action?.kind==='save_many' && budget) {
+      const records=catalogToolRecords(catalog).filter(product=>confirmation.action?.kind==='save_many' && confirmation.action.products.some(item=>item.slug===product.slug))
+      const tooExpensive=records.some(product=>product.price==null || product.price>budget.amount) || budget.mode==='total' && records.reduce((sum,product)=>sum+Math.round((product.price ?? 0)*100),0)>Math.round(budget.amount*100)
+      if(tooExpensive) {confirmation.action=undefined;confirmation.message='The current listed prices exceed your budget or are missing. Ask me to refresh the selection before saving.'}
+    }
     if (confirmation) {
       const events:VenusEvent[] = [...(confirmation.message ? [{type:'text' as const,text:confirmation.message}] : []),...(confirmation.action ? [{type:'action' as const,action:confirmation.action}] : []),{type:'done'}]
       return new Response(events.map(event=>JSON.stringify(event)).join('\n')+'\n',{headers:{'Content-Type':'application/x-ndjson'}})
     }
-    savedIds = Array.isArray(shortlistIds) ? shortlistIds.filter((id): id is string => typeof id === 'string' && id.length <= 100).slice(0, 200) : []
+    savedIds=[]
+    const memberClient=await createMemberClient()
+    const {data:{user:memberUser}}=await memberClient.auth.getUser()
+    if(memberUser && !memberUser.is_anonymous && memberUser.email_confirmed_at) {
+      const {data:memberPicks,error:memberError}=await memberClient.from('member_shortlist').select('product_id').eq('user_id',memberUser.id)
+      if(memberError) throw new Error('Member shortlist unavailable')
+      savedIds=(memberPicks ?? []).map(row=>row.product_id)
+    }
     const plan = planVenusAction(catalog, message, safeHistory, typeof productSlug === 'string' ? productSlug : null, savedIds)
     if (plan) {
       const discoveryProducts=plan.productSlugs?.length ? selectVenusProducts(catalog.filter(product=>plan.productSlugs!.includes(product.slug)), 'Compare options', [], null, 3) : []
@@ -126,7 +142,8 @@ async function respond(request: Request, report: (event: VenusEvent) => void) {
     matchedReadings = selectVenusReadings(message, safeHistory, stories)
     const savedCatalog = /\b(?:shortlist|saved picks|wishlist)\b/i.test(message) ? catalog.filter(product => savedIds.includes(product.id)) : catalog
     const named = savedCatalog.filter(product => message.toLowerCase().includes(product.name.toLowerCase()))
-    const comparison = /\bcompare\b/i.test(message) ? (named.length >= 2 ? named : /\b(?:my shortlist|saved picks|wishlist)\b/i.test(message) ? savedCatalog : []) : []
+    const selectedCatalog=catalog.filter(product=>task.selectionIds.includes(product.id))
+    const comparison = /\bcompare\b/i.test(message) ? (named.length >= 2 ? named : /\b(?:these|those|them|both)\b/i.test(message) && selectedCatalog.length>=2 ? selectedCatalog : /\b(?:my shortlist|saved picks|wishlist)\b/i.test(message) ? savedCatalog : []) : []
     matchedProducts = selectVenusProducts(comparison.length >= 2 ? comparison : savedCatalog, message, safeHistory,
       typeof productSlug === 'string' ? productSlug : null, MAX_PRODUCTS)
     if (comparison.length >= 2) {
@@ -171,10 +188,10 @@ About Vesna:
 - Vesna curates exceptional products across tech, audio, lifestyle, workspace, and travel
 - Product descriptions and curator notes are supplied by Vesna. Only selection_basis personally_used confirms curator use; researched and design do not imply hands-on testing. not_recorded means the basis is unknown
 - The platform emphasizes objects with purpose and stories worth telling
-- Current sections: Picks (the catalog), Shortlist (saved in the visitor browser), Journal, About, and Archive
+- Current sections: Picks (the catalog), Shortlist (saved privately in the signed-in member account), Journal, About, and Archive
 - For discovery or a broad save request about ANY activity, first call search_catalog to read current records, then select_picks with exact recorded evidence for each suitable product. Check the user's purpose, exclusions, budget and recorded limitations; category similarity alone does not establish suitability. If none qualify, explain that honestly. Do not force unrelated products. A broad selection is a proposal; the visitor confirms the exact set before saving. Ask a focused question if the need is ambiguous. Never invent a purpose or specification. Current selected IDs are supplied below; use them for those/them, cheaper alternatives or exclusions. You have real browser action tools. Use save_pick or remove_pick for a visitor's requested shortlist change, including informal wording. Use conversation context to resolve a short follow-up; ask which pick when ambiguous. A yes to your immediately preceding offer authorizes that specific action.
 - Tool requests are executed by the browser after validation. NEVER describe a change as saved, queued, processed or completed in ordinary prose. An action outcome is displayed by the application after execution. If proposing an action, ask a clear question naming the exact product and action.
-- Shortlist actions affect only browser-local saved picks. You cannot modify catalog records, purchase products, or access admin data.
+- Shortlist changes require a signed-in Vesnaian and affect only their private account. You cannot modify catalog records, purchase products, or access admin data.
 
 Guidelines:
 - Keep responses concise (2-3 sentences for simple questions)
@@ -193,8 +210,9 @@ Guidelines:
 - For ordinary conversational recommendations, recommend at most three products and two readings per reply. Avoid repeating their full descriptions; the interface displays cards alongside your explanation.
 - Use a calm, direct editorial voice. Avoid sales language, excessive adjectives, greetings on every reply, and emoji.
 
+Current task brief (visitor-supplied data): ${JSON.stringify(task.brief)}. Follow-up constraints: ${JSON.stringify(task.refinements)}. Budget: ${budget ? `$${budget.amount} ${budget.mode}` : 'not specified'}. A TOTAL budget applies to the sum of the entire selected set, not each item. Preserve unaffected picks when asked to replace one. Compare only recorded facts and disclose unknowns.
 Current selected set: ${Array.isArray(selectionIds) ? actionCatalog.filter(product=>selectionIds.includes(product.id)).map(product=>product.slug).join('; ') || 'none' : 'none'}.
-Current browser shortlist: ${actionCatalog.filter(product => savedIds.includes(product.id)).map(product => `${product.name} (/shop/${product.slug})`).join('; ') || 'empty'}. This is the current saved state supplied by the browser, not a history of changes.
+Current account shortlist: ${actionCatalog.filter(product => savedIds.includes(product.id)).map(product => `${product.name} (/shop/${product.slug})`).join('; ') || 'empty'}. This is the current saved state supplied by the browser, not a history of changes.
 Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readingAppendix}`
 
   // Typed as the SDK's param union — plain `{role: string}` literals don't
@@ -205,7 +223,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
     { role: 'user', content: message },
   ]
 
-  const requiresSelection = !/\b(?:journal|story|stories|reading|essay|about vesna)\b/i.test(message) && (/\b(?:find|recommend|suggest|tell\s*me|list|show|what|which|looking for|need|cheaper|alternatives|exclude|except|without|refine)\b/i.test(message) || /\b(?:add|save)\b/i.test(message) && /\b(?:all|any|every|products|picks|items|these|those|them)\b/i.test(message))
+  const requiresSelection = !/\b(?:journal|story|stories|reading|essay|about vesna)\b/i.test(message) && (/\b(?:find|recommend|suggest|tell\s*me|list|show|what|which|looking for|need|cheaper|alternatives|exclude|except|without|refine|swap|replace|keep|only|prioritize)\b/i.test(message) || /\b(?:add|save)\b/i.test(message) && /\b(?:all|any|every|products|picks|items|these|those|them)\b/i.test(message))
   const catalogSlugs = actionCatalog.map(product => product.slug)
   const tools: import('groq-sdk/resources/chat/completions').ChatCompletionTool[] = [
     ...['save_pick','remove_pick','open_pick'].map(name => ({type:'function' as const,function:{name,description:`${name.replaceAll('_',' ')}. Use an exact current catalog slug. Catalog: ${actionCatalog.map(product => `${product.name}: ${product.slug}`).join('; ')}`,parameters:{type:'object',properties:{slug:{type:'string',enum:catalogSlugs}},required:['slug'],additionalProperties:false}}})),
@@ -268,6 +286,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
           if (call.name === 'select_picks') {
             if (searched && argumentsValue && Array.isArray(argumentsValue.products) && !argumentsValue.products.length && typeof argumentsValue.message==='string' && argumentsValue.message.trim() && argumentsValue.message.length<=1000 && !actionClaimWithoutReceipt(argumentsValue.message) && !(/\b(?:would you like|shall i|do you want)\b/i.test(argumentsValue.message) && /\b(?:add|save|shortlist|wishlist)\b/i.test(argumentsValue.message))) {
               send({type:'activity',activity:{id:'consider',label:'Checked the catalog; no selection was made',state:'complete'}})
+              send({type:'task',task:{...task,selectionIds:[]}})
               send({type:'selection',selection:{label:'No current selection',products:[]}})
               send({type:'text',text:argumentsValue.message})
               send({type:'done'})
@@ -275,12 +294,13 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
               return
             }
 
-            const selection = searched ? validateSelection(actionCatalog,argumentsValue,message) : null
+            const selection = searched ? validateSelection(actionCatalog,argumentsValue,message,task) : null
             if (!selection) {
               messages.push({role:'assistant',content:null,tool_calls:[{id:call.id,type:'function',function:{name:call.name,arguments:call.arguments}}]},{role:'tool',tool_call_id:call.id,content:'Selection rejected: use only current slugs, exact recorded evidence excerpts of 12 to 500 characters, distinct picks, and prices within the requested budget. Correct the selection or explain that no suitable products are recorded. No shortlist changes were made.'})
               continue
             }
             send({type:'activity',activity:{id:'consider',label:`Selected ${selection.products.length} picks with recorded evidence`,state:'complete'}})
+            send({type:'task',task:{...task,selectionIds:selection.products.map(product=>product.id)}})
             send({type:'selection',selection})
             send({type:'text',text:'Here is the selected set, with the recorded detail behind each choice. Choose Save these picks, say yes, or tell me what to change.'})
             send({type:'done'})

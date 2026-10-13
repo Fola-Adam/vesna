@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
+  const isAdmin=request.nextUrl.pathname.startsWith('/admin')
   const login = () => {
     const url = new URL('/login', request.url)
     url.searchParams.set('next', request.nextUrl.pathname)
@@ -11,7 +12,7 @@ export async function updateSession(request: NextRequest) {
   }
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-  if (!url || !key) return login()
+  if (!url || !key) return isAdmin ? login() : NextResponse.next({request})
 
   let response = NextResponse.next({ request })
   try {
@@ -26,6 +27,7 @@ export async function updateSession(request: NextRequest) {
       },
     })
     const { data: { user }, error } = await supabase.auth.getUser()
+    if (!isAdmin) {response.headers.set('Cache-Control','private, no-store');return response}
     if (!user || error) return login()
     const { data: profile, error: profileError } = await supabase
       .from('profiles').select('role').eq('id', user.id).single()
@@ -33,6 +35,6 @@ export async function updateSession(request: NextRequest) {
     response.headers.set('Cache-Control', 'no-store')
     return response
   } catch {
-    return login()
+    return isAdmin ? login() : NextResponse.next({request})
   }
 }

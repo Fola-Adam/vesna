@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import '../globals.css'
+import MemberProvider from '@/components/MemberProvider'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import VenusChatWidget from '@/components/VenusChatWidget'
@@ -24,7 +25,7 @@ export default function PublicLayout({
   children: React.ReactNode
 }) {
   return (
-    <VenusProvider>
+    <MemberProvider><VenusProvider>
       <Navbar />
       {children}
       <Footer />
@@ -34,6 +35,6 @@ export default function PublicLayout({
       </div>
       <Analytics />
       <SpeedInsights />
-    </VenusProvider>
+    </VenusProvider></MemberProvider>
   )
 }
