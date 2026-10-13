@@ -229,7 +229,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         const completion = await groq.chat.completions.create({
           model: 'openai/gpt-oss-120b',
           max_completion_tokens: 1536,
-          tools, tool_choice: 'auto', parallel_tool_calls: false,
+          tools, tool_choice: searched ? 'auto' : {type:'function',function:{name:'search_catalog'}}, parallel_tool_calls: false,
           reasoning_effort: 'low',
           include_reasoning: false,
           messages,
@@ -266,7 +266,10 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
           }
           if (call.name === 'select_picks') {
             const selection = searched ? validateSelection(actionCatalog,argumentsValue,message) : null
-            if (!selection) throw new Error('Selection could not be verified')
+            if (!selection) {
+              messages.push({role:'assistant',content:null,tool_calls:[{id:call.id,type:'function',function:{name:call.name,arguments:call.arguments}}]},{role:'tool',tool_call_id:call.id,content:'Selection rejected: use only current slugs, exact recorded evidence excerpts of 12 to 500 characters, distinct picks, and prices within the requested budget. Correct the selection or explain that no suitable products are recorded. No shortlist changes were made.'})
+              continue
+            }
             send({type:'activity',activity:{id:'consider',label:`Selected ${selection.products.length} picks with recorded evidence`,state:'complete'}})
             send({type:'selection',selection})
             send({type:'text',text:'Here is the selected set, with the recorded detail behind each choice. You can save these picks or tell me what to change.'})
