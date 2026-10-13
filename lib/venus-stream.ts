@@ -32,7 +32,7 @@ export type VenusEvent =
   | { type: 'readings'; readings: VenusReading[] }
   | { type: 'action'; action: VenusAction }
   | { type: 'done' }
-  | { type: 'error'; message: string }
+  | { type: 'error'; message: string; code?: string }
 
 function parseEvent(line: string): VenusEvent {
   let event: VenusEvent

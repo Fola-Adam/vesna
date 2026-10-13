@@ -267,14 +267,17 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
             call.id += delta.id ?? ''
             call.name += delta.function?.name ?? ''
             call.arguments += delta.function?.arguments ?? ''
-            if (call.arguments.length > 16_000) throw new Error('Invalid action payload')
+            if (call.arguments.length > 16_000) throw new Error('oversized_tool_payload')
             calls.set(delta.index,call)
           }
         }
         if (calls.size) {
-          if (calls.size !== 1 || finishReason === 'length') throw new Error('Invalid action request')
+          if (calls.size !== 1) throw new Error('conflicting_tool_calls')
+          if (finishReason === 'length') throw new Error('incomplete_tool_call')
           const call = [...calls.values()][0]
-          const argumentsValue = JSON.parse(call.arguments)
+          let argumentsValue: unknown
+          try {argumentsValue=JSON.parse(call.arguments)} catch {throw new Error('invalid_tool_json')}
+          const parameters=argumentsValue as Record<string,unknown>
           if (call.name === 'search_catalog') {
             send({type:'activity',activity:{id:'search',label:'Reading product uses, details and prices',state:'running'}})
             const records = catalogToolRecords(actionCatalog)
@@ -284,11 +287,11 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
             continue
           }
           if (call.name === 'select_picks') {
-            if (searched && argumentsValue && Array.isArray(argumentsValue.products) && !argumentsValue.products.length && typeof argumentsValue.message==='string' && argumentsValue.message.trim() && argumentsValue.message.length<=1000 && !actionClaimWithoutReceipt(argumentsValue.message) && !(/\b(?:would you like|shall i|do you want)\b/i.test(argumentsValue.message) && /\b(?:add|save|shortlist|wishlist)\b/i.test(argumentsValue.message))) {
+            if (searched && parameters && Array.isArray(parameters.products) && !parameters.products.length && typeof parameters.message==='string' && parameters.message.trim() && parameters.message.length<=1000 && !actionClaimWithoutReceipt(parameters.message) && !(/\b(?:would you like|shall i|do you want)\b/i.test(parameters.message) && /\b(?:add|save|shortlist|wishlist)\b/i.test(parameters.message))) {
               send({type:'activity',activity:{id:'consider',label:'Checked the catalog; no selection was made',state:'complete'}})
               send({type:'task',task:{...task,selectionIds:[]}})
               send({type:'selection',selection:{label:'No current selection',products:[]}})
-              send({type:'text',text:argumentsValue.message})
+              send({type:'text',text:parameters.message})
               send({type:'done'})
               if (!cancelled) controller.close()
               return
@@ -315,7 +318,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
           if (!cancelled) controller.close()
           return
         }
-        if (finishReason === 'length') throw new Error('Incomplete assistant reply')
+        if (finishReason === 'length') throw new Error('incomplete_reply')
         if (actionClaimWithoutReceipt(answer)) answer = 'I have not changed your shortlist in this reply. Tell me which pick to save or remove, and I will run the action and report its actual result.'
         send({type:'activity',activity:{id:'consider',label:'Finished considering your request',state:'complete'}})
         send({type:'text',text:answer})
@@ -330,7 +333,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         if (!cancelled) controller.close()
         return
         }
-        throw new Error('Task exceeded its step limit')
+        throw new Error('task_step_limit')
       } catch (failure) {
         const status = failure && typeof failure === 'object' && 'status' in failure ? failure.status : null
         // Log only the provider status, never request headers or credentials.
@@ -342,7 +345,9 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
             : status === 400 || status === 404
               ? 'Venus cannot start its AI model right now. The model configuration needs attention.'
               : 'Venus could not complete that response. Please try again.'
-        send({ type: 'error', message })
+        const allowed=['conflicting_tool_calls','incomplete_tool_call','invalid_tool_json','oversized_tool_payload','incomplete_reply','task_step_limit']
+        const code=failure instanceof Error && allowed.includes(failure.message) ? failure.message : status ? `provider_${status}` : failure instanceof Error && failure.name==='APIConnectionTimeoutError' ? 'provider_timeout' : 'provider_stream_error'
+        send({ type: 'error', message, code })
         if (!cancelled) controller.close()
       } finally { clearInterval(heartbeat) }
     },
