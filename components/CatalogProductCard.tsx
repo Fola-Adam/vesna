@@ -1,34 +1,33 @@
-import Icon from '@/components/Icon'
 import Link from 'next/link'
 import type { ProductRow } from '@/lib/data'
 import { effectivePricing, formatPrice } from '@/lib/pricing'
 import CatalogImage from './CatalogImage'
-import VenusTriggerPill from './VenusTriggerPill'
 import ShortlistButton from './ShortlistButton'
 
-export default function CatalogProductCard({ product }: { product: ProductRow }) {
+export type CatalogLayout = 'gallery' | 'compact' | 'list'
+
+export default function CatalogProductCard({ product, layout = 'gallery' }: { product: ProductRow; layout?: CatalogLayout }) {
   const { price, strike } = effectivePricing(product)
+  const list = layout === 'list'
+  const compact = layout === 'compact'
+  const note = product.why_victory || product.description
 
   return (
-    <article className="flex h-full flex-col overflow-hidden border border-ink/10 bg-paper-raised text-ink transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-primary-ink/40 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none">
-      <Link href={`/shop/${product.slug}`} className="group flex flex-1 flex-col focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-ink">
-        <div className="relative aspect-[4/3] overflow-hidden bg-paper">
-          <CatalogImage src={product.image_urls?.[0]} alt={product.name} className="object-contain p-5 transition-transform duration-300 group-hover:scale-[1.025] motion-reduce:transform-none motion-reduce:transition-none" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
-          {product.is_featured && <span className="absolute left-3 top-3 bg-ink px-3 py-1.5 font-button-label text-[10px] uppercase tracking-[0.12em] text-paper">Featured pick</span>}
-        </div>
-        <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-6">
-          <p className="mb-2 font-section-header font-semibold text-[#514a40]">{product.categories?.name ?? 'Selected object'}</p>
-          <h2 className="mb-3 break-words font-display-hero text-xl font-semibold leading-snug text-ink transition-colors group-hover:text-primary-ink sm:text-2xl">{product.name}</h2>
-          <p className="mb-4 flex flex-wrap items-baseline gap-x-2 gap-y-1 font-button-label text-sm font-semibold text-ink">
-            {price == null ? 'Price not listed' : formatPrice(price)}
-            {strike != null && <span className="text-xs text-ink-muted line-through">{formatPrice(strike)}</span>}
-          </p>
-          {(product.why_victory || product.description) && <p className="mb-5 line-clamp-3 font-body-main text-sm leading-relaxed text-[#514a40]">{product.why_victory ?? product.description}</p>}
-          <span className="mt-auto inline-flex items-center gap-2 font-button-label text-xs font-semibold uppercase tracking-wider text-primary-ink">View the pick <Icon name="arrow_forward" className="align-middle" /></span>
-        </div>
+    <article className={`group relative min-w-0 border border-ink/15 bg-paper-raised text-ink transition-colors duration-200 hover:border-primary-ink/40 motion-reduce:transition-none ${list ? 'grid grid-cols-[100px_minmax(0,1fr)] gap-3 p-3 sm:grid-cols-[160px_minmax(0,1fr)] sm:gap-6 sm:p-4' : 'flex h-full flex-col'}`}>
+      <Link href={`/shop/${product.slug}`} aria-label={`View ${product.name}`} className={`relative block overflow-hidden bg-paper focus-ring ${list ? 'aspect-square self-start' : compact ? 'aspect-square' : 'aspect-[4/3]'}`}>
+        <CatalogImage src={product.image_urls?.[0]} alt={product.name} className={`object-contain transition-transform duration-300 group-hover:scale-[1.025] motion-reduce:transform-none motion-reduce:transition-none ${compact || list ? 'p-3' : 'p-5'}`} sizes={list ? '(max-width: 640px) 100px, 160px' : compact ? '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw' : '(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw'} />
+        {product.is_featured && !compact && !list && <span className="absolute bottom-3 left-3 bg-ink px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-paper">Featured pick</span>}
       </Link>
-      <div className="border-t border-ink/10 px-5 py-3 sm:px-6"><VenusTriggerPill productName={product.name} productSlug={product.slug} className="w-full justify-center rounded-sm border border-primary-ink/25 bg-green-wash px-3 py-2.5 font-semibold text-primary-ink transition-colors hover:bg-primary-ink hover:text-paper" /></div>
-      <div className="px-5 pb-4 sm:px-6"><ShortlistButton id={product.id} name={product.name} /></div>
+      <div className={`min-w-0 ${list ? 'py-1 pr-11 sm:py-3' : compact ? 'p-3 sm:p-4' : 'p-4 sm:p-5'}`}>
+        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted">{product.categories?.name ?? 'Selected object'}</p>
+        <h2 className={`break-words font-semibold leading-snug text-ink ${compact ? 'text-sm sm:text-base' : 'font-display-hero text-base sm:text-xl'}`}><Link href={`/shop/${product.slug}`} className="transition-colors hover:text-primary-ink focus-ring">{product.name}</Link></h2>
+        <p className="mt-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm font-semibold text-ink">
+          {price == null ? 'Price not listed' : formatPrice(price)}
+          {strike != null && <span className="text-xs font-normal text-ink-muted line-through">{formatPrice(strike)}</span>}
+        </p>
+        {note && !compact && <p className={`mt-3 text-sm leading-relaxed text-ink-muted ${list ? 'hidden line-clamp-2 sm:block' : 'line-clamp-2'}`}>{note}</p>}
+      </div>
+      <div className="absolute right-2 top-2 sm:right-3 sm:top-3"><ShortlistButton id={product.id} name={product.name} compact /></div>
     </article>
   )
 }

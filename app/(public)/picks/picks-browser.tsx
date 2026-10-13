@@ -1,13 +1,13 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useSyncExternalStore } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Bookmark, SlidersHorizontal, X } from 'lucide-react'
+import { Bookmark, Grid2X2, LayoutGrid, List, SlidersHorizontal, X } from 'lucide-react'
 import { useShortlist } from '@/lib/shortlist'
 import { COLLECTIONS, inCollection } from '@/lib/catalog-collections'
 import type { ProductRow } from '@/lib/data'
 import { effectivePricing } from '@/lib/pricing'
-import CatalogProductCard from '@/components/CatalogProductCard'
+import CatalogProductCard, { type CatalogLayout } from '@/components/CatalogProductCard'
 import {
   Dialog,
   DialogClose,
@@ -18,6 +18,28 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 
+const LAYOUT_KEY = 'vesna:picks-layout'
+const LAYOUT_EVENT = 'vesna:picks-layout-change'
+const LAYOUTS = [
+  { value: 'gallery', label: 'Gallery', icon: LayoutGrid },
+  { value: 'compact', label: 'Compact grid', icon: Grid2X2 },
+  { value: 'list', label: 'List', icon: List },
+] as const
+function readLayout(): CatalogLayout {
+  try {
+    const value = window.localStorage.getItem(LAYOUT_KEY)
+    return value === 'compact' || value === 'list' ? value : 'gallery'
+  } catch { return 'gallery' }
+}
+function subscribeLayout(listener: () => void) {
+  window.addEventListener('storage', listener)
+  window.addEventListener(LAYOUT_EVENT, listener)
+  return () => {
+    window.removeEventListener('storage', listener)
+    window.removeEventListener(LAYOUT_EVENT, listener)
+  }
+}
+const serverLayout = (): CatalogLayout => 'gallery'
 const ITEMS_PER_LOAD = 12
 const keyFor = (name: string) => name.trim().toLowerCase()
 
@@ -74,6 +96,16 @@ function FilterControls({ categories, currentCategory, query, maxPrice, sort, fi
 
 export default function PicksBrowser({ products }: { products: ProductRow[] }) {
   const params = useSearchParams()
+  const storedLayout = useSyncExternalStore(subscribeLayout, readLayout, serverLayout)
+  const [selectedLayout, setSelectedLayout] = useState<CatalogLayout | null>(null)
+  const layout = selectedLayout ?? storedLayout
+  function chooseLayout(value: CatalogLayout) {
+    setSelectedLayout(value)
+    try {
+      window.localStorage.setItem(LAYOUT_KEY, value)
+      window.dispatchEvent(new Event(LAYOUT_EVENT))
+    } catch { /* The selected layout still works when storage is unavailable. */ }
+  }
   const currentCategory = params.get('category') ?? 'all'
   const query = params.get('q') ?? ''
   const maxPrice = params.get('maxPrice') ?? ''
@@ -189,6 +221,13 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
           </Dialog>
         </div>
 
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <span className="text-xs font-medium text-ink-muted">Browse your way</span>
+          <div role="group" aria-label="Browsing layout" className="inline-flex border border-ink/20 bg-paper-raised p-1">
+            {LAYOUTS.map(({value, label, icon: LayoutIcon}) => <button key={value} type="button" aria-pressed={layout === value} onClick={() => chooseLayout(value)} className={`inline-flex min-h-10 items-center gap-2 px-3 text-xs font-semibold transition-colors focus-ring ${layout === value ? 'bg-primary-ink text-paper' : 'text-ink-muted hover:bg-green-wash hover:text-primary-ink'}`}><LayoutIcon size={16} aria-hidden="true" />{label}</button>)}
+          </div>
+        </div>
+
         {activeFilters.length > 0 && (
           <div className="mb-7 flex flex-wrap items-center gap-2" aria-label="Active filters">
             {activeFilters.map(filter => (
@@ -207,8 +246,8 @@ export default function PicksBrowser({ products }: { products: ProductRow[] }) {
           ))}
         </div>
 
-        {filteredProducts.length ? <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-          {filteredProducts.slice(0, displayedCount).map(product => <CatalogProductCard key={product.id} product={product} />)}
+        {filteredProducts.length ? <div className={layout === 'list' ? 'grid min-w-0 grid-cols-1 gap-3' : layout === 'compact' ? 'grid min-w-0 grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4' : 'grid min-w-0 grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3'}>
+          {filteredProducts.slice(0, displayedCount).map(product => <CatalogProductCard key={product.id} product={product} layout={layout} />)}
         </div> : <div className="border-y border-ink/15 py-16 text-center"><h2 className="font-display-hero mb-3 text-2xl">{savedOnly && savedCount === 0 ? 'Your shortlist is waiting' : 'No picks match these filters'}</h2><p className="mb-5 text-ink-muted">{savedOnly && savedCount === 0 ? 'Save a pick to keep it here while you consider your options.' : 'Try a broader search or a different budget.'}</p><button className="text-primary-ink underline underline-offset-4 focus-ring" onClick={() => savedOnly ? window.history.pushState(null, '', '/picks') : clearFilters()}>{savedOnly ? 'Browse all picks' : 'Clear filters'}</button></div>}
         {displayedCount < filteredProducts.length && <div className="mt-12 text-center"><button onClick={() => setPagination({ key: pageKey, count: displayedCount + ITEMS_PER_LOAD })} className="min-h-12 border border-primary-ink px-8 py-3 text-primary-ink transition-colors hover:bg-primary hover:text-on-primary focus-ring">Show more picks</button></div>}
       </div>
