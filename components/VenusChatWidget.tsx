@@ -165,7 +165,7 @@ export default function VenusChatWidget() {
       let content = streamContentRef.current
       let actionError = false
       let action = streamActionRef.current as VenusAction | null
-      if (action && ['save','remove','save_many','clear'].includes(action.kind) && !requireMember()) {content='Join or sign in as a Vesnaian to save these picks. [Join or sign in](/member). Your shortlist has not changed.';action=null}
+      if (action && ['save','remove','save_many','clear'].includes(action.kind) && !requireMember()) {setIsOpen(false);content='Join or sign in as a Vesnaian to save these picks. [Join or sign in](/member). Your shortlist has not changed.';action=null}
       if (action?.kind === 'save' || action?.kind === 'remove') {
         updateActivity({id:'shortlist',label:action.kind==='save' ? 'Adding to your shortlist' : 'Removing from your shortlist',state:'running'})
         const successful = action.kind === 'save' ? await add(action.id) : await remove(action.id)
@@ -253,10 +253,10 @@ export default function VenusChatWidget() {
                 </div>
                 <VenusActivity activities={message.activities ?? []} />
                 {message.selection && message.selection.products.length > 0 && <section aria-label="Selected picks" className="mt-3 w-full rounded-xl border border-primary-ink/20 bg-paper-raised p-4">
-                  <p className="text-sm font-semibold text-primary-ink">{message.selection.label}</p><p className="mt-1 text-xs text-ink-muted">{message.selection.products.every(product=>product.price!=null) ? `Set total: $${message.selection.products.reduce((sum,product)=>sum+Math.round(product.price!*100),0)/100}` : 'Some prices are not recorded; a complete total is unavailable.'}</p>
+                  <p className="text-sm font-semibold text-primary-ink">{message.selection.label}</p><p className="mt-1 text-xs text-ink-muted">{message.selection.products.every(product=>product.price!=null) ? `Listed subtotal: $${(message.selection.products.reduce((sum,product)=>sum+Math.round(product.price!*100),0)/100).toFixed(2)}` : 'Some prices are not recorded; a complete total is unavailable.'}</p>
                   <ul className="mt-3 divide-y divide-ink/10">{message.selection.products.map(product=><li key={product.id} className="py-3"><a href={`/shop/${product.slug}`} className="text-sm font-semibold text-ink underline underline-offset-4" onClick={()=>setIsOpen(false)}>{product.name}</a>{product.price != null && <span className="ml-2 text-xs font-medium text-primary-ink">${product.price.toFixed(2)}</span>}<p className="mt-1 text-xs leading-6 text-ink-muted">Recorded detail: {product.evidence}</p></li>)}</ul>
-                  <button type="button" disabled={isTyping || message.selectionSaved || message.selection !== selectionRef.current} onClick={()=>void sendMessage('Save these picks')} className="mt-3 min-h-11 rounded-full bg-primary-ink px-5 text-sm font-medium text-paper focus-ring disabled:opacity-50">{message.selectionSaved ? 'Saved to shortlist' : message.selection !== selectionRef.current ? 'Selection superseded' : 'Save these picks'}</button>
-                  <p className="mt-2 text-xs leading-5 text-ink-muted">Ask for a different budget, exclude an item, or describe your needs more precisely.</p>
+                  <button type="button" disabled={isTyping || message.selectionSaved || message.selection !== selectionRef.current} onClick={()=>{if(requireMember())void sendMessage('Save these picks');else setIsOpen(false)}} className="mt-3 min-h-11 rounded-full bg-primary-ink px-5 text-sm font-medium text-paper focus-ring disabled:opacity-50">{message.selectionSaved ? 'Saved to shortlist' : message.selection !== selectionRef.current ? 'Selection superseded' : 'Save these picks'}</button>
+                  <p className="mt-2 text-xs leading-5 text-ink-muted">Ask for a different budget or exclude an item. Listed prices exclude delivery and taxes.</p>
                 </section>}
                 {message.pendingClear && <div className="mt-3 flex flex-wrap gap-3"><button type="button" onClick={async () => {
                   const successful = await clear()
