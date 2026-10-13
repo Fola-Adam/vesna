@@ -34,3 +34,8 @@ Live activity events originate from catalog IO, provider steps and browser-local
 Broad saves present a selection and a Save these picks button. The next request carries concrete selected IDs so refinements can refer to those picks. Confirmation rechecks those IDs against the live catalog before returning a bounded save action. Single named saves remain immediate. Browser storage is read back before a success receipt is displayed.
 
 Selections and activity are not persisted across reloads; old product snapshots and action buttons cannot replay. Starting a new conversation clears selection context. Up to 20 records can be selected per task, with at most four provider turns and one browser action per completed response. Deployment remains on ves-na Deploy Preview using its production-backed catalog.
+
+
+### Confirmation handoff correction
+
+Discovery and broad-save requests now require a structured selection result after reading the catalog. Empty results permit a factual no-match answer or clarification, not an untracked offer to save products. Informal confirmations including yes pls and yes pls, add these three to my shortlist resolve the current selection without another provider request. Legacy prose offers are recovered only when every offered item resolves unambiguously to current catalog records; otherwise the visitor is asked to refresh the set. Errors no longer need to be repeated by sending approval back to the provider.

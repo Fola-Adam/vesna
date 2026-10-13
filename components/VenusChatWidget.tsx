@@ -99,7 +99,7 @@ export default function VenusChatWidget() {
 
   async function sendMessage(text: string) {
     if (!text || isTyping || requestRef.current) return
-    if (!/\b(?:these|those|them|it|that|this|cheaper|instead|exclude|except|without|budget|under|below|refine|yes)\b/i.test(text)) selectionRef.current=null
+    if (!/\b(?:these|those|them|it|that|this|cheaper|instead|exclude|except|without|budget|under|below|refine|yes|yep|yeah|sure|okay|ok|go ahead|do it)\b/i.test(text)) selectionRef.current=null
     pinnedRef.current = true
     setShowLatest(false)
     const selectionAtRequest=selectionRef.current
@@ -114,7 +114,7 @@ export default function VenusChatWidget() {
     receivedSelectionRef.current = null
     const updateActivity = (activity: Activity) => {
       const index = activityRef.current.findIndex(item=>item.id===activity.id)
-      activityRef.current = index<0 ? [...activityRef.current,activity] : activityRef.current.map((item,i)=>i===index ? activity : item)
+      activityRef.current = index<0 ? [...activityRef.current,activity] : [...activityRef.current.filter(item=>item.id!==activity.id),activity]
       setActivities(activityRef.current)
     }
     streamContentRef.current = ''
@@ -231,7 +231,7 @@ export default function VenusChatWidget() {
                   {message.role === 'user' ? <p className="whitespace-pre-wrap !mb-0">{message.content}</p> : <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>}
                 </div>
                 <VenusActivity activities={message.activities ?? []} />
-                {message.selection && <section aria-label="Selected picks" className="mt-3 w-full rounded-xl border border-primary-ink/20 bg-paper-raised p-4">
+                {message.selection && message.selection.products.length > 0 && <section aria-label="Selected picks" className="mt-3 w-full rounded-xl border border-primary-ink/20 bg-paper-raised p-4">
                   <p className="text-sm font-semibold text-primary-ink">{message.selection.label}</p>
                   <ul className="mt-3 divide-y divide-ink/10">{message.selection.products.map(product=><li key={product.id} className="py-3"><a href={`/shop/${product.slug}`} className="text-sm font-semibold text-ink underline underline-offset-4" onClick={()=>setIsOpen(false)}>{product.name}</a>{product.price != null && <span className="ml-2 text-xs font-medium text-primary-ink">${product.price.toFixed(2)}</span>}<p className="mt-1 text-xs leading-6 text-ink-muted">Recorded detail: {product.evidence}</p></li>)}</ul>
                   <button type="button" disabled={isTyping || message.selectionSaved || message.selection !== selectionRef.current} onClick={()=>void sendMessage('Save these picks')} className="mt-3 min-h-11 rounded-full bg-primary-ink px-5 text-sm font-medium text-paper focus-ring disabled:opacity-50">{message.selectionSaved ? 'Saved to shortlist' : message.selection !== selectionRef.current ? 'Selection superseded' : 'Save these picks'}</button>

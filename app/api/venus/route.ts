@@ -1,4 +1,4 @@
-import { catalogToolRecords, validateSelection } from '@/lib/venus-task'
+import { catalogToolRecords, confirmVenusSelection, validateSelection } from '@/lib/venus-task'
 import { actionClaimWithoutReceipt, compareVenusPicks, planVenusAction, resolveVenusTool } from '@/lib/venus-actions'
 import { readPublishedStories } from '@/lib/journal-server'
 import { readActiveCatalog } from '@/lib/data'
@@ -106,9 +106,9 @@ async function respond(request: Request, report: (event: VenusEvent) => void) {
     report({type:'activity',activity:{id:'catalog',label:`Read ${catalog.length} current picks`,state:'complete'}})
     actionCatalog = catalog
     const selectedIds = Array.isArray(selectionIds) ? [...new Set(selectionIds.filter((id):id is string=>typeof id==='string'))].slice(0,20) : []
-    const selected = catalog.filter(product=>selectedIds.includes(product.id))
-    if (/^(?:yes|yes please|save (?:these|those)(?: picks)?|add (?:these|those)(?: picks)?|save them)[.!]*$/i.test(message.trim()) && selectedIds.length) {
-      const events:VenusEvent[] = selected.length===selectedIds.length ? [{type:'action',action:{kind:'save_many',label:'your selected set',products:selected.map(({id,name,slug})=>({id,name,slug}))}},{type:'done'}] : [{type:'text',text:'Some selected picks are no longer available. Ask me to refresh the selection before saving.'},{type:'done'}]
+    const confirmation = confirmVenusSelection(catalog,message,selectedIds,safeHistory)
+    if (confirmation) {
+      const events:VenusEvent[] = [...(confirmation.message ? [{type:'text' as const,text:confirmation.message}] : []),...(confirmation.action ? [{type:'action' as const,action:confirmation.action}] : []),{type:'done'}]
       return new Response(events.map(event=>JSON.stringify(event)).join('\n')+'\n',{headers:{'Content-Type':'application/x-ndjson'}})
     }
     savedIds = Array.isArray(shortlistIds) ? shortlistIds.filter((id): id is string => typeof id === 'string' && id.length <= 100).slice(0, 200) : []
@@ -160,7 +160,7 @@ async function respond(request: Request, report: (event: VenusEvent) => void) {
 
   const systemPrompt = `You are Venus, the assistant for Vesna — a curated lifestyle platform by Ebenezer Victory.
 
-For any product discovery or broad save request you MUST use search_catalog before selecting products. search_catalog covers every current record, regardless of the request's activity. Use select_picks for a grounded selection; if none match, say so. A quoted excerpt proves the source, but you must still assess whether it actually supports the user's need. Do not use generic praise as evidence of suitability. Budget limits apply to listed effective prices. Read considerations before selecting. Never select a product based on unknown compatibility.
+For any product discovery or broad save request you MUST use search_catalog before selecting products. search_catalog covers every current record, regardless of the request's activity. Use select_picks for a grounded selection; if none match, say so. A quoted excerpt proves the source, but you must still assess whether it actually supports the user's need. Do not use generic praise as evidence of suitability. Match the actual requested role: a drinking bottle or recipe journal is not a cooking utensil or kitchen appliance. A work-session mug is not evidence of space-saving kitchenware. For any space or compatibility constraint, say which dimensions or specifications are unknown; do not claim a product meets that constraint without recorded support. Budget limits apply to listed effective prices. Read considerations before selecting. Never select a product based on unknown compatibility.
 
 Your personality:
 - Warm, knowledgeable, and slightly poetic
@@ -205,12 +205,13 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
     { role: 'user', content: message },
   ]
 
+  const requiresSelection = !/\b(?:journal|story|stories|reading|essay|about vesna)\b/i.test(message) && (/\b(?:find|recommend|suggest|tell\s*me|list|show|what|which|looking for|need|cheaper|alternatives|exclude|except|without|refine)\b/i.test(message) || /\b(?:add|save)\b/i.test(message) && /\b(?:all|any|every|products|picks|items|these|those|them)\b/i.test(message))
   const catalogSlugs = actionCatalog.map(product => product.slug)
   const tools: import('groq-sdk/resources/chat/completions').ChatCompletionTool[] = [
     ...['save_pick','remove_pick','open_pick'].map(name => ({type:'function' as const,function:{name,description:`${name.replaceAll('_',' ')}. Use an exact current catalog slug. Catalog: ${actionCatalog.map(product => `${product.name}: ${product.slug}`).join('; ')}`,parameters:{type:'object',properties:{slug:{type:'string',enum:catalogSlugs}},required:['slug'],additionalProperties:false}}})),
     ...['open_shortlist','clear_shortlist'].map(name => ({type:'function' as const,function:{name,description:name === 'clear_shortlist' ? 'Request visible confirmation to clear the shortlist; never clear it in prose.' : 'Open the dedicated shortlist page.',parameters:{type:'object',properties:{},additionalProperties:false}}})),
     {type:'function',function:{name:'search_catalog',description:'Read the live catalog for any purpose or activity, including gardening, skating, cooking or workspace. Returns recorded product facts and prices for suitability checks. Call before select_picks.',parameters:{type:'object',properties:{},additionalProperties:false}}},
-    {type:'function',function:{name:'select_picks',description:'Present a concrete set of suitable current picks for discovery or confirmation before saving. Quote an exact excerpt of at least 12 characters from each record as evidence. Never guess missing capabilities. Select at most 20.',parameters:{type:'object',properties:{label:{type:'string',maxLength:150},products:{type:'array',minItems:1,maxItems:20,items:{type:'object',properties:{slug:{type:'string',enum:catalogSlugs},evidence:{type:'string',minLength:12,maxLength:500}},required:['slug','evidence'],additionalProperties:false}}},required:['label','products'],additionalProperties:false}}},
+    {type:'function',function:{name:'select_picks',description:'Present a concrete set of suitable current picks for discovery or confirmation before saving. Quote an exact excerpt of at least 12 characters from each record as evidence. Never guess missing capabilities. Select at most 20. If nothing is suitable or a clarification is necessary, return an empty products array and explain why in message. Never recommend or offer unsupplied picks in that message.',parameters:{type:'object',properties:{message:{type:'string',maxLength:1000},label:{type:'string',maxLength:150},products:{type:'array',minItems:0,maxItems:20,items:{type:'object',properties:{slug:{type:'string',enum:catalogSlugs},evidence:{type:'string',minLength:12,maxLength:500}},required:['slug','evidence'],additionalProperties:false}}},required:['label','products','message'],additionalProperties:false}}},
     {type:'function',function:{name:'filter_picks',description:'Open Picks with a category or maximum USD price requested by the visitor.',parameters:{type:'object',properties:{category:{type:'string',enum:[...new Set(actionCatalog.map(product => product.categories?.name.toLowerCase()).filter(Boolean))]},maxPrice:{type:'number',minimum:0,maximum:1000000}},additionalProperties:false}}},
   ]
   const encoder = new TextEncoder()
@@ -229,7 +230,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         const completion = await groq.chat.completions.create({
           model: 'openai/gpt-oss-120b',
           max_completion_tokens: 1536,
-          tools, tool_choice: searched ? 'auto' : {type:'function',function:{name:'search_catalog'}}, parallel_tool_calls: false,
+          tools, tool_choice: searched ? (requiresSelection ? {type:'function',function:{name:'select_picks'}} : 'auto') : {type:'function',function:{name:'search_catalog'}}, parallel_tool_calls: false,
           reasoning_effort: 'low',
           include_reasoning: false,
           messages,
@@ -265,6 +266,15 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
             continue
           }
           if (call.name === 'select_picks') {
+            if (searched && argumentsValue && Array.isArray(argumentsValue.products) && !argumentsValue.products.length && typeof argumentsValue.message==='string' && argumentsValue.message.trim() && argumentsValue.message.length<=1000 && !actionClaimWithoutReceipt(argumentsValue.message) && !(/\b(?:would you like|shall i|do you want)\b/i.test(argumentsValue.message) && /\b(?:add|save|shortlist|wishlist)\b/i.test(argumentsValue.message))) {
+              send({type:'activity',activity:{id:'consider',label:'Checked the catalog; no selection was made',state:'complete'}})
+              send({type:'selection',selection:{label:'No current selection',products:[]}})
+              send({type:'text',text:argumentsValue.message})
+              send({type:'done'})
+              if (!cancelled) controller.close()
+              return
+            }
+
             const selection = searched ? validateSelection(actionCatalog,argumentsValue,message) : null
             if (!selection) {
               messages.push({role:'assistant',content:null,tool_calls:[{id:call.id,type:'function',function:{name:call.name,arguments:call.arguments}}]},{role:'tool',tool_call_id:call.id,content:'Selection rejected: use only current slugs, exact recorded evidence excerpts of 12 to 500 characters, distinct picks, and prices within the requested budget. Correct the selection or explain that no suitable products are recorded. No shortlist changes were made.'})
@@ -272,7 +282,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
             }
             send({type:'activity',activity:{id:'consider',label:`Selected ${selection.products.length} picks with recorded evidence`,state:'complete'}})
             send({type:'selection',selection})
-            send({type:'text',text:'Here is the selected set, with the recorded detail behind each choice. You can save these picks or tell me what to change.'})
+            send({type:'text',text:'Here is the selected set, with the recorded detail behind each choice. Choose Save these picks, say yes, or tell me what to change.'})
             send({type:'done'})
             if (!cancelled) controller.close()
             return
@@ -304,7 +314,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
       } catch (failure) {
         const status = failure && typeof failure === 'object' && 'status' in failure ? failure.status : null
         // Log only the provider status, never request headers or credentials.
-        console.error('Venus streaming failed', { status })
+        console.error('Venus streaming failed', { status, stage: failure instanceof Error && ['Invalid action request','Incomplete assistant reply','Task exceeded its step limit','Invalid action payload'].includes(failure.message) ? failure.message : 'provider_or_stream_failure' })
         const message = status === 401 || status === 403
           ? 'Venus cannot access its AI service right now. The service connection needs attention.'
           : status === 429
