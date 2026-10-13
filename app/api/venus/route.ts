@@ -1,3 +1,4 @@
+import { planVenusAction } from '@/lib/venus-actions'
 import { readPublishedStories } from '@/lib/journal-server'
 import { readActiveCatalog } from '@/lib/data'
 import { selectVenusProducts } from '@/lib/venus-catalog'
@@ -57,10 +58,11 @@ export async function POST(request: Request) {
     })
   }
 
-  const { message, history = [], productSlug } = (body ?? {}) as {
+  const { message, history = [], productSlug, shortlistIds = [] } = (body ?? {}) as {
     message?: unknown
     history?: unknown
     productSlug?: unknown
+    shortlistIds?: unknown
   }
 
   if (typeof message !== 'string' || !message.trim()) {
@@ -92,23 +94,35 @@ export async function POST(request: Request) {
         .map((h) => ({ role: h.role, content: h.content.slice(0, MAX_MESSAGE_LENGTH) }))
     : []
 
+  let matchedProducts: ReturnType<typeof selectVenusProducts>
+  let matchedReadings: ReturnType<typeof selectVenusReadings>
+  try {
+    const [catalog, stories] = await Promise.all([readActiveCatalog(), readPublishedStories()])
+    const savedIds = Array.isArray(shortlistIds) ? shortlistIds.filter((id): id is string => typeof id === 'string' && id.length <= 100).slice(0, 200) : []
+    const plan = planVenusAction(catalog, message, safeHistory, typeof productSlug === 'string' ? productSlug : null, savedIds)
+    if (plan) {
+      const events: VenusEvent[] = [
+        ...(plan.message ? [{type: 'text' as const, text: plan.message}] : []),
+        ...(plan.action ? [{type: 'action' as const, action: plan.action}] : []),
+        {type: 'done'},
+      ]
+      return new Response(events.map(event => JSON.stringify(event)).join('\n') + '\n', {headers: {'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store'}})
+    }
+    matchedReadings = selectVenusReadings(message, safeHistory, stories)
+    const savedCatalog = /\b(?:shortlist|saved picks|wishlist)\b/i.test(message) ? catalog.filter(product => savedIds.includes(product.id)) : catalog
+    const comparison = /\bcompare\b/i.test(message) ? savedCatalog.filter(product => message.toLowerCase().includes(product.name.toLowerCase())) : []
+    matchedProducts = selectVenusProducts(comparison.length >= 2 ? comparison : savedCatalog, message, safeHistory,
+      typeof productSlug === 'string' ? productSlug : null, MAX_PRODUCTS)
+  } catch {
+    console.error('Venus catalog retrieval failed')
+    return Response.json({ error: 'Venus cannot read the collection right now. Please try again shortly.' }, { status: 503 })
+  }
+
   if (!process.env.GROQ_API_KEY) {
     return new Response(JSON.stringify({ error: 'AI service is not configured' }), {
       status: 503,
       headers: { 'Content-Type': 'application/json' },
     })
-  }
-
-  let matchedProducts: ReturnType<typeof selectVenusProducts>
-  let matchedReadings: ReturnType<typeof selectVenusReadings>
-  try {
-    const [catalog, stories] = await Promise.all([readActiveCatalog(), readPublishedStories()])
-    matchedReadings = selectVenusReadings(message, safeHistory, stories)
-    matchedProducts = selectVenusProducts(catalog, message, safeHistory,
-      typeof productSlug === 'string' ? productSlug : null, MAX_PRODUCTS)
-  } catch {
-    console.error('Venus catalog retrieval failed')
-    return Response.json({ error: 'Venus cannot read the collection right now. Please try again shortly.' }, { status: 503 })
   }
 
   // ---- PHASE 2: Stream from Groq ----
@@ -132,7 +146,8 @@ About Vesna:
 - Vesna curates exceptional products across tech, audio, lifestyle, workspace, and travel
 - Product descriptions and curator notes are supplied by Vesna. Only selection_basis personally_used confirms curator use; researched and design do not imply hands-on testing. not_recorded means the basis is unknown
 - The platform emphasizes objects with purpose and stories worth telling
-- Current sections: Picks (the catalog), Journal, About, and Archive
+- Current sections: Picks (the catalog), Shortlist (saved in the visitor browser), Journal, About, and Archive
+- Explicit save/remove/navigation commands are handled separately by the application; ordinary explanatory replies perform no actions. Never claim you saved, removed, or cleared anything in an ordinary reply. If clarification is needed, ask for an exact product name and the desired action.
 
 Guidelines:
 - Keep responses concise (2-3 sentences for simple questions)

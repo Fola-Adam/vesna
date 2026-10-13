@@ -6,7 +6,7 @@ import ShortlistButton from './ShortlistButton'
 
 export type CatalogLayout = 'gallery' | 'compact' | 'list'
 
-export default function CatalogProductCard({ product, layout = 'gallery' }: { product: ProductRow; layout?: CatalogLayout }) {
+export default function CatalogProductCard({ product, layout = 'gallery', compareSelected, onCompareToggle }: { product: ProductRow; layout?: CatalogLayout; compareSelected?: boolean; onCompareToggle?: () => void }) {
   const { price, strike } = effectivePricing(product)
   const list = layout === 'list'
   const compact = layout === 'compact'
@@ -27,6 +27,7 @@ export default function CatalogProductCard({ product, layout = 'gallery' }: { pr
         </p>
         {note && !compact && <p className={`mt-3 text-sm leading-relaxed text-ink-muted ${list ? 'hidden line-clamp-2 sm:block' : 'line-clamp-2'}`}>{note}</p>}
       </div>
+      {onCompareToggle && <label className={`flex min-h-11 cursor-pointer items-center gap-2 border-t border-ink/10 px-4 text-xs font-medium text-primary-ink ${list ? 'col-span-2' : ''}`}><input type="checkbox" checked={!!compareSelected} onChange={onCompareToggle} aria-label={`Select ${product.name} for comparison`} className="h-4 w-4 accent-primary-ink" />Compare</label>}
       <div className="absolute right-2 top-2 sm:right-3 sm:top-3"><ShortlistButton id={product.id} name={product.name} compact /></div>
     </article>
   )

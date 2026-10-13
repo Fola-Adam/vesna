@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { useShortlist } from '@/lib/shortlist'
+import type { VenusAction } from '@/lib/venus-actions'
 import * as Dialog from '@radix-ui/react-dialog'
 import { ArrowDown, ArrowUp, ArrowUpRight, Maximize, Minimize, RotateCcw, Square, Plus, X } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
@@ -11,7 +14,7 @@ import VenusMark from './VenusMark'
 import VenusRecommendations from './VenusRecommendations'
 import styles from './VenusChatWidget.module.css'
 
-interface Message { role: 'assistant' | 'user'; content: string; products?: VenusProduct[]; readings?: VenusReading[]; error?: boolean }
+interface Message { role: 'assistant' | 'user'; content: string; products?: VenusProduct[]; readings?: VenusReading[]; error?: boolean; pendingClear?: boolean }
 const STORAGE_KEY = 'vesna_chat_messages'
 const WELCOME_MESSAGES: Message[] = [{ role: 'assistant', content: "I'm Venus. Ask me about a pick, compare options, or describe what you're looking for." }]
 
@@ -34,6 +37,9 @@ function resizeComposer(element: HTMLTextAreaElement | null) {
 
 export default function VenusChatWidget() {
   const { isOpen, setIsOpen, draft: inputValue, setDraft: setInputValue, productSlug, openChat, clearProductContext } = useVenus()
+  const router = useRouter()
+  const { ids: shortlistIds, add, remove, clear, undo, canUndo } = useShortlist()
+  const streamActionRef = useRef<VenusAction | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [messages, setMessages] = useState<Message[]>(WELCOME_MESSAGES)
   const [isTyping, setIsTyping] = useState(false)
@@ -95,10 +101,11 @@ export default function VenusChatWidget() {
     streamContentRef.current = ''
     streamProductsRef.current = []
     streamReadingsRef.current = []
+    streamActionRef.current = null
     try {
       const response = await fetch('/api/venus', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-        body: JSON.stringify({ message: text, productSlug, history: messages.filter(message => !message.error).slice(-10).map(message => ({ role: message.role, content: message.content })) }),
+        body: JSON.stringify({ message: text, productSlug, shortlistIds, history: messages.filter(message => !message.error).slice(-10).map(message => ({ role: message.role, content: message.content })) }),
       })
       if (!response.ok) {
         const result = await response.json().catch(() => null)
@@ -110,10 +117,23 @@ export default function VenusChatWidget() {
         if (event.type === 'text') streamContentRef.current += event.text
         if (event.type === 'products') streamProductsRef.current = event.products
         if (event.type === 'readings') streamReadingsRef.current = event.readings
+        if (event.type === 'action') {
+          if (streamActionRef.current) throw new Error('Venus returned conflicting actions. Please try again.')
+          streamActionRef.current = event.action
+        }
       })
-      const content = streamContentRef.current
+      let content = streamContentRef.current
+      let actionError = false
+      const action = streamActionRef.current as VenusAction | null
+      if (action?.kind === 'save' || action?.kind === 'remove') {
+        const successful = action.kind === 'save' ? add(action.id) : remove(action.id)
+        actionError = !successful
+        content = successful ? (action.kind === 'save' ? `${action.name} is in your shortlist. [View your shortlist](/shortlist).` : `Removed ${action.name} from your shortlist. You can undo this below.`) : 'I could not update your shortlist. Check that browser storage is available, then try again.'
+      }
+      if (action?.kind === 'navigate') { router.push(action.path); setIsOpen(false) }
+
       if (content || streamProductsRef.current.length || streamReadingsRef.current.length) {
-        setMessages(previous => [...previous, { role: 'assistant', content, products: streamProductsRef.current, readings: streamReadingsRef.current }])
+        setMessages(previous => [...previous, { role: 'assistant', content, products: streamProductsRef.current, readings: streamReadingsRef.current, error: actionError, pendingClear: action?.kind === 'clear' }])
       }
     } catch (failure) {
       if (controller.signal.aborted && streamContentRef.current) {
@@ -176,6 +196,10 @@ export default function VenusChatWidget() {
                 <div className={`${markdownClass} ${message.role === 'user' ? 'max-w-[90%] rounded-2xl rounded-tr-md bg-[#e7ece5] px-5 py-3 text-ink' : message.error ? 'w-full border-l-2 border-[#1b5a45]/35 pl-4 text-ink-muted' : 'w-full text-ink'}`}>
                   {message.role === 'user' ? <p className="whitespace-pre-wrap !mb-0">{message.content}</p> : <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>}
                 </div>
+                {message.pendingClear && <div className="mt-3 flex flex-wrap gap-3"><button type="button" onClick={() => {
+                  const successful = clear()
+                  setMessages(current => current.map((entry, i) => i === index ? {...entry, pendingClear: !successful, content: successful ? 'Your shortlist is cleared. You can undo this below.' : 'I could not clear your shortlist. Check browser storage and try again.'} : entry))
+                }} className="min-h-11 bg-primary-ink px-4 text-sm text-paper focus-ring">Confirm clear shortlist</button><button type="button" onClick={() => setMessages(current => current.map((entry, i) => i === index ? {...entry, pendingClear: false, content: 'Kept your shortlist.'} : entry))} className="min-h-11 border border-ink/25 px-4 text-sm focus-ring">Keep my picks</button></div>}
                 {message.error && <button disabled={isTyping} onClick={() => { const question = messages.slice(0, index).reverse().find(entry => entry.role === 'user'); if (question) { setInputValue(question.content); composerRef.current?.focus() } }} className="mt-2 inline-flex min-h-11 items-center gap-2 text-xs font-medium text-primary-ink hover:underline focus-ring disabled:opacity-40"><RotateCcw size={14} aria-hidden="true" />Try again</button>}
                 <VenusRecommendations products={message.products} readings={message.readings} onNavigate={() => setIsOpen(false)} />
               </div>)}
@@ -187,10 +211,11 @@ export default function VenusChatWidget() {
         {showLatest && <button onClick={() => { pinnedRef.current = true; setShowLatest(false); messagesEndRef.current?.scrollIntoView({ behavior: 'auto' }) }} className="mx-auto mb-2 inline-flex min-h-11 items-center gap-2 rounded-full border border-[#292720]/10 bg-paper-raised px-4 text-xs text-ink shadow-sm focus-ring">Latest response <ArrowDown size={14} aria-hidden="true" /></button>}
         <footer className="shrink-0 bg-paper px-4 pt-2 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:px-7 sm:pb-5">
           <div className="mx-auto max-w-[680px]">
+            {canUndo && <button type="button" onClick={() => { const successful = undo(); setMessages(previous => [...previous, {role:'assistant', error:!successful, content:successful ? 'Restored the removed picks to your shortlist.' : 'I could not restore the picks. Check browser storage and try again.'}]) }} className="mb-3 inline-flex min-h-10 items-center gap-2 text-xs font-medium text-primary-ink underline focus-ring"><RotateCcw size={14} aria-hidden="true" />Undo shortlist removal</button>}
             <form onSubmit={handleSubmit} className="rounded-[22px] border border-[#292720]/15 bg-paper-raised p-3 shadow-[0_4px_20px_rgba(41,39,32,.04)] transition-[border-color,box-shadow] focus-within:border-[#1b5a45]/50 focus-within:shadow-[0_0_0_3px_rgba(16,56,45,.06)]">
               <label className="sr-only" htmlFor="venus-message">Message Venus</label>
               <textarea ref={attachComposer} id="venus-message" value={inputValue} onChange={event => setInputValue(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); if (!isTyping) event.currentTarget.form?.requestSubmit() } }} placeholder="A question, a thought, a possibility…" rows={1} maxLength={2000} className="block max-h-36 min-h-11 w-full resize-none overflow-y-auto bg-transparent px-2 py-2 text-base leading-6 text-ink placeholder:text-ink-muted focus:outline-none sm:text-[15px]" />
-              <div className="mt-1 flex items-center justify-between gap-3 pl-2"><span className="text-[10px] font-medium tracking-wide text-ink-muted">Picks &amp; Journal</span>{isTyping ? <button type="button" onClick={() => requestRef.current?.abort()} aria-label="Stop response" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#10382d] text-paper focus-ring"><Square aria-hidden="true" size={14} /></button> : <button type="submit" aria-label="Send message" disabled={!inputValue.trim()} className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#10382d] text-paper transition-colors hover:bg-[#174938] focus-ring disabled:bg-[#292720]/10 disabled:text-ink-muted"><ArrowUp aria-hidden="true" size={19} strokeWidth={1.5} /></button>}</div>
+              <div className="mt-1 flex items-center justify-between gap-3 pl-2"><span className="text-[10px] font-medium tracking-wide text-ink-muted">Picks, Shortlist &amp; Journal</span>{isTyping ? <button type="button" onClick={() => requestRef.current?.abort()} aria-label="Stop response" className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#10382d] text-paper focus-ring"><Square aria-hidden="true" size={14} /></button> : <button type="submit" aria-label="Send message" disabled={!inputValue.trim()} className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#10382d] text-paper transition-colors hover:bg-[#174938] focus-ring disabled:bg-[#292720]/10 disabled:text-ink-muted"><ArrowUp aria-hidden="true" size={19} strokeWidth={1.5} /></button>}</div>
             </form>
             <p className="mt-3 text-center text-[10px] leading-4 text-ink-muted">Selected from Vesna. Check current prices and availability with the seller.</p>
           </div>

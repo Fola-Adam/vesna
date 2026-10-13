@@ -1,3 +1,5 @@
+import { validVenusAction, type VenusAction } from './venus-actions'
+
 export interface VenusProduct {
   name: string
   slug: string
@@ -23,6 +25,7 @@ export type VenusEvent =
   | { type: 'text'; text: string }
   | { type: 'products'; products: VenusProduct[] }
   | { type: 'readings'; readings: VenusReading[] }
+  | { type: 'action'; action: VenusAction }
   | { type: 'done' }
   | { type: 'error'; message: string }
 
@@ -31,6 +34,7 @@ function parseEvent(line: string): VenusEvent {
   try { event = JSON.parse(line) } catch { throw new Error('Invalid assistant response.') }
   if (!event || typeof event !== 'object') throw new Error('Invalid assistant response.')
   if (event.type === 'text' && typeof event.text === 'string') return event
+  if (event.type === 'action' && validVenusAction(event.action)) return event
   if (event.type === 'done') return event
   if (event.type === 'error' && typeof event.message === 'string') return event
   if (event.type === 'readings' && Array.isArray(event.readings) && event.readings.length <= 3 && event.readings.every(reading =>
