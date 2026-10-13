@@ -1,3 +1,4 @@
+import { catalogToolRecords, validateSelection } from '@/lib/venus-task'
 import { actionClaimWithoutReceipt, compareVenusPicks, planVenusAction, resolveVenusTool } from '@/lib/venus-actions'
 import { readPublishedStories } from '@/lib/journal-server'
 import { readActiveCatalog } from '@/lib/data'
@@ -38,7 +39,7 @@ function venusRateLimited(ip: string): boolean {
 // prompt-injection / API-abuse vector (e.g. spoofed "system" messages).
 const ALLOWED_ROLES = new Set(['user', 'assistant'])
 
-export async function POST(request: Request) {
+async function respond(request: Request, report: (event: VenusEvent) => void) {
   const ip =
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '0.0.0.0'
   if (venusRateLimited(ip)) {
@@ -58,10 +59,11 @@ export async function POST(request: Request) {
     })
   }
 
-  const { message, history = [], productSlug, shortlistIds = [] } = (body ?? {}) as {
+  const { message, history = [], productSlug, shortlistIds = [], selectionIds = [] } = (body ?? {}) as {
     message?: unknown
     history?: unknown
     productSlug?: unknown
+    selectionIds?: unknown
     shortlistIds?: unknown
   }
 
@@ -99,8 +101,16 @@ export async function POST(request: Request) {
   let matchedProducts: ReturnType<typeof selectVenusProducts>
   let matchedReadings: ReturnType<typeof selectVenusReadings>
   try {
+    report({type:'activity',activity:{id:'catalog',label:'Reading the current collection',state:'running'}})
     const [catalog, stories] = await Promise.all([readActiveCatalog(), readPublishedStories()])
+    report({type:'activity',activity:{id:'catalog',label:`Read ${catalog.length} current picks`,state:'complete'}})
     actionCatalog = catalog
+    const selectedIds = Array.isArray(selectionIds) ? [...new Set(selectionIds.filter((id):id is string=>typeof id==='string'))].slice(0,20) : []
+    const selected = catalog.filter(product=>selectedIds.includes(product.id))
+    if (/^(?:yes|yes please|save (?:these|those)(?: picks)?|add (?:these|those)(?: picks)?|save them)[.!]*$/i.test(message.trim()) && selectedIds.length) {
+      const events:VenusEvent[] = selected.length===selectedIds.length ? [{type:'action',action:{kind:'save_many',label:'your selected set',products:selected.map(({id,name,slug})=>({id,name,slug}))}},{type:'done'}] : [{type:'text',text:'Some selected picks are no longer available. Ask me to refresh the selection before saving.'},{type:'done'}]
+      return new Response(events.map(event=>JSON.stringify(event)).join('\n')+'\n',{headers:{'Content-Type':'application/x-ndjson'}})
+    }
     savedIds = Array.isArray(shortlistIds) ? shortlistIds.filter((id): id is string => typeof id === 'string' && id.length <= 100).slice(0, 200) : []
     const plan = planVenusAction(catalog, message, safeHistory, typeof productSlug === 'string' ? productSlug : null, savedIds)
     if (plan) {
@@ -150,6 +160,8 @@ export async function POST(request: Request) {
 
   const systemPrompt = `You are Venus, the assistant for Vesna — a curated lifestyle platform by Ebenezer Victory.
 
+For any product discovery or broad save request you MUST use search_catalog before selecting products. search_catalog covers every current record, regardless of the request's activity. Use select_picks for a grounded selection; if none match, say so. A quoted excerpt proves the source, but you must still assess whether it actually supports the user's need. Do not use generic praise as evidence of suitability. Budget limits apply to listed effective prices. Read considerations before selecting. Never select a product based on unknown compatibility.
+
 Your personality:
 - Warm, knowledgeable, and slightly poetic
 - You appreciate craftsmanship, design, and thoughtful curation
@@ -160,7 +172,7 @@ About Vesna:
 - Product descriptions and curator notes are supplied by Vesna. Only selection_basis personally_used confirms curator use; researched and design do not imply hands-on testing. not_recorded means the basis is unknown
 - The platform emphasizes objects with purpose and stories worth telling
 - Current sections: Picks (the catalog), Shortlist (saved in the visitor browser), Journal, About, and Archive
-- You have real browser action tools. Use save_matching_picks for an explicit group request such as adding every workspace pick. Do not ask for one product when the user clearly wants the whole group. Use save_pick or remove_pick for a visitor's requested shortlist change, including informal wording. Use conversation context to resolve a short follow-up; ask which pick when ambiguous. A yes to your immediately preceding offer authorizes that specific action.
+- For discovery or a broad save request about ANY activity, first call search_catalog to read current records, then select_picks with exact recorded evidence for each suitable product. Check the user's purpose, exclusions, budget and recorded limitations; category similarity alone does not establish suitability. If none qualify, explain that honestly. Do not force unrelated products. A broad selection is a proposal; the visitor confirms the exact set before saving. Ask a focused question if the need is ambiguous. Never invent a purpose or specification. Current selected IDs are supplied below; use them for those/them, cheaper alternatives or exclusions. You have real browser action tools. Use save_pick or remove_pick for a visitor's requested shortlist change, including informal wording. Use conversation context to resolve a short follow-up; ask which pick when ambiguous. A yes to your immediately preceding offer authorizes that specific action.
 - Tool requests are executed by the browser after validation. NEVER describe a change as saved, queued, processed or completed in ordinary prose. An action outcome is displayed by the application after execution. If proposing an action, ask a clear question naming the exact product and action.
 - Shortlist actions affect only browser-local saved picks. You cannot modify catalog records, purchase products, or access admin data.
 
@@ -178,9 +190,10 @@ Guidelines:
 - Format links as Markdown: [Product name](/shop/slug) or [Story title](/journal/slug), with the exact supplied slug and ordinary spaces.
 - State specifications only when explicitly supplied. Do not infer unlisted benefits or claim an object solves a problem the record does not mention.
 - If asked for archive reading, explain that the Archive is for past picks; offer a relevant published Journal story instead.
-- Recommend at most three products and two readings per reply. Avoid repeating their full descriptions; the interface displays cards alongside your explanation.
+- For ordinary conversational recommendations, recommend at most three products and two readings per reply. Avoid repeating their full descriptions; the interface displays cards alongside your explanation.
 - Use a calm, direct editorial voice. Avoid sales language, excessive adjectives, greetings on every reply, and emoji.
 
+Current selected set: ${Array.isArray(selectionIds) ? actionCatalog.filter(product=>selectionIds.includes(product.id)).map(product=>product.slug).join('; ') || 'none' : 'none'}.
 Current browser shortlist: ${actionCatalog.filter(product => savedIds.includes(product.id)).map(product => `${product.name} (/shop/${product.slug})`).join('; ') || 'empty'}. This is the current saved state supplied by the browser, not a history of changes.
 Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readingAppendix}`
 
@@ -196,7 +209,8 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
   const tools: import('groq-sdk/resources/chat/completions').ChatCompletionTool[] = [
     ...['save_pick','remove_pick','open_pick'].map(name => ({type:'function' as const,function:{name,description:`${name.replaceAll('_',' ')}. Use an exact current catalog slug. Catalog: ${actionCatalog.map(product => `${product.name}: ${product.slug}`).join('; ')}`,parameters:{type:'object',properties:{slug:{type:'string',enum:catalogSlugs}},required:['slug'],additionalProperties:false}}})),
     ...['open_shortlist','clear_shortlist'].map(name => ({type:'function' as const,function:{name,description:name === 'clear_shortlist' ? 'Request visible confirmation to clear the shortlist; never clear it in prose.' : 'Open the dedicated shortlist page.',parameters:{type:'object',properties:{},additionalProperties:false}}})),
-    {type:'function',function:{name:'save_matching_picks',description:'Save ALL current matching catalog picks for an explicit group request. Workspace means the considered-workspace collection (lighting, keyboard, mouse, charging), not just the Workspace category.',parameters:{type:'object',properties:{collection:{type:'string',enum:['considered-workspace','slower-mornings','on-the-move']},category:{type:'string',enum:[...new Set(actionCatalog.map(product=>product.categories?.name.toLowerCase()).filter(Boolean))]}},additionalProperties:false}}},
+    {type:'function',function:{name:'search_catalog',description:'Read the live catalog for any purpose or activity, including gardening, skating, cooking or workspace. Returns recorded product facts and prices for suitability checks. Call before select_picks.',parameters:{type:'object',properties:{},additionalProperties:false}}},
+    {type:'function',function:{name:'select_picks',description:'Present a concrete set of suitable current picks for discovery or confirmation before saving. Quote an exact excerpt of at least 12 characters from each record as evidence. Never guess missing capabilities. Select at most 20.',parameters:{type:'object',properties:{label:{type:'string',maxLength:150},products:{type:'array',minItems:1,maxItems:20,items:{type:'object',properties:{slug:{type:'string',enum:catalogSlugs},evidence:{type:'string',minLength:12,maxLength:500}},required:['slug','evidence'],additionalProperties:false}}},required:['label','products'],additionalProperties:false}}},
     {type:'function',function:{name:'filter_picks',description:'Open Picks with a category or maximum USD price requested by the visitor.',parameters:{type:'object',properties:{category:{type:'string',enum:[...new Set(actionCatalog.map(product => product.categories?.name.toLowerCase()).filter(Boolean))]},maxPrice:{type:'number',minimum:0,maximum:1000000}},additionalProperties:false}}},
   ]
   const encoder = new TextEncoder()
@@ -209,6 +223,9 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
       const send = (event: VenusEvent) => { if (!cancelled) controller.enqueue(encoder.encode(JSON.stringify(event) + '\n')) }
       const heartbeat = setInterval(() => send({type:'text',text:''}), 5000)
       try {
+        let searched = false
+        for (let step = 0; step < 4; step++) {
+        send({type:'activity',activity:{id:'consider',label:searched ? 'Checking catalog details against your request' : 'Understanding your request',state:'running'}})
         const completion = await groq.chat.completions.create({
           model: 'openai/gpt-oss-120b',
           max_completion_tokens: 1536,
@@ -220,14 +237,15 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         }, { signal: abort.signal, timeout: 25_000 })
 
         let answer = ''
-        const calls = new Map<number,{name:string;arguments:string}>()
+        const calls = new Map<number,{id:string;name:string;arguments:string}>()
         let finishReason: string | null = null
         for await (const chunk of completion) {
           const choice = chunk.choices?.[0]
           if (choice?.finish_reason) finishReason = choice.finish_reason
           answer += choice?.delta?.content ?? ''
           for (const delta of choice?.delta?.tool_calls ?? []) {
-            const call = calls.get(delta.index) ?? {name:'',arguments:''}
+            const call = calls.get(delta.index) ?? {id:'',name:'',arguments:''}
+            call.id += delta.id ?? ''
             call.name += delta.function?.name ?? ''
             call.arguments += delta.function?.arguments ?? ''
             if (call.arguments.length > 16_000) throw new Error('Invalid action payload')
@@ -237,6 +255,26 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         if (calls.size) {
           if (calls.size !== 1 || finishReason === 'length') throw new Error('Invalid action request')
           const call = [...calls.values()][0]
+          const argumentsValue = JSON.parse(call.arguments)
+          if (call.name === 'search_catalog') {
+            send({type:'activity',activity:{id:'search',label:'Reading product uses, details and prices',state:'running'}})
+            const records = catalogToolRecords(actionCatalog)
+            searched = true
+            send({type:'activity',activity:{id:'search',label:`Read details for ${records.length} current picks`,state:'complete'}})
+            messages.push({role:'assistant',content:null,tool_calls:[{id:call.id,type:'function',function:{name:call.name,arguments:call.arguments}}]},{role:'tool',tool_call_id:call.id,content:JSON.stringify(records)})
+            continue
+          }
+          if (call.name === 'select_picks') {
+            const selection = searched ? validateSelection(actionCatalog,argumentsValue,message) : null
+            if (!selection) throw new Error('Selection could not be verified')
+            send({type:'activity',activity:{id:'consider',label:`Selected ${selection.products.length} picks with recorded evidence`,state:'complete'}})
+            send({type:'selection',selection})
+            send({type:'text',text:'Here is the selected set, with the recorded detail behind each choice. You can save these picks or tell me what to change.'})
+            send({type:'done'})
+            if (!cancelled) controller.close()
+            return
+          }
+          send({type:'activity',activity:{id:'consider',label:'Checked the requested action against current picks',state:'complete'}})
           const plan = resolveVenusTool(actionCatalog,call.name,JSON.parse(call.arguments),message,safeHistory,typeof productSlug === 'string' ? productSlug : null,savedIds)
           if (plan.message) send({type:'text',text:plan.message})
           if (plan.action) send({type:'action',action:plan.action})
@@ -246,6 +284,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         }
         if (finishReason === 'length') throw new Error('Incomplete assistant reply')
         if (actionClaimWithoutReceipt(answer)) answer = 'I have not changed your shortlist in this reply. Tell me which pick to save or remove, and I will run the action and report its actual result.'
+        send({type:'activity',activity:{id:'consider',label:'Finished considering your request',state:'complete'}})
         send({type:'text',text:answer})
 
         // Models sometimes emit narrow spaces or zero-width characters in names/URLs.
@@ -256,6 +295,9 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         send({ type: 'readings', readings: matchedReadings.filter(reading => mentioned.includes(fold(reading.title)) || mentioned.includes(`/journal/${reading.slug}`)).slice(0, 2) })
         send({ type: 'done' })
         if (!cancelled) controller.close()
+        return
+        }
+        throw new Error('Task exceeded its step limit')
       } catch (failure) {
         const status = failure && typeof failure === 'object' && 'status' in failure ? failure.status : null
         // Log only the provider status, never request headers or credentials.
@@ -280,4 +322,32 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
       'Cache-Control': 'no-cache',
     },
   })
+}
+
+/** Start the response before catalog IO so progress reflects actual server work. */
+export async function POST(request: Request) {
+  const encoder = new TextEncoder()
+  let cancelled = false
+  let reader: ReadableStreamDefaultReader<Uint8Array> | undefined
+  return new Response(new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const report = (event: VenusEvent) => { if (!cancelled) controller.enqueue(encoder.encode(JSON.stringify(event)+'\n')) }
+      try {
+        const response = await respond(request,report)
+        if (!response.ok) {
+          const failure = await response.json().catch(()=>null)
+          report({type:'error',message:failure?.error ?? 'Venus could not complete this request.'})
+        } else if (response.body) {
+          reader = response.body.getReader()
+          while (!cancelled) {
+            const chunk = await reader.read()
+            if (chunk.done) break
+            if (!cancelled) controller.enqueue(chunk.value)
+          }
+        }
+      } catch { report({type:'error',message:'Venus could not complete this request.'}) }
+      finally { reader?.releaseLock(); if (!cancelled) controller.close() }
+    },
+    async cancel() { cancelled=true; await reader?.cancel() },
+  }),{headers:{'Content-Type':'application/x-ndjson; charset=utf-8','Cache-Control':'no-store'}})
 }

@@ -87,20 +87,16 @@ const keyboard={...one,id:'44444444-4444-4444-8444-444444444444',name:'Logitech 
 const charger={...two,id:'55555555-5555-4555-8555-555555555555',name:'Anker Charger',slug:'anker-charger',categories:{name:'Tech'}}
 const mug={...two,id:'66666666-6666-4666-8666-666666666666',name:'Ember Mug',slug:'ember-mug',categories:{name:'Home'},description:'Keeps coffee warm during a work session.'}
 const workspaceCatalog=[keyboard,charger,mug,sonos]
-test('bulk workspace saves include related Tech and recorded work use without including unrelated home audio',()=>{
- const plan=planVenusAction(workspaceCatalog,'add all the products that can be used in a workspace to my shortlost')
- assert.equal(plan.action.kind,'save_many')
- assert.deepEqual(plan.action.products.map(product=>product.id),[keyboard.id,charger.id,mug.id])
- assert.equal(validVenusAction(plan.action),true)
+test('bulk workspace requests delegate to catalog selection rather than immediately mutating',()=>{
+ assert.equal(planVenusAction(workspaceCatalog,'add all the products that can be used in a workspace to my shortlost'),null)
 })
-test('a group clarification keeps the earlier bulk intent while a discovery question does not mutate',()=>{
+
+test('group clarification and discovery delegate to the general catalog tools',()=>{
  const history=[{role:'user',content:'add all workspace products to my shortlist'},{role:'assistant',content:'Which pick do you mean? Give me its product name.'}]
- assert.equal(planVenusAction(workspaceCatalog,'any that can be used in a workspace is what i mean.',history).action.kind,'save_many')
- const discovery=planVenusAction(workspaceCatalog,'tellme products that can be used in a workspace',history)
- assert.equal(discovery.action,undefined)
- assert.equal(discovery.productSlugs.length,3)
- assert.match(discovery.message,/Anker Charger/)
+ assert.equal(planVenusAction(workspaceCatalog,'any that can be used in a workspace is what i mean.',history),null)
+ assert.equal(planVenusAction(workspaceCatalog,'tellme products that can be used in a workspace',history),null)
 })
+
 test('ordinary shortlist advice does not get mistaken for a completed action',()=>{
  assert.equal(actionClaimWithoutReceipt('Here are workspace picks. You can add any of these to your shortlist, or keep your previously saved picks.'),false)
  assert.equal(actionClaimWithoutReceipt('You removed a pick earlier. These are the current workspace options.'),false)

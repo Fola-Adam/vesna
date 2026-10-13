@@ -25,7 +25,9 @@ function undoSnapshot() {
   try { return sessionStorage.getItem(UNDO_KEY) ?? '' } catch { return '' }
 }
 function write(ids: string[]) {
-  localStorage.setItem(KEY, JSON.stringify(ids))
+  const encoded = JSON.stringify(ids)
+  localStorage.setItem(KEY, encoded)
+  if (localStorage.getItem(KEY) !== encoded) throw new Error('Shortlist storage did not retain the update')
   window.dispatchEvent(new Event(EVENT))
 }
 

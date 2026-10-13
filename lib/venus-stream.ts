@@ -1,3 +1,4 @@
+import type { VenusActivity, VenusSelection } from './venus-task'
 import { validVenusAction, type VenusAction } from './venus-actions'
 
 export interface VenusProduct {
@@ -22,6 +23,8 @@ export interface VenusReading {
 }
 
 export type VenusEvent =
+  | { type: 'activity'; activity: VenusActivity }
+  | { type: 'selection'; selection: VenusSelection }
   | { type: 'text'; text: string }
   | { type: 'products'; products: VenusProduct[] }
   | { type: 'readings'; readings: VenusReading[] }
@@ -33,6 +36,8 @@ function parseEvent(line: string): VenusEvent {
   let event: VenusEvent
   try { event = JSON.parse(line) } catch { throw new Error('Invalid assistant response.') }
   if (!event || typeof event !== 'object') throw new Error('Invalid assistant response.')
+  if (event.type === 'activity' && event.activity && /^[a-z-]{1,40}$/.test(event.activity.id) && typeof event.activity.label === 'string' && event.activity.label.length <= 200 && ['running','complete','failed'].includes(event.activity.state)) return event
+  if (event.type === 'selection' && event.selection && typeof event.selection.label === 'string' && event.selection.label.length <= 150 && Array.isArray(event.selection.products) && event.selection.products.length > 0 && event.selection.products.length <= 20 && event.selection.products.every(product => typeof product.evidence === 'string' && product.evidence.length <= 500 && validVenusAction({...product,kind:'save'}))) return event
   if (event.type === 'text' && typeof event.text === 'string') return event
   if (event.type === 'action' && validVenusAction(event.action)) return event
   if (event.type === 'done') return event

@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useShortlist } from '@/lib/shortlist'
+import VenusActivity from './VenusActivity'
+import type { VenusActivity as Activity, VenusSelection } from '@/lib/venus-task'
 import type { VenusAction } from '@/lib/venus-actions'
 import * as Dialog from '@radix-ui/react-dialog'
 import { ArrowDown, ArrowUp, ArrowUpRight, Maximize, Minimize, RotateCcw, Square, Plus, X } from 'lucide-react'
@@ -14,7 +16,7 @@ import VenusMark from './VenusMark'
 import VenusRecommendations from './VenusRecommendations'
 import styles from './VenusChatWidget.module.css'
 
-interface Message { role: 'assistant' | 'user'; content: string; products?: VenusProduct[]; readings?: VenusReading[]; error?: boolean; pendingClear?: boolean }
+interface Message { role: 'assistant' | 'user'; content: string; products?: VenusProduct[]; readings?: VenusReading[]; error?: boolean; pendingClear?: boolean; activities?: Activity[]; selection?: VenusSelection; selectionSaved?: boolean }
 const STORAGE_KEY = 'vesna_chat_messages'
 const WELCOME_MESSAGES: Message[] = [{ role: 'assistant', content: "I'm Venus. Ask me about a pick, compare options, or describe what you're looking for." }]
 
@@ -39,6 +41,10 @@ export default function VenusChatWidget() {
   const { isOpen, setIsOpen, draft: inputValue, setDraft: setInputValue, productSlug, openChat, clearProductContext } = useVenus()
   const router = useRouter()
   const { ids: shortlistIds, add, addMany, remove, clear, undo, canUndo } = useShortlist()
+  const [activities, setActivities] = useState<Activity[]>([])
+  const activityRef = useRef<Activity[]>([])
+  const selectionRef = useRef<VenusSelection | null>(null)
+  const receivedSelectionRef = useRef<VenusSelection | null>(null)
   const streamActionRef = useRef<VenusAction | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [messages, setMessages] = useState<Message[]>(WELCOME_MESSAGES)
@@ -88,16 +94,29 @@ export default function VenusChatWidget() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const text = inputValue.trim()
+    await sendMessage(inputValue.trim())
+  }
+
+  async function sendMessage(text: string) {
     if (!text || isTyping || requestRef.current) return
+    if (!/\b(?:these|those|them|it|that|this|cheaper|instead|exclude|except|without|budget|under|below|refine|yes)\b/i.test(text)) selectionRef.current=null
     pinnedRef.current = true
     setShowLatest(false)
+    const selectionAtRequest=selectionRef.current
     const controller = new AbortController()
     requestRef.current = controller
     setInputValue('')
     setMessages(previous => [...previous, { role: 'user', content: text }])
     setIsTyping(true)
     setStreamText('')
+    activityRef.current = []
+    setActivities([])
+    receivedSelectionRef.current = null
+    const updateActivity = (activity: Activity) => {
+      const index = activityRef.current.findIndex(item=>item.id===activity.id)
+      activityRef.current = index<0 ? [...activityRef.current,activity] : activityRef.current.map((item,i)=>i===index ? activity : item)
+      setActivities(activityRef.current)
+    }
     streamContentRef.current = ''
     streamProductsRef.current = []
     streamReadingsRef.current = []
@@ -105,7 +124,7 @@ export default function VenusChatWidget() {
     try {
       const response = await fetch('/api/venus', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-        body: JSON.stringify({ message: text, productSlug, shortlistIds, history: messages.filter(message => !message.error).slice(-10).map(message => ({ role: message.role, content: message.content })) }),
+        body: JSON.stringify({ message: text, productSlug, shortlistIds, selectionIds: selectionRef.current?.products.map(product=>product.id) ?? [], history: messages.filter(message => !message.error).slice(-10).map(message => ({ role: message.role, content: message.content })) }),
       })
       if (!response.ok) {
         const result = await response.json().catch(() => null)
@@ -114,6 +133,8 @@ export default function VenusChatWidget() {
       if (!response.body) throw new Error('The response was empty. Please try again.')
       streamFlushRef.current = setInterval(() => setStreamText(streamContentRef.current), 80)
       await readVenusStream(response.body, event => {
+        if (event.type === 'activity') updateActivity(event.activity)
+        if (event.type === 'selection') receivedSelectionRef.current = event.selection
         if (event.type === 'text') streamContentRef.current += event.text
         if (event.type === 'products') streamProductsRef.current = event.products
         if (event.type === 'readings') streamReadingsRef.current = event.readings
@@ -126,26 +147,34 @@ export default function VenusChatWidget() {
       let actionError = false
       const action = streamActionRef.current as VenusAction | null
       if (action?.kind === 'save' || action?.kind === 'remove') {
+        updateActivity({id:'shortlist',label:action.kind==='save' ? 'Adding to your shortlist' : 'Removing from your shortlist',state:'running'})
         const successful = action.kind === 'save' ? add(action.id) : remove(action.id)
+        updateActivity({id:'shortlist',label:successful ? (action.kind==='save' ? 'Verified pick saved in this browser' : 'Verified pick removed from this browser') : 'Shortlist update failed',state:successful ? 'complete' : 'failed'})
         actionError = !successful
         content = successful ? (action.kind === 'save' ? `${action.name} is in your shortlist. [View your shortlist](/shortlist).` : `Removed ${action.name} from your shortlist. You can undo this below.`) : 'I could not update your shortlist. Check that browser storage is available, then try again.'
       }
       if (action?.kind === 'save_many') {
+        updateActivity({id:'shortlist',label:'Adding the selected picks to your shortlist',state:'running'})
         const result=addMany(action.products.map(product=>product.id))
+        updateActivity({id:'shortlist',label:result.success ? `Verified ${result.added} new picks saved in this browser` : 'Could not save the selected set; nothing was added',state:result.success ? 'complete' : 'failed'})
+        if (result.success) { selectionRef.current=null; setMessages(current=>current.map(entry=>entry.selection && entry.selection===selectionAtRequest ? {...entry,selectionSaved:true} : entry)) }
         actionError=!result.success
         content=result.success ? `${result.added ? `Added ${result.added} picks matching ${action.label}.` : `All ${action.products.length} picks matching ${action.label} are already saved.`}${action.products.length-result.added && result.added ? ` ${action.products.length-result.added} were already saved.` : ''}\n\n${action.products.map(product=>`- [${product.name}](/shop/${product.slug})`).join('\n')}\n\n[View your shortlist](/shortlist).` : 'I could not save that group. Check browser storage and the 200-pick shortlist limit; no partial group was saved.'
       }
       if (action?.kind === 'navigate') { router.push(action.path); setIsOpen(false) }
 
-      if (content || streamProductsRef.current.length || streamReadingsRef.current.length) {
-        setMessages(previous => [...previous, { role: 'assistant', content, products: streamProductsRef.current, readings: streamReadingsRef.current, error: actionError, pendingClear: action?.kind === 'clear' }])
+      if (receivedSelectionRef.current) selectionRef.current=receivedSelectionRef.current
+      if (content || receivedSelectionRef.current || streamProductsRef.current.length || streamReadingsRef.current.length) {
+        setMessages(previous => [...previous, { role: 'assistant', content, products: streamProductsRef.current, readings: streamReadingsRef.current, error: actionError, pendingClear: action?.kind === 'clear', activities:activityRef.current, selection:receivedSelectionRef.current ?? undefined }])
       }
     } catch (failure) {
-      if (controller.signal.aborted && streamContentRef.current) {
-        setMessages(previous => [...previous, { role: 'assistant', content: streamContentRef.current + '\n\n_Response stopped._', products: streamProductsRef.current }])
+      activityRef.current=activityRef.current.map(activity=>activity.state==='running' ? {...activity,state:'failed',label:controller.signal.aborted ? 'Stopped before completion' : 'Could not complete this step'} : activity)
+      setActivities(activityRef.current)
+      if (controller.signal.aborted) {
+        setMessages(previous => [...previous, { role: 'assistant', activities:activityRef.current, content: (streamContentRef.current || 'Stopped before the response completed. No pending shortlist action was run.') + '\n\n_Response stopped._', products: streamProductsRef.current }])
       }
       if (!controller.signal.aborted) setMessages(previous => [...previous, {
-        role: 'assistant', error: true, content: failure instanceof Error && failure.message !== 'Failed to fetch' ? failure.message : 'Venus could not connect. Please try again.',
+        role: 'assistant', error: true, activities:activityRef.current, content: failure instanceof Error && failure.message !== 'Failed to fetch' ? failure.message : 'Venus could not connect. Please try again.',
       }])
     } finally {
       if (streamFlushRef.current) clearInterval(streamFlushRef.current)
@@ -173,7 +202,7 @@ export default function VenusChatWidget() {
             <Dialog.Description className="mt-1.5 text-[10px] font-medium uppercase tracking-[.13em] text-ink-muted">The Vesna concierge</Dialog.Description>
           </div></div>
           <div className="flex shrink-0 gap-1">
-            <button disabled={isTyping} aria-label="Start a new conversation" title="Start a new conversation" onClick={() => { setMessages(WELCOME_MESSAGES); saveMessages([]); clearProductContext() }} className="inline-flex h-11 w-11 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-[#292720]/5 hover:text-ink focus-ring disabled:opacity-40"><Plus aria-hidden="true" size={18} strokeWidth={1.5} /></button>
+            <button disabled={isTyping} aria-label="Start a new conversation" title="Start a new conversation" onClick={() => { selectionRef.current=null; setMessages(WELCOME_MESSAGES); saveMessages([]); clearProductContext() }} className="inline-flex h-11 w-11 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-[#292720]/5 hover:text-ink focus-ring disabled:opacity-40"><Plus aria-hidden="true" size={18} strokeWidth={1.5} /></button>
             <button aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'} onClick={() => setIsFullscreen(full => !full)} className="hidden h-11 w-11 items-center justify-center rounded-full text-ink-muted hover:bg-[#292720]/5 focus-ring sm:inline-flex">{isFullscreen ? <Minimize aria-hidden="true" size={16} strokeWidth={1.5} /> : <Maximize aria-hidden="true" size={16} strokeWidth={1.5} />}</button>
             <Dialog.Close aria-label="Close chat" className="inline-flex h-11 w-11 items-center justify-center rounded-full text-ink-muted hover:bg-[#292720]/5 focus-ring"><X aria-hidden="true" size={19} strokeWidth={1.5} /></Dialog.Close>
           </div>
@@ -201,6 +230,13 @@ export default function VenusChatWidget() {
                 <div className={`${markdownClass} ${message.role === 'user' ? 'max-w-[90%] rounded-2xl rounded-tr-md bg-[#e7ece5] px-5 py-3 text-ink' : message.error ? 'w-full border-l-2 border-[#1b5a45]/35 pl-4 text-ink-muted' : 'w-full text-ink'}`}>
                   {message.role === 'user' ? <p className="whitespace-pre-wrap !mb-0">{message.content}</p> : <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>}
                 </div>
+                <VenusActivity activities={message.activities ?? []} />
+                {message.selection && <section aria-label="Selected picks" className="mt-3 w-full rounded-xl border border-primary-ink/20 bg-paper-raised p-4">
+                  <p className="text-sm font-semibold text-primary-ink">{message.selection.label}</p>
+                  <ul className="mt-3 divide-y divide-ink/10">{message.selection.products.map(product=><li key={product.id} className="py-3"><a href={`/shop/${product.slug}`} className="text-sm font-semibold text-ink underline underline-offset-4" onClick={()=>setIsOpen(false)}>{product.name}</a>{product.price != null && <span className="ml-2 text-xs font-medium text-primary-ink">${product.price.toFixed(2)}</span>}<p className="mt-1 text-xs leading-6 text-ink-muted">Recorded detail: {product.evidence}</p></li>)}</ul>
+                  <button type="button" disabled={isTyping || message.selectionSaved || message.selection !== selectionRef.current} onClick={()=>void sendMessage('Save these picks')} className="mt-3 min-h-11 rounded-full bg-primary-ink px-5 text-sm font-medium text-paper focus-ring disabled:opacity-50">{message.selectionSaved ? 'Saved to shortlist' : message.selection !== selectionRef.current ? 'Selection superseded' : 'Save these picks'}</button>
+                  <p className="mt-2 text-xs leading-5 text-ink-muted">Ask for a different budget, exclude an item, or describe your needs more precisely.</p>
+                </section>}
                 {message.pendingClear && <div className="mt-3 flex flex-wrap gap-3"><button type="button" onClick={() => {
                   const successful = clear()
                   setMessages(current => current.map((entry, i) => i === index ? {...entry, pendingClear: !successful, content: successful ? 'Your shortlist is cleared. You can undo this below.' : 'I could not clear your shortlist. Check browser storage and try again.'} : entry))
@@ -208,7 +244,7 @@ export default function VenusChatWidget() {
                 {message.error && <button disabled={isTyping} onClick={() => { const question = messages.slice(0, index).reverse().find(entry => entry.role === 'user'); if (question) { setInputValue(question.content); composerRef.current?.focus() } }} className="mt-2 inline-flex min-h-11 items-center gap-2 text-xs font-medium text-primary-ink hover:underline focus-ring disabled:opacity-40"><RotateCcw size={14} aria-hidden="true" />Try again</button>}
                 <VenusRecommendations products={message.products} readings={message.readings} onNavigate={() => setIsOpen(false)} />
               </div>)}
-              {isTyping && <div className="flex flex-col items-start"><p className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.16em] text-primary-ink"><VenusMark className="h-4 w-5" />Venus</p><div className={`w-full ${markdownClass}`}>{streamText ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{streamText}</ReactMarkdown> : <p role="status" className={`${styles.thinking} text-sm text-ink-muted`}>Considering your request<span aria-hidden="true">…</span></p>}</div></div>}
+              {isTyping && <div className="flex flex-col items-start"><p className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.16em] text-primary-ink"><VenusMark className="h-4 w-5" />Venus</p><VenusActivity activities={activities} live /><div className={`w-full ${markdownClass}`}>{streamText ? <ReactMarkdown remarkPlugins={[remarkGfm]}>{streamText}</ReactMarkdown> : <p role="status" className={`${styles.thinking} text-sm text-ink-muted`}>Waiting for Venus<span aria-hidden="true">…</span></p>}</div></div>}
               <div ref={messagesEndRef} />
             </div>
           </div>
