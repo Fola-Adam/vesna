@@ -58,3 +58,12 @@ export function planVenusAction(catalog: ProductRow[], message: string, history:
   }
   return null
 }
+
+
+/** Factual comparison template; no missing specifications or hands-on claims are inferred. */
+export function compareVenusPicks(products: {name:string; slug:string; price:number|null; category?:string|null; why_victory?:string|null; best_for?:string|null; considerations?:string|null; specifications?:string|null}[]) {
+  const cell = (value?: string|null) => value?.replace(/[|\r\n]/g, ' ').trim() || 'Not recorded'
+  const rows = products.map(product => `| [${cell(product.name)}](/shop/${product.slug}) | ${product.price == null ? 'Not listed' : '$'+product.price.toFixed(2)} | ${cell(product.category)} | ${cell(product.best_for)} | ${cell(product.considerations)} |`)
+  const notes = products.map(product => `**${cell(product.name)}**\n\n${product.why_victory ? cell(product.why_victory) : 'The curator has not recorded a selection note.'}\n\n${product.specifications ? 'Recorded specifications: '+cell(product.specifications) : 'Detailed specifications are not recorded.'}`).join('\n\n')
+  return 'Here is a comparison using the details recorded in Vesna.\n\n| Pick | Listed price | Category | Who it suits | What to consider |\n| --- | --- | --- | --- | --- |\n'+rows.join('\n')+'\n\n'+notes+'\n\nPrices are listed catalog prices; check the seller for current price and availability. Missing details do not imply that a product lacks a feature.'
+}

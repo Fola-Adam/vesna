@@ -1,6 +1,6 @@
 import {test} from 'node:test'
 import assert from 'node:assert/strict'
-import {planVenusAction, validVenusAction} from '../../lib/venus-actions.ts'
+import {compareVenusPicks, planVenusAction, validVenusAction} from '../../lib/venus-actions.ts'
 const one={id:'11111111-1111-4111-8111-111111111111',name:'Sony WH-1000XM6',slug:'sony-wh-1000xm6',categories:{name:'Audio'}}
 const two={id:'22222222-2222-4222-8222-222222222222',name:'Sony Speaker',slug:'sony-speaker',categories:{name:'Audio'}}
 const catalog=[one,two]
@@ -26,4 +26,13 @@ test('the browser action boundary rejects external and administrative destinatio
  assert.equal(validVenusAction({kind:'navigate',path:'//evil.example'}),false)
  assert.equal(validVenusAction({kind:'navigate',path:'/picks?redirect=https://evil.example'}),false)
  assert.equal(validVenusAction({kind:'navigate',path:'/picks?maxPrice=-1'}),false)
+})
+
+test('comparison reports missing facts and uses only supplied records',()=>{
+ const result=compareVenusPicks([{...one,price:378,category:'Audio',considerations:null,specifications:null}])
+ assert.match(result,/\$378\.00/)
+ assert.match(result,/Not recorded/)
+ assert.match(result,/Detailed specifications are not recorded/)
+ assert.match(result,/\/shop\/sony-wh-1000xm6/)
+ assert.doesNotMatch(result,/tested|battery life|waterproof/i)
 })

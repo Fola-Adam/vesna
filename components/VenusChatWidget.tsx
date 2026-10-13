@@ -140,7 +140,7 @@ export default function VenusChatWidget() {
         setMessages(previous => [...previous, { role: 'assistant', content: streamContentRef.current + '\n\n_Response stopped._', products: streamProductsRef.current }])
       }
       if (!controller.signal.aborted) setMessages(previous => [...previous, {
-        role: 'assistant', error: true, content: failure instanceof Error ? failure.message : 'Venus is temporarily unavailable. Please try again.',
+        role: 'assistant', error: true, content: failure instanceof Error && failure.message !== 'Failed to fetch' ? failure.message : 'Venus could not connect. Please try again.',
       }])
     } finally {
       if (streamFlushRef.current) clearInterval(streamFlushRef.current)
@@ -152,7 +152,7 @@ export default function VenusChatWidget() {
   }
 
   const hasConversation = messages.some(message => message.role === 'user')
-  const markdownClass = "break-words text-[15px] leading-[1.85] [&_a]:font-medium [&_a]:text-primary-ink [&_a]:underline [&_a]:decoration-[#1b5a45]/30 [&_a]:underline-offset-4 [&_p]:mb-4 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-5 [&_h2]:mb-3 [&_h2]:font-display-hero [&_h2]:text-2xl [&_h3]:mb-2 [&_h3]:font-semibold"
+  const markdownClass = "break-words text-[15px] leading-[1.85] [&_a]:font-medium [&_a]:text-primary-ink [&_a]:underline [&_a]:decoration-[#1b5a45]/30 [&_a]:underline-offset-4 [&_p]:mb-4 [&_p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:space-y-2 [&_ol]:pl-5 [&_h2]:mb-3 [&_h2]:font-display-hero [&_h2]:text-2xl [&_h3]:mb-2 [&_h3]:font-semibold [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto [&_table]:text-xs [&_th]:border-b [&_th]:border-ink/20 [&_th]:p-3 [&_th]:text-left [&_td]:border-b [&_td]:border-ink/10 [&_td]:p-3"
   return <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
     <Dialog.Trigger asChild>
       <button onClick={() => openChat()} aria-label="Open chat assistant" className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-4 z-40 inline-flex min-h-14 items-center gap-3 rounded-full border border-[#1b5a45]/40 bg-[#10382d] py-2 pl-3 pr-5 text-paper shadow-xl transition-colors hover:bg-[#174938] focus-ring">

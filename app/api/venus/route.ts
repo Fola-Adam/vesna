@@ -1,4 +1,4 @@
-import { planVenusAction } from '@/lib/venus-actions'
+import { compareVenusPicks, planVenusAction } from '@/lib/venus-actions'
 import { readPublishedStories } from '@/lib/journal-server'
 import { readActiveCatalog } from '@/lib/data'
 import { selectVenusProducts } from '@/lib/venus-catalog'
@@ -110,9 +110,17 @@ export async function POST(request: Request) {
     }
     matchedReadings = selectVenusReadings(message, safeHistory, stories)
     const savedCatalog = /\b(?:shortlist|saved picks|wishlist)\b/i.test(message) ? catalog.filter(product => savedIds.includes(product.id)) : catalog
-    const comparison = /\bcompare\b/i.test(message) ? savedCatalog.filter(product => message.toLowerCase().includes(product.name.toLowerCase())) : []
+    const named = savedCatalog.filter(product => message.toLowerCase().includes(product.name.toLowerCase()))
+    const comparison = /\bcompare\b/i.test(message) ? (named.length >= 2 ? named : /\b(?:my shortlist|saved picks|wishlist)\b/i.test(message) ? savedCatalog : []) : []
     matchedProducts = selectVenusProducts(comparison.length >= 2 ? comparison : savedCatalog, message, safeHistory,
       typeof productSlug === 'string' ? productSlug : null, MAX_PRODUCTS)
+    if (comparison.length >= 2) {
+      matchedProducts = selectVenusProducts(comparison, 'Compare options', [], null, 3)
+      const events: VenusEvent[] = comparison.length > 3
+        ? [{type:'text',text:'Select two or three picks on your Shortlist page, then choose Compare selected so we can give each a useful comparison.'},{type:'done'}]
+        : [{type:'text',text:compareVenusPicks(matchedProducts)},{type:'products',products:matchedProducts.slice(0,3)},{type:'done'}]
+      return new Response(events.map(event => JSON.stringify(event)).join('\n')+'\n',{headers:{'Content-Type':'application/x-ndjson; charset=utf-8','Cache-Control':'no-store'}})
+    }
   } catch {
     console.error('Venus catalog retrieval failed')
     return Response.json({ error: 'Venus cannot read the collection right now. Please try again shortly.' }, { status: 503 })
