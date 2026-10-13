@@ -1,10 +1,13 @@
+import { COLLECTIONS, inCollection } from './catalog-collections'
+import { effectivePricing } from './pricing'
 import type { ProductRow } from './data'
 
 export type VenusAction =
   | { kind: 'save' | 'remove'; id: string; name: string; slug: string }
+  | { kind: 'save_many'; products: {id:string;name:string;slug:string}[]; label:string }
   | { kind: 'clear' }
   | { kind: 'navigate'; path: string }
-export type VenusActionPlan = { action?: VenusAction; message: string }
+export type VenusActionPlan = { action?: VenusAction; message: string; productSlugs?: string[] }
 const fold = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 const compact = (text: string) => fold(text).replaceAll(' ', '')
 const mentions = (text: string, product: Pick<ProductRow,'name'|'slug'>) => compact(text).includes(compact(product.name)) || compact(text).includes(compact(product.slug))
@@ -14,6 +17,7 @@ const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 export function validVenusAction(value: unknown): value is VenusAction {
   if (!value || typeof value !== 'object') return false
   const action = value as Record<string, unknown>
+  if (action.kind === 'save_many') return typeof action.label === 'string' && action.label.length <= 150 && Array.isArray(action.products) && action.products.length > 0 && action.products.length <= 20 && new Set(action.products.map(product => product?.id)).size === action.products.length && action.products.every(product => validVenusAction({...product,kind:'save'}))
   if (action.kind === 'clear') return true
   if (action.kind === 'save' || action.kind === 'remove') return typeof action.id === 'string' && uuid.test(action.id) && typeof action.name === 'string' && action.name.length <= 300 && typeof action.slug === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(action.slug)
   if (action.kind !== 'navigate' || typeof action.path !== 'string') return false
@@ -25,8 +29,17 @@ export function validVenusAction(value: unknown): value is VenusAction {
 
 /** Explicit user commands, resolved against current catalog records; model output cannot invent actions. */
 export function planVenusAction(catalog: ProductRow[], message: string, history: {role: string; content: string}[] = [], productSlug?: string | null, savedIds: string[] = []): VenusActionPlan | null {
-  const command = message.trim().replace(/^(?:please\s+|(?:can|could|would) you\s+)+/i, '')
+  const command = message.trim().replace(/\bshortlost\b/ig, 'shortlist').replace(/^(?:please\s+|(?:can|could|would) you\s+)+/i, '')
   if (/\b(?:do not|don't|dont|never)\b/i.test(message) || /\b(?:how (?:can|do|to)|should i)\b/i.test(message)) return null
+  const scope = scopeFor(command, catalog)
+  const informationRequest = /^(?:tell\s*me|recommend|find|list|what|which|show me)\b/i.test(command)
+  const bulkRequest = /\b(?:add|save|bookmark|put|pop|keep)\b/i.test(command) && /\b(?:all|any|every|matching|products|picks|items)\b/i.test(command)
+  const bulkFollowup = /^(?:any|all|every|those|whatever|i mean)\b/i.test(command) && history.filter(entry => entry.role === 'user').slice(-3).some(entry => /\b(?:add|save|bookmark)\b/i.test(entry.content) && /\b(?:all|any|every|products|picks|items)\b/i.test(entry.content))
+  if (scope && informationRequest) {
+    const products = scopeProducts(catalog,scope,command)
+    return {message: products.length ? `These ${products.length} picks match ${scope.label}:\n\n` + products.map(product => `- [${product.name}](/shop/${product.slug})${effectivePricing(product).price == null ? '' : ' - $'+effectivePricing(product).price!.toFixed(2)}: ${product.why_victory || product.description || 'The curator has not recorded a selection note.'}`).join('\n') : 'There are no current picks matching that group and budget.', productSlugs:products.slice(0,3).map(product=>product.slug)}
+  }
+  if (scope && (bulkRequest || bulkFollowup)) return groupSavePlan(catalog,scope,command)
   const previous = history.at(-1)
   const previousAssistant = previous?.role === 'assistant' ? previous.content : ''
   const previousNames = catalog.filter(product => mentions(previousAssistant, product))
@@ -44,6 +57,7 @@ export function planVenusAction(catalog: ProductRow[], message: string, history:
   if (/^(?:done|did you (?:add|save|remove) (?:it|that)|is it (?:done|saved|added))[?! .]*$/i.test(command)) {
     const reference = [...history].reverse().find(entry => entry.role === 'assistant' && /\b(?:shortlist|wishlist)\b/i.test(entry.content) && catalog.some(product => mentions(entry.content, product)))
     const named = reference ? catalog.filter(product => mentions(reference.content, product)) : []
+    if (named.length > 1) return {message:`${named.filter(product=>savedIds.includes(product.id)).length} of the ${named.length} picks from that reply are currently in your shortlist.`}
     if (named.length === 1) return {message:savedIds.includes(named[0].id) ? `${named[0].name} is currently in your shortlist.` : `${named[0].name} is not in your shortlist. Would you like me to add ${named[0].name} to your shortlist?`}
     return {message:'I cannot verify which pick you mean. Give me the product name and I will check your current shortlist.'}
   }
@@ -105,7 +119,14 @@ export function resolveVenusTool(catalog: ProductRow[], name: string, args: unkn
   const parameters = args as Record<string,unknown>
   if (/\b(?:do not|don't|dont|never)\b/i.test(message) || /\b(?:should i|how (?:can|do|to))\b/i.test(message)) return {message:'I have not changed your shortlist. Tell me directly if you want a pick saved or removed.'}
   const existingPlan = planVenusAction(catalog,message,history,productSlug,savedIds)
-  if (existingPlan?.action) return existingPlan
+  if (existingPlan?.action || existingPlan?.productSlugs) return existingPlan
+  if (name === 'save_matching_picks' && /\b(?:add|save|bookmark|put|pop|keep)\b/i.test(message) && /\b(?:all|any|every|matching|products|picks|items)\b/i.test(message)) {
+    const requestedScope = scopeFor(message,catalog)
+    const collection = COLLECTIONS.find(item=>item.slug===parameters.collection)
+    const category = catalog.map(product=>product.categories?.name).find(category=>category && category.toLowerCase()===parameters.category)
+    const scope = requestedScope ?? (collection && fold(message).includes(fold(collection.title)) ? {collection:collection.slug,label:collection.title} : category && fold(message).split(' ').includes(category.toLowerCase()) ? {category:category.toLowerCase(),label:category+' picks'} : null)
+    return scope ? groupSavePlan(catalog,scope,message) : {message:'Which collection or category should I save? I can save all current picks in a matching group.'}
+  }
   if (name === 'open_shortlist' && /\b(?:open|show|take|go|view)\b/i.test(message)) return {action:{kind:'navigate',path:'/shortlist'},message:'Opening your shortlist.'}
   if (name === 'clear_shortlist' && /\b(?:clear|empty|remove all)\b/i.test(message) && /\b(?:shortlist|wishlist)\b/i.test(message)) return {action:{kind:'clear'},message:'Confirm below to clear your shortlist. You can undo this afterwards.'}
   if (name === 'filter_picks' && /\b(?:show|browse|filter|open)\b/i.test(message)) {
@@ -134,5 +155,26 @@ export function resolveVenusTool(catalog: ProductRow[], name: string, args: unkn
 }
 
 export function actionClaimWithoutReceipt(text: string) {
-  return /\b(?:shortlist|wishlist|request)\b[\s\S]{0,100}\b(?:processed|updated|completed|saved|added|removed|cleared)\b|\b(?:added|saved|removed|cleared|updated)\b[\s\S]{0,100}\b(?:shortlist|wishlist)\b|\b(?:i have|i've|successfully)\s+(?:added|saved|removed|cleared)\b/i.test(text)
+  return /\b(?:i've|i have|i|we have|we|successfully)\s+(?:now\s+)?(?:saved|added|removed|cleared|updated)\b|\b(?:shortlist|wishlist|request|update)\b[^.!?\n]{0,100}\b(?:has been|have been|was|is now|will be)\s+(?:successfully\s+)?(?:processed|updated|completed|saved|added|removed|cleared)\b/i.test(text)
+}
+
+type Scope = {collection?:string;category?:string;label:string}
+function scopeFor(message: string, catalog: ProductRow[]): Scope | null {
+  if (/\b(?:workspace|work space|desk|office|work setup)\b/i.test(message)) return {collection:'considered-workspace',label:'workspace use'}
+  if (/\b(?:slower mornings|morning routine|coffee ritual)\b/i.test(message)) return {collection:'slower-mornings',label:'Slower mornings'}
+  if (/\b(?:on the move|travelling|traveling|travel|commute)\b/i.test(message)) return {collection:'on-the-move',label:'On the move'}
+  const categories = [...new Set(catalog.map(product=>product.categories?.name).filter((name):name is string=>!!name))]
+  const category = categories.find(name=>fold(message).split(' ').includes(name.toLowerCase()))
+  return category ? {category:category.toLowerCase(),label:category+' picks'} : null
+}
+function scopeProducts(catalog:ProductRow[],scope:Scope,message:string) {
+  const budget=message.match(/(?:under|below|up to|maximum)\s*\$?\s*([\d,]+(?:\.\d+)?)/i)
+  const limit=budget ? Number(budget[1].replaceAll(',','')) : null
+  return catalog.filter(product=>product.item_type!=='archive' && (scope.collection ? (inCollection(product,scope.collection) || (scope.collection==='considered-workspace' && /\b(?:workspace|desk|office|focused work|work session|productivity)\b/i.test(`${product.description ?? ''} ${product.why_victory ?? ''} ${product.best_for ?? ''}`))) : product.categories?.name.toLowerCase()===scope.category) && (limit==null || (effectivePricing(product).price!=null && effectivePricing(product).price!<=limit)))
+}
+function groupSavePlan(catalog:ProductRow[],scope:Scope,message:string):VenusActionPlan {
+  const matches=scopeProducts(catalog,scope,message).filter(product=>uuid.test(product.id))
+  if (!matches.length) return {message:'There are no current catalog picks matching that group and budget.'}
+  if (matches.length>20) return {message:'That group contains more than 20 picks. Narrow it by category or budget so I can save a useful set.'}
+  return {action:{kind:'save_many',label:scope.label,products:matches.map(({id,name,slug})=>({id,name,slug}))},message:''}
 }

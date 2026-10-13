@@ -1,6 +1,14 @@
-import {test} from 'node:test'
+import {test,after} from 'node:test'
 import assert from 'node:assert/strict'
-import {actionClaimWithoutReceipt, compareVenusPicks, planVenusAction, resolveVenusTool, validVenusAction} from '../../lib/venus-actions.ts'
+import {mkdtempSync,readFileSync,writeFileSync,rmSync} from 'node:fs'
+import {tmpdir} from 'node:os'
+import {join} from 'node:path'
+import {createRequire} from 'node:module'
+import ts from 'typescript'
+const directory=mkdtempSync(join(tmpdir(),'vesna-actions-'))
+for(const name of ['pricing','catalog-collections','venus-actions']) writeFileSync(join(directory,`${name}.js`),ts.transpileModule(readFileSync(new URL(`../../lib/${name}.ts`,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021}}).outputText)
+const {actionClaimWithoutReceipt, compareVenusPicks, planVenusAction, resolveVenusTool, validVenusAction}=createRequire(import.meta.url)(join(directory,'venus-actions.js'))
+after(()=>rmSync(directory,{recursive:true,force:true}))
 const one={id:'11111111-1111-4111-8111-111111111111',name:'Sony WH-1000XM6',slug:'sony-wh-1000xm6',categories:{name:'Audio'}}
 const two={id:'22222222-2222-4222-8222-222222222222',name:'Sony Speaker',slug:'sony-speaker',categories:{name:'Audio'}}
 const catalog=[one,two]
@@ -73,4 +81,32 @@ test('the screenshot wording Era100 resolves to the canonical Era 100 record',()
  assert.equal(offer.action,undefined)
  assert.match(offer.message,/Sonos Era 100/)
  assert.equal(planVenusAction([sonos],'yes',[{role:'assistant',content:'Would you like to add **Sonos Era100** to your Shortlist?'}]).action.id,sonos.id)
+})
+
+const keyboard={...one,id:'44444444-4444-4444-8444-444444444444',name:'Logitech MX Keys S',slug:'logitech-mx-keys-s',categories:{name:'Workspace'}}
+const charger={...two,id:'55555555-5555-4555-8555-555555555555',name:'Anker Charger',slug:'anker-charger',categories:{name:'Tech'}}
+const mug={...two,id:'66666666-6666-4666-8666-666666666666',name:'Ember Mug',slug:'ember-mug',categories:{name:'Home'},description:'Keeps coffee warm during a work session.'}
+const workspaceCatalog=[keyboard,charger,mug,sonos]
+test('bulk workspace saves include related Tech and recorded work use without including unrelated home audio',()=>{
+ const plan=planVenusAction(workspaceCatalog,'add all the products that can be used in a workspace to my shortlost')
+ assert.equal(plan.action.kind,'save_many')
+ assert.deepEqual(plan.action.products.map(product=>product.id),[keyboard.id,charger.id,mug.id])
+ assert.equal(validVenusAction(plan.action),true)
+})
+test('a group clarification keeps the earlier bulk intent while a discovery question does not mutate',()=>{
+ const history=[{role:'user',content:'add all workspace products to my shortlist'},{role:'assistant',content:'Which pick do you mean? Give me its product name.'}]
+ assert.equal(planVenusAction(workspaceCatalog,'any that can be used in a workspace is what i mean.',history).action.kind,'save_many')
+ const discovery=planVenusAction(workspaceCatalog,'tellme products that can be used in a workspace',history)
+ assert.equal(discovery.action,undefined)
+ assert.equal(discovery.productSlugs.length,3)
+ assert.match(discovery.message,/Anker Charger/)
+})
+test('ordinary shortlist advice does not get mistaken for a completed action',()=>{
+ assert.equal(actionClaimWithoutReceipt('Here are workspace picks. You can add any of these to your shortlist, or keep your previously saved picks.'),false)
+ assert.equal(actionClaimWithoutReceipt('You removed a pick earlier. These are the current workspace options.'),false)
+ assert.equal(validVenusAction({kind:'save_many',label:'workspace',products:[{kind:'navigate',path:'/shortlist'}]}),false)
+})
+
+test('a contextual tool call still resolves a single previously named pick',()=>{
+ assert.equal(resolveVenusTool([sonos],'save_pick',{slug:sonos.slug},'Pop that onto my wishlist',[{role:'assistant',content:'Sonos Era 100 is a room speaker.'}]).action.id,sonos.id)
 })

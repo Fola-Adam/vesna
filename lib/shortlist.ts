@@ -43,6 +43,15 @@ export function useShortlist() {
       return true
     } catch { return false }
   }
+  function addMany(newIds: string[]) {
+    try {
+      const current = parse(snapshot())
+      const next = [...new Set([...current,...newIds])]
+      if (next.length > 200) return {success:false,added:0}
+      write(next)
+      return {success:true,added:next.length-current.length}
+    } catch {return {success:false,added:0}}
+  }
   function remove(id: string) {
     try {
       const current = parse(snapshot())
@@ -72,5 +81,5 @@ export function useShortlist() {
     } catch { return false }
   }
   function toggle(id: string) { return parse(snapshot()).includes(id) ? remove(id) : add(id) }
-  return { ids, toggle, add, remove, clear, undo, canUndo: removedIds.length > 0 }
+  return { ids, toggle, add, addMany, remove, clear, undo, canUndo: removedIds.length > 0 }
 }

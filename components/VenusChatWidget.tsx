@@ -38,7 +38,7 @@ function resizeComposer(element: HTMLTextAreaElement | null) {
 export default function VenusChatWidget() {
   const { isOpen, setIsOpen, draft: inputValue, setDraft: setInputValue, productSlug, openChat, clearProductContext } = useVenus()
   const router = useRouter()
-  const { ids: shortlistIds, add, remove, clear, undo, canUndo } = useShortlist()
+  const { ids: shortlistIds, add, addMany, remove, clear, undo, canUndo } = useShortlist()
   const streamActionRef = useRef<VenusAction | null>(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [messages, setMessages] = useState<Message[]>(WELCOME_MESSAGES)
@@ -129,6 +129,11 @@ export default function VenusChatWidget() {
         const successful = action.kind === 'save' ? add(action.id) : remove(action.id)
         actionError = !successful
         content = successful ? (action.kind === 'save' ? `${action.name} is in your shortlist. [View your shortlist](/shortlist).` : `Removed ${action.name} from your shortlist. You can undo this below.`) : 'I could not update your shortlist. Check that browser storage is available, then try again.'
+      }
+      if (action?.kind === 'save_many') {
+        const result=addMany(action.products.map(product=>product.id))
+        actionError=!result.success
+        content=result.success ? `${result.added ? `Added ${result.added} picks matching ${action.label}.` : `All ${action.products.length} picks matching ${action.label} are already saved.`}${action.products.length-result.added && result.added ? ` ${action.products.length-result.added} were already saved.` : ''}\n\n${action.products.map(product=>`- [${product.name}](/shop/${product.slug})`).join('\n')}\n\n[View your shortlist](/shortlist).` : 'I could not save that group. Check browser storage and the 200-pick shortlist limit; no partial group was saved.'
       }
       if (action?.kind === 'navigate') { router.push(action.path); setIsOpen(false) }
 
