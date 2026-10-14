@@ -352,7 +352,10 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
           const generated=detail.failed_generation
           if(/search_catalog/.test(generated)) providerCode='tool_requested_catalog_again'
           else if(/select_picks/.test(generated)) providerCode='tool_selection_schema_failed'
-          else providerCode='tool_unexpected_function'
+          else {
+            const name=generated.match(/(?:<function=|"name"\s*:\s*")([a-zA-Z_][a-zA-Z0-9_.]{0,60})/)?.[1]
+            providerCode=name ? `tool_unexpected_${name.replaceAll('.','_')}` : `tool_format_${generated.trim().startsWith('{') ? 'json' : generated.trim().startsWith('<') ? 'markup' : 'other'}`
+          }
         }
         const allowed=['conflicting_tool_calls','incomplete_tool_call','invalid_tool_json','oversized_tool_payload','incomplete_reply','task_step_limit','task_deadline']
         const code=Date.now()>=deadline ? 'task_deadline' : failure instanceof Error && allowed.includes(failure.message) ? failure.message : providerCode ? `provider_${providerCode}` : status ? `provider_${status}` : failure instanceof Error && failure.name==='APIConnectionTimeoutError' ? 'provider_timeout' : 'provider_stream_error'
