@@ -260,24 +260,16 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
           reasoning_effort: 'low',
           include_reasoning: false,
           messages,
-          stream: true,
+          stream: false,
         }, { signal: abort.signal, timeout:Math.max(1000,Math.min(12_000,deadline-Date.now())) })
 
-        let answer = ''
-        const calls = new Map<number,{id:string;name:string;arguments:string}>()
-        let finishReason: string | null = null
-        for await (const chunk of completion) {
-          const choice = chunk.choices?.[0]
-          if (choice?.finish_reason) finishReason = choice.finish_reason
-          answer += choice?.delta?.content ?? ''
-          for (const delta of choice?.delta?.tool_calls ?? []) {
-            const call = calls.get(delta.index) ?? {id:'',name:'',arguments:''}
-            call.id += delta.id ?? ''
-            call.name += delta.function?.name ?? ''
-            call.arguments += delta.function?.arguments ?? ''
-            if (call.arguments.length > 16_000) throw new Error('oversized_tool_payload')
-            calls.set(delta.index,call)
-          }
+        const choice=completion.choices?.[0]
+        let answer=choice?.message?.content ?? ''
+        const calls=new Map<number,{id:string;name:string;arguments:string}>()
+        const finishReason=choice?.finish_reason ?? null
+        for(const [index,call] of (choice?.message?.tool_calls ?? []).entries()) {
+          if(call.function.arguments.length>16_000) throw new Error('oversized_tool_payload')
+          calls.set(index,{id:call.id,name:call.function.name,arguments:call.function.arguments})
         }
         if (calls.size) {
           if (calls.size !== 1) throw new Error('conflicting_tool_calls')
