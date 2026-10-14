@@ -256,7 +256,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         const completion = await groq.chat.completions.create({
           model: 'openai/gpt-oss-120b',
           max_completion_tokens: 4096,
-          tools:requiresSelection ? tools.filter(tool=>tool.function.name==='select_picks') : tools, tool_choice:requiresSelection ? 'required' : 'auto', parallel_tool_calls: false,
+          tools:requiresSelection ? tools.filter(tool=>tool.function?.name==='select_picks') : tools, tool_choice:requiresSelection ? 'required' : 'auto', parallel_tool_calls: false,
           reasoning_effort: 'low',
           include_reasoning: false,
           messages,
