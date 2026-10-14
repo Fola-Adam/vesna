@@ -291,6 +291,11 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
             continue
           }
           if (call.name === 'select_picks') {
+            if(requiresSelection && step===1 && !validateSelection(actionCatalog,argumentsValue,message,task) && Array.isArray(parameters.products) && parameters.products.length) {
+              const badSlug=parameters.products.some((item:{slug?:string})=>!actionCatalog.some(product=>product.slug===item.slug))
+              const badField=parameters.products.some((item:{slug?:string;evidenceField?:string})=>{const product=actionCatalog.find(product=>product.slug===item.slug);return !product || typeof product[item.evidenceField as keyof typeof product]!=='string' || String(product[item.evidenceField as keyof typeof product]).trim().length<12})
+              throw new Error(badSlug ? 'selection_unknown_slug' : badField ? 'selection_empty_evidence' : 'selection_budget_or_shape')
+            }
             if (searched && parameters && Array.isArray(parameters.products) && !parameters.products.length && typeof parameters.message==='string' && parameters.message.trim() && parameters.message.length<=1000 && !actionClaimWithoutReceipt(parameters.message) && !(/\b(?:would you like|shall i|do you want)\b/i.test(parameters.message) && /\b(?:add|save|shortlist|wishlist)\b/i.test(parameters.message))) {
               send({type:'activity',activity:{id:'consider',label:'Checked the catalog; no selection was made',state:'complete'}})
               send({type:'task',task:{...task,selectionIds:[]}})
@@ -361,7 +366,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
             providerCode=name ? `tool_unexpected_${name.replaceAll('.','_')}` : `tool_format_${generated.trim().startsWith('{') ? 'json' : generated.trim().startsWith('<') ? 'markup' : 'other'}`
           }
         }
-        const allowed=['conflicting_tool_calls','incomplete_tool_call','invalid_tool_json','oversized_tool_payload','incomplete_reply','task_step_limit','task_deadline']
+        const allowed=['selection_unknown_slug','selection_empty_evidence','selection_budget_or_shape','conflicting_tool_calls','incomplete_tool_call','invalid_tool_json','oversized_tool_payload','incomplete_reply','task_step_limit','task_deadline']
         const code=Date.now()>=deadline ? 'task_deadline' : failure instanceof Error && allowed.includes(failure.message) ? failure.message : providerCode ? `provider_${providerCode}` : status ? `provider_${status}` : failure instanceof Error && failure.name==='APIConnectionTimeoutError' ? 'provider_timeout' : 'provider_stream_error'
         send({ type: 'error', message, code })
         if (!cancelled) controller.close()
