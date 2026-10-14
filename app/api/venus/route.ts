@@ -256,10 +256,10 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         const completion = await groq.chat.completions.create({
           model: 'openai/gpt-oss-120b',
           max_completion_tokens: 4096,
-          tools:requiresSelection ? tools.filter(tool=>tool.function?.name==='select_picks') : tools, tool_choice:requiresSelection ? 'required' : 'auto', parallel_tool_calls: false,
+          ...(requiresSelection ? {response_format:{type:'json_schema' as const,json_schema:{name:'venus_selection',strict:true,schema:{type:'object',properties:{message:{type:'string'},label:{type:'string'},products:{type:'array',items:{type:'object',properties:{slug:{type:'string',enum:catalogSlugs},evidenceField:{type:'string',enum:['description','best_for','why_victory','specifications']}},required:['slug','evidenceField'],additionalProperties:false}}},required:['label','products','message'],additionalProperties:false}}}} : {tools,tool_choice:'auto' as const,parallel_tool_calls:false}),
           reasoning_effort: 'low',
           include_reasoning: false,
-          messages,
+          messages:requiresSelection ? [...messages.filter(item=>!('tool_calls' in item)).map(item=>item.role==='tool' ? {role:'system' as const,content:String(item.content)} : item),{role:'system',content:'Return the complete proposed selection as JSON, even when prior picks need no change. Use current records below. Never report a save. Use an empty products array plus an explanation if no suitable selection is recorded. Catalog: '+JSON.stringify(records)}] : messages,
           stream: false,
         }, { signal: abort.signal, timeout:Math.max(1000,Math.min(12_000,deadline-Date.now())) })
 
@@ -270,6 +270,10 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         for(const [index,call] of (choice?.message?.tool_calls ?? []).entries()) {
           if(call.function.arguments.length>16_000) throw new Error('oversized_tool_payload')
           calls.set(index,{id:call.id,name:call.function.name,arguments:call.function.arguments})
+        }
+        if(requiresSelection && answer) {
+          calls.set(0,{id:'structured_selection',name:'select_picks',arguments:answer})
+          answer=''
         }
         if (calls.size) {
           if (calls.size !== 1) throw new Error('conflicting_tool_calls')
@@ -359,7 +363,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         }
         const allowed=['conflicting_tool_calls','incomplete_tool_call','invalid_tool_json','oversized_tool_payload','incomplete_reply','task_step_limit','task_deadline']
         const code=Date.now()>=deadline ? 'task_deadline' : failure instanceof Error && allowed.includes(failure.message) ? failure.message : providerCode ? `provider_${providerCode}` : status ? `provider_${status}` : failure instanceof Error && failure.name==='APIConnectionTimeoutError' ? 'provider_timeout' : 'provider_stream_error'
-        send({ type: 'error', message:providerCode?.startsWith('tool_') && task.brief==='Find a workspace starter set under $200 total' && typeof detail?.failed_generation==='string' ? detail.failed_generation.slice(0,1200) : message, code })
+        send({ type: 'error', message, code })
         if (!cancelled) controller.close()
       } finally { clearInterval(heartbeat);clearTimeout(taskTimer) }
     },
