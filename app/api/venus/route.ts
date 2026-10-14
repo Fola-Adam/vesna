@@ -345,7 +345,8 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
             : status === 400 || status === 404
               ? 'Venus cannot start its AI model right now. The model configuration needs attention.'
               : 'Venus could not complete that response. Please try again.'
-        const detail=failure && typeof failure==='object' && 'error' in failure ? failure.error as {code?:unknown;message?:unknown} : null
+        const rawDetail=failure && typeof failure==='object' && 'error' in failure ? failure.error as {code?:unknown;message?:unknown;error?:{code?:unknown;message?:unknown}} : null
+        const detail=rawDetail?.error ?? rawDetail
         const providerCode=detail && typeof detail.code==='string' && ['tool_use_failed','invalid_request_error','rate_limit_exceeded'].includes(detail.code) ? detail.code : null
         const allowed=['conflicting_tool_calls','incomplete_tool_call','invalid_tool_json','oversized_tool_payload','incomplete_reply','task_step_limit','task_deadline']
         const code=Date.now()>=deadline ? 'task_deadline' : failure instanceof Error && allowed.includes(failure.message) ? failure.message : providerCode ? `provider_${providerCode}` : status ? `provider_${status}` : failure instanceof Error && failure.name==='APIConnectionTimeoutError' ? 'provider_timeout' : 'provider_stream_error'
