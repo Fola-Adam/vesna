@@ -1,5 +1,5 @@
 import { createClient as createMemberClient } from '@/lib/supabase/server'
-import { advanceVenusTask, catalogToolRecords, confirmVenusSelection, taskBudget, validateSelection } from '@/lib/venus-task'
+import { advanceVenusTask, groundSelectionEvidence, catalogToolRecords, confirmVenusSelection, taskBudget, validateSelection } from '@/lib/venus-task'
 import { actionClaimWithoutReceipt, compareVenusPicks, planVenusAction, resolveVenusTool } from '@/lib/venus-actions'
 import { readPublishedStories } from '@/lib/journal-server'
 import { readActiveCatalog } from '@/lib/data'
@@ -281,14 +281,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
           const call = [...calls.values()][0]
           let argumentsValue: unknown
           try {argumentsValue=JSON.parse(call.arguments)} catch {throw new Error('invalid_tool_json')}
-          if(requiresSelection && argumentsValue && typeof argumentsValue==='object' && 'products' in argumentsValue && Array.isArray(argumentsValue.products)) {
-            argumentsValue={...argumentsValue,products:argumentsValue.products.map(item=>{
-              if(!item || typeof item!=='object' || typeof item.slug!=='string') return item
-              const product=actionCatalog.find(product=>product.slug===item.slug)
-              const field=(['best_for','description','why_victory','specifications'] as const).find(field=>product && typeof product[field]==='string' && product[field]!.trim().length>=12)
-              return {...item,evidenceField:field ?? ''}
-            })}
-          }
+          if(requiresSelection) argumentsValue=groundSelectionEvidence(actionCatalog,argumentsValue)
           const parameters=argumentsValue as Record<string,unknown>
           if (call.name === 'search_catalog') {
             send({type:'activity',activity:{id:'search',label:'Reading product uses, details and prices',state:'running'}})

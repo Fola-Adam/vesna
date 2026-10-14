@@ -94,3 +94,14 @@ export function catalogToolRecords(catalog: ProductRow[]) {
     specifications: product.specifications?.slice(0, 1500), considerations: product.considerations?.slice(0, 1000),
   }))
 }
+
+/** Discovery proposes slugs; source evidence is selected from populated real fields. */
+export function groundSelectionEvidence(catalog: ProductRow[], value: unknown): unknown {
+  if(!value || typeof value!=='object' || !('products' in value) || !Array.isArray(value.products)) return value
+  return {...value,products:value.products.map(item=>{
+    if(!item || typeof item!=='object' || typeof item.slug!=='string') return item
+    const product=catalog.find(product=>product.slug===item.slug)
+    const field=(['best_for','description','why_victory','specifications'] as const).find(field=>product && typeof product[field]==='string' && product[field]!.trim().length>=12)
+    return {...item,evidenceField:field ?? ''}
+  })}
+}
