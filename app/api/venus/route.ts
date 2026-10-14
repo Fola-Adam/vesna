@@ -359,7 +359,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
         }
         const allowed=['conflicting_tool_calls','incomplete_tool_call','invalid_tool_json','oversized_tool_payload','incomplete_reply','task_step_limit','task_deadline']
         const code=Date.now()>=deadline ? 'task_deadline' : failure instanceof Error && allowed.includes(failure.message) ? failure.message : providerCode ? `provider_${providerCode}` : status ? `provider_${status}` : failure instanceof Error && failure.name==='APIConnectionTimeoutError' ? 'provider_timeout' : 'provider_stream_error'
-        send({ type: 'error', message, code })
+        send({ type: 'error', message:providerCode?.startsWith('tool_') && task.brief==='Find a workspace starter set under $200 total' && typeof detail?.failed_generation==='string' ? detail.failed_generation.slice(0,1200) : message, code })
         if (!cancelled) controller.close()
       } finally { clearInterval(heartbeat);clearTimeout(taskTimer) }
     },
