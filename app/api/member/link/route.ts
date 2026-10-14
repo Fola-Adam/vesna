@@ -1,3 +1,4 @@
+import { memberRequestOrigin } from '@/lib/member-origin'
 import { createServiceClient } from '@/lib/supabase/service'
 import { sendMemberLink } from '@/lib/member-email'
 export const runtime='nodejs'
@@ -9,8 +10,8 @@ function limited(key:string,limit:number,windowMs:number) {
   return false
 }
 export async function POST(request:Request) {
-  const origin=new URL(request.url).origin
-  if(request.headers.get('origin')!==origin) return Response.json({error:'Invalid request origin.'},{status:403})
+  const origin=memberRequestOrigin(request)
+  if(!origin) return Response.json({error:'Invalid request origin.'},{status:403})
   const ip=request.headers.get('x-nf-client-connection-ip') || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
   if(limited('ip:'+ip,4,900000) || limited('global',100,3600000)) return Response.json({error:'Please wait before requesting another sign-in link.'},{status:429})
   try {

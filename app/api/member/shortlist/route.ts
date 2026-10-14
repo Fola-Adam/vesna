@@ -1,3 +1,4 @@
+import { memberRequestOrigin } from '@/lib/member-origin'
 import { createClient } from '@/lib/supabase/server'
 
 export const runtime='nodejs'
@@ -17,7 +18,7 @@ export async function GET() {
   } catch {return Response.json({error:'Membership is temporarily unavailable.'},{status:503,headers})}
 }
 export async function POST(request:Request) {
-  if (request.headers.get('origin')!==new URL(request.url).origin) return Response.json({error:'Invalid request origin.'},{status:403,headers})
+  if (!memberRequestOrigin(request)) return Response.json({error:'Invalid request origin.'},{status:403,headers})
   try {
     const {client,user}=await member()
     if (!user) return Response.json({error:'Join or sign in as a Vesnaian to save picks.',code:'membership_required'},{status:401,headers})

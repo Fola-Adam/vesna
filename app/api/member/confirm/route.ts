@@ -1,6 +1,7 @@
+import { memberRequestOrigin } from '@/lib/member-origin'
 import { createClient } from '@/lib/supabase/server'
 export async function POST(request:Request) {
-  if(request.headers.get('origin')!==new URL(request.url).origin) return Response.json({error:'Invalid request origin.'},{status:403})
+  if(!memberRequestOrigin(request)) return Response.json({error:'Invalid request origin.'},{status:403})
   try {
     const {token}=await request.json()
     if(typeof token!=='string' || !/^[a-zA-Z0-9_-]{20,256}$/.test(token)) return Response.json({error:'This sign-in link is invalid.'},{status:400})

@@ -71,9 +71,10 @@ export function validateSelection(catalog: ProductRow[], value: unknown, message
   const ceiling = budget?.amount ?? null
   const products: VenusSelection['products'] = []
   for (const item of input.products) {
-    if (!item || typeof item !== 'object' || typeof item.slug !== 'string' || typeof item.evidence !== 'string') return null
+    if (!item || typeof item !== 'object' || typeof item.slug !== 'string' || typeof item.evidence !== 'string' && typeof item.evidenceField !== 'string') return null
     const product = catalog.find(product => product.slug === item.slug && product.item_type !== 'archive')
-    const evidence = item.evidence.trim()
+    const requestedField=typeof item.evidenceField==='string' && ['description','why_victory','best_for','specifications'].includes(item.evidenceField) ? item.evidenceField as typeof fields[number] : null
+    const evidence = requestedField && product && typeof product[requestedField]==='string' ? product[requestedField]!.trim().slice(0,500) : typeof item.evidence==='string' ? item.evidence.trim() : ''
     const price = product ? effectivePricing(product).price : null
     if (ceiling !== null && (price === null || price > ceiling)) return null
     if (!product || evidence.length < 12 || evidence.length > 500 || products.some(item => item.id === product.id)) return null

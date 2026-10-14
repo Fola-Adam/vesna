@@ -167,7 +167,7 @@ async function respond(request: Request, report: (event: VenusEvent) => void) {
 
   // ---- PHASE 2: Stream from Groq ----
   const { Groq } = await import('groq-sdk')
-  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY, maxRetries:0 })
 
   const productAppendix = matchedProducts.length > 0
     ? '\n\nRelevant products in the catalog right now:\n' +
@@ -189,7 +189,7 @@ About Vesna:
 - Product descriptions and curator notes are supplied by Vesna. Only selection_basis personally_used confirms curator use; researched and design do not imply hands-on testing. not_recorded means the basis is unknown
 - The platform emphasizes objects with purpose and stories worth telling
 - Current sections: Picks (the catalog), Shortlist (saved privately in the signed-in member account), Journal, About, and Archive
-- For discovery or a broad save request about ANY activity, first call search_catalog to read current records, then select_picks with exact recorded evidence for each suitable product. Check the user's purpose, exclusions, budget and recorded limitations; category similarity alone does not establish suitability. If none qualify, explain that honestly. Do not force unrelated products. A broad selection is a proposal; the visitor confirms the exact set before saving. Ask a focused question if the need is ambiguous. Never invent a purpose or specification. Current selected IDs are supplied below; use them for those/them, cheaper alternatives or exclusions. You have real browser action tools. Use save_pick or remove_pick for a visitor's requested shortlist change, including informal wording. Use conversation context to resolve a short follow-up; ask which pick when ambiguous. A yes to your immediately preceding offer authorizes that specific action.
+- For discovery or a broad save request about ANY activity, first call search_catalog to read current records, then select_picks choosing a recorded evidenceField for each suitable product. Check the user's purpose, exclusions, budget and recorded limitations; category similarity alone does not establish suitability. If none qualify, explain that honestly. Do not force unrelated products. A broad selection is a proposal; the visitor confirms the exact set before saving. Ask a focused question if the need is ambiguous. Never invent a purpose or specification. Current selected IDs are supplied below; use them for those/them, cheaper alternatives or exclusions. You have real browser action tools. Use save_pick or remove_pick for a visitor's requested shortlist change, including informal wording. Use conversation context to resolve a short follow-up; ask which pick when ambiguous. A yes to your immediately preceding offer authorizes that specific action.
 - Tool requests are executed by the browser after validation. NEVER describe a change as saved, queued, processed or completed in ordinary prose. An action outcome is displayed by the application after execution. If proposing an action, ask a clear question naming the exact product and action.
 - Shortlist changes require a signed-in Vesnaian and affect only their private account. You cannot modify catalog records, purchase products, or access admin data.
 
@@ -229,7 +229,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
     ...['save_pick','remove_pick','open_pick'].map(name => ({type:'function' as const,function:{name,description:`${name.replaceAll('_',' ')}. Use an exact current catalog slug. Catalog: ${actionCatalog.map(product => `${product.name}: ${product.slug}`).join('; ')}`,parameters:{type:'object',properties:{slug:{type:'string',enum:catalogSlugs}},required:['slug'],additionalProperties:false}}})),
     ...['open_shortlist','clear_shortlist'].map(name => ({type:'function' as const,function:{name,description:name === 'clear_shortlist' ? 'Request visible confirmation to clear the shortlist; never clear it in prose.' : 'Open the dedicated shortlist page.',parameters:{type:'object',properties:{},additionalProperties:false}}})),
     {type:'function',function:{name:'search_catalog',description:'Read the live catalog for any purpose or activity, including gardening, skating, cooking or workspace. Returns recorded product facts and prices for suitability checks. Call before select_picks.',parameters:{type:'object',properties:{},additionalProperties:false}}},
-    {type:'function',function:{name:'select_picks',description:'Present a concrete set of suitable current picks for discovery or confirmation before saving. Quote an exact excerpt of at least 12 characters from each record as evidence. Never guess missing capabilities. Select at most 20. If nothing is suitable or a clarification is necessary, return an empty products array and explain why in message. Never recommend or offer unsupplied picks in that message.',parameters:{type:'object',properties:{message:{type:'string',maxLength:1000},label:{type:'string',maxLength:150},products:{type:'array',minItems:0,maxItems:20,items:{type:'object',properties:{slug:{type:'string',enum:catalogSlugs},evidence:{type:'string',minLength:12,maxLength:500}},required:['slug','evidence'],additionalProperties:false}}},required:['label','products','message'],additionalProperties:false}}},
+    {type:'function',function:{name:'select_picks',description:'Present a concrete set of suitable current picks for discovery or confirmation before saving. Choose the recorded field that supports each pick. The server copies the original evidence; never write or guess a quotation. Never guess missing capabilities. Select at most 20. If nothing is suitable or a clarification is necessary, return an empty products array and explain why in message. Never recommend or offer unsupplied picks in that message.',parameters:{type:'object',properties:{message:{type:'string',maxLength:1000},label:{type:'string',maxLength:150},products:{type:'array',minItems:0,maxItems:20,items:{type:'object',properties:{slug:{type:'string',enum:catalogSlugs},evidenceField:{type:'string',enum:['description','best_for','why_victory','specifications']}},required:['slug','evidenceField'],additionalProperties:false}}},required:['label','products','message'],additionalProperties:false}}},
     {type:'function',function:{name:'filter_picks',description:'Open Picks with a category or maximum USD price requested by the visitor.',parameters:{type:'object',properties:{category:{type:'string',enum:[...new Set(actionCatalog.map(product => product.categories?.name.toLowerCase()).filter(Boolean))]},maxPrice:{type:'number',minimum:0,maximum:1000000}},additionalProperties:false}}},
   ]
   const encoder = new TextEncoder()
@@ -241,19 +241,27 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
     async start(controller) {
       const send = (event: VenusEvent) => { if (!cancelled) controller.enqueue(encoder.encode(JSON.stringify(event) + '\n')) }
       const heartbeat = setInterval(() => send({type:'text',text:''}), 5000)
+      const deadline=Date.now()+18_000
+      const taskTimer=setTimeout(()=>abort.abort(),18_000)
       try {
-        let searched = false
-        for (let step = 0; step < 4; step++) {
+        send({type:'activity',activity:{id:'search',label:'Reading recorded product uses, details and prices',state:'running'}})
+        const records=catalogToolRecords(actionCatalog)
+        send({type:'activity',activity:{id:'search',label:`Read details for ${records.length} current picks`,state:'complete'}})
+        // The application reads known catalog data eagerly; no model round-trip is needed to request it.
+        messages.push({role:'assistant',content:null,tool_calls:[{id:'catalog_bootstrap',type:'function',function:{name:'search_catalog',arguments:'{}'}}]},{role:'tool',tool_call_id:'catalog_bootstrap',content:JSON.stringify(records)})
+        let searched = true
+        for (let step = 0; step < 2; step++) {
+        if(Date.now()>=deadline) throw new Error('task_deadline')
         send({type:'activity',activity:{id:'consider',label:searched ? 'Checking catalog details against your request' : 'Understanding your request',state:'running'}})
         const completion = await groq.chat.completions.create({
           model: 'openai/gpt-oss-120b',
-          max_completion_tokens: 1536,
+          max_completion_tokens: 4096,
           tools, tool_choice: searched ? (requiresSelection ? {type:'function',function:{name:'select_picks'}} : 'auto') : {type:'function',function:{name:'search_catalog'}}, parallel_tool_calls: false,
           reasoning_effort: 'low',
           include_reasoning: false,
           messages,
           stream: true,
-        }, { signal: abort.signal, timeout: 25_000 })
+        }, { signal: abort.signal, timeout:Math.max(1000,Math.min(12_000,deadline-Date.now())) })
 
         let answer = ''
         const calls = new Map<number,{id:string;name:string;arguments:string}>()
@@ -299,7 +307,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
 
             const selection = searched ? validateSelection(actionCatalog,argumentsValue,message,task) : null
             if (!selection) {
-              messages.push({role:'assistant',content:null,tool_calls:[{id:call.id,type:'function',function:{name:call.name,arguments:call.arguments}}]},{role:'tool',tool_call_id:call.id,content:'Selection rejected: use only current slugs, exact recorded evidence excerpts of 12 to 500 characters, distinct picks, and prices within the requested budget. Correct the selection or explain that no suitable products are recorded. No shortlist changes were made.'})
+              messages.push({role:'assistant',content:null,tool_calls:[{id:call.id,type:'function',function:{name:call.name,arguments:call.arguments}}]},{role:'tool',tool_call_id:call.id,content:'Selection rejected: use only current slugs, a populated recorded evidenceField that supports the request, distinct picks, and prices within the requested budget. Correct the selection or explain that no suitable products are recorded. No shortlist changes were made.'})
               continue
             }
             send({type:'activity',activity:{id:'consider',label:`Selected ${selection.products.length} picks with recorded evidence`,state:'complete'}})
@@ -345,11 +353,11 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
             : status === 400 || status === 404
               ? 'Venus cannot start its AI model right now. The model configuration needs attention.'
               : 'Venus could not complete that response. Please try again.'
-        const allowed=['conflicting_tool_calls','incomplete_tool_call','invalid_tool_json','oversized_tool_payload','incomplete_reply','task_step_limit']
-        const code=failure instanceof Error && allowed.includes(failure.message) ? failure.message : status ? `provider_${status}` : failure instanceof Error && failure.name==='APIConnectionTimeoutError' ? 'provider_timeout' : 'provider_stream_error'
+        const allowed=['conflicting_tool_calls','incomplete_tool_call','invalid_tool_json','oversized_tool_payload','incomplete_reply','task_step_limit','task_deadline']
+        const code=Date.now()>=deadline ? 'task_deadline' : failure instanceof Error && allowed.includes(failure.message) ? failure.message : status ? `provider_${status}` : failure instanceof Error && failure.name==='APIConnectionTimeoutError' ? 'provider_timeout' : 'provider_stream_error'
         send({ type: 'error', message, code })
         if (!cancelled) controller.close()
-      } finally { clearInterval(heartbeat) }
+      } finally { clearInterval(heartbeat);clearTimeout(taskTimer) }
     },
     cancel() { cancelled = true; abort.abort() },
   })

@@ -39,3 +39,8 @@ test('fabricated evidence and incomplete legacy offers cannot authorize a set',(
  const result=confirmVenusSelection(catalog,'yes pls',[],[{role:'assistant',content:'Here are three picks: Small kettle, Coffee dripper, imaginary pan. Would you like me to add these three to your shortlist?'}])
  assert.equal(result.action,undefined)
 })
+test('field selection copies original catalog evidence and rejects unrecorded fields',()=>{
+ const result=validateSelection(catalog,{label:'Kettle',products:[{slug:'small-kettle',evidenceField:'description'}]})
+ assert.equal(result.products[0].evidence,catalog[0].description)
+ assert.equal(validateSelection(catalog,{label:'Kettle',products:[{slug:'small-kettle',evidenceField:'specifications'}]}),null)
+})
