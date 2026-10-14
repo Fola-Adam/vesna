@@ -259,7 +259,7 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
           ...(requiresSelection ? {response_format:{type:'json_object' as const}} : {tools,tool_choice:'auto' as const,parallel_tool_calls:false}),
           reasoning_effort: 'low',
           include_reasoning: false,
-          messages:requiresSelection ? [{role:'system',content:'Select current catalog products matching the supplied task and refinements. Return ONLY JSON with this shape: {"label":"short set title","message":"brief explanation","products":[{"slug":"exact catalog slug","evidenceField":"description or best_for or why_victory or specifications"}]}. Do not call functions or tools. Always return the complete proposed set, even if unchanged. Select at most 20 distinct slugs; evidenceField must name a populated recorded field supporting suitability. Obey the combined total budget when budget.mode is total. Do not infer missing compatibility, size or capabilities. If none qualify return products:[] and explain in message. Never claim a shortlist change. Catalog: '+JSON.stringify(records)},{role:'user',content:JSON.stringify({task,budget,currentSelection:actionCatalog.filter(product=>task.selectionIds.includes(product.id)).map(product=>product.slug),message,validationFeedback:messages.filter(item=>item.role==='tool' && item.tool_call_id!=='catalog_bootstrap').map(item=>item.content)})}] : messages,
+          messages:requiresSelection ? [{role:'system',content:'Select current catalog products matching the supplied task and refinements. Return ONLY JSON with this shape: {"label":"short set title","message":"brief explanation","products":[{"slug":"exact catalog slug"}]}. Do not call functions or tools. Always return the complete proposed set, even if unchanged. Select at most 20 distinct slugs; Base suitability on populated recorded facts; the application attaches original evidence. Obey the combined total budget when budget.mode is total. Do not infer missing compatibility, size or capabilities. If none qualify return products:[] and explain in message. Never claim a shortlist change. Catalog: '+JSON.stringify(records)},{role:'user',content:JSON.stringify({task,budget,currentSelection:actionCatalog.filter(product=>task.selectionIds.includes(product.id)).map(product=>product.slug),message,validationFeedback:messages.filter(item=>item.role==='tool' && item.tool_call_id!=='catalog_bootstrap').map(item=>item.content)})}] : messages,
           stream: false,
         }, { signal: abort.signal, timeout:Math.max(1000,Math.min(12_000,deadline-Date.now())) })
 
@@ -281,6 +281,14 @@ Current date: ${new Date().toISOString().split('T')[0]}${productAppendix}${readi
           const call = [...calls.values()][0]
           let argumentsValue: unknown
           try {argumentsValue=JSON.parse(call.arguments)} catch {throw new Error('invalid_tool_json')}
+          if(requiresSelection && argumentsValue && typeof argumentsValue==='object' && 'products' in argumentsValue && Array.isArray(argumentsValue.products)) {
+            argumentsValue={...argumentsValue,products:argumentsValue.products.map(item=>{
+              if(!item || typeof item!=='object' || typeof item.slug!=='string') return item
+              const product=actionCatalog.find(product=>product.slug===item.slug)
+              const field=(['best_for','description','why_victory','specifications'] as const).find(field=>product && typeof product[field]==='string' && product[field]!.trim().length>=12)
+              return {...item,evidenceField:field ?? ''}
+            })}
+          }
           const parameters=argumentsValue as Record<string,unknown>
           if (call.name === 'search_catalog') {
             send({type:'activity',activity:{id:'search',label:'Reading product uses, details and prices',state:'running'}})
