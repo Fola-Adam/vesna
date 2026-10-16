@@ -27,6 +27,7 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
  const discussion=!!oldIds.length&&!previous?.discovery?.pendingQuestion&&isSelectionDiscussion(message)
  if(!confirmation&&!discussion)task={...task,discovery:mergeDiscovery(task.discovery??null,{},task.discovery?.pendingQuestion??null)}
  send({type:'task',task}) // invalidate before any operation that can fail
+ if(isSelectionDiscussion(message)&&!oldIds.length){done('There is no current selection to explain—the last search did not produce a selected set. I can search again using your existing preferences; I have not changed your shortlist.');return}
  if(confirmation){
   activity('verify','Checking the selected picks and current prices')
   const catalog=await readVenusDetails(oldIds,signal,'id',true)
@@ -72,7 +73,7 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
  activity('brief','Understanding your brief')
  const planned=await groq.chat.completions.create({model:'openai/gpt-oss-120b',max_completion_tokens:1600,reasoning_effort:'low',include_reasoning:false,response_format:{type:'json_object'},messages:[{role:'system',content:DISCOVERY_PLANNER_PROMPT},{role:'user',content:JSON.stringify({message,brief:task.discovery,originalRequest:task.brief,history,productSlug:body.productSlug,pendingQuestion:previous?.discovery?.pendingQuestion})}]},{signal,timeout:timeout(6000)})
  const plan=readDiscoveryPlan(JSON.parse(planned.choices[0]?.message?.content??'null'))
- if(!plan)throw new Error('Venus could not understand that request. Please try rephrasing it.')
+ if(!plan){console.error('Venus planner returned an invalid structured response',{finishReason:planned.choices[0]?.finish_reason});throw new Error('Venus could not process its AI response. Your request was not changed. Please try again.')}
  const explicitBudget=budgetFromText(message,task.discovery?.budget??null)
  if(explicitBudget!==undefined)plan.patch.budget=explicitBudget
  const explicitReset=/\b(?:start over|new topic|forget (?:that|the previous)|instead I (?:want|need))\b/i.test(message)

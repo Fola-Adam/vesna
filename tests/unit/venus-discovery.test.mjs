@@ -43,6 +43,7 @@ test('explicit natural budgets survive omitted planner patches and mode answers'
 })
 
 test('explanations preserve the set while refinements invalidate it; coffee survives empty interest patch',()=>{
+ assert.equal(isSelectionDiscussion('Explain why each selected pick fits, and what you’re unsure about. Don’t change the selection'),true)
  assert.equal(isSelectionDiscussion('Explain why each option fits, and tell me anything you’re unsure about.'),true)
  assert.equal(isSelectionDiscussion('Make it under $100 total. No subscriptions.'),false)
  assert.equal(isOfferConfirmation('Yes please, save those picks',{...mergeDiscovery(null,{},null),proposal:'offered'}),true)

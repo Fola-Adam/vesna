@@ -31,7 +31,7 @@ export function mergeDiscovery(previous:DiscoveryBrief|null,patch:DiscoveryPatch
  return {...base,...changes,interests:[...new Set([...base.interests.filter(v=>!removeInterests.some(x=>x.toLowerCase()===v.toLowerCase())),...(patch.interests??[])])].slice(-12),exclusions:[...new Set([...base.exclusions.filter(v=>!removeExclusions.some(x=>x.toLowerCase()===v.toLowerCase())),...(patch.exclusions??[])])].slice(-12),constraints:[...new Set([...base.constraints.filter(v=>!removeConstraints.some(x=>x.toLowerCase()===v.toLowerCase())),...(patch.constraints??[])])].slice(-12),pendingQuestion,proposal:'invalidated'}
 }
 export function isSelectionDiscussion(message:string):boolean {
- const text=message.trim().replace(/^[“”"']+|[“”"']+$/g,'')
+ const text=message.trim().replace(/^[“”"']+|[“”"']+$/g,'').replace(/\b(?:don['’]t|do not) change (?:the |my |this )?(?:selection|picks|options)\b/gi,'').replace(/\beach selected (?:pick|option|product)\b/gi,'each pick')
  return (/\b(?:each (?:option|pick|product)|these|those|them|both|the (?:displayed |current )?(?:selection|options|picks)|it|this|that)\b/i.test(text)||/^(?:please )?(?:tell me more|explain further|why)[?.!]*$/i.test(text)) && /\b(?:explain|why|uncertain|unsure|trade.?offs?|details?|limitations?|specifications?|worth)\b/i.test(text) && !/\b(?:instead|exclude|without|replace|swap|remove|save|add|cheaper|change|make it|new topic|start over)\b/i.test(text)
 }
 export function isOfferConfirmation(message:string,state:DiscoveryBrief|null):boolean {
@@ -41,7 +41,7 @@ export function isOfferConfirmation(message:string,state:DiscoveryBrief|null):bo
 }
 export function focusTermsForInterests(interests:string[]):string[] {
  const aliases:Record<string,string[]>={coffee:['coffee','espresso','pour over','hot drink','mug','kettle','grinder'],gardening:['garden','plant','seeds','soil','growing','pruning'],rollerskating:['roller skate','rollerblade','skating','skates']}
- return [...new Set(interests.filter(value=>! /^(?:practical|useful|thoughtful|gifts?|quality|luxury)$/i.test(value.trim())).flatMap(value=>aliases[value.toLowerCase().replace(/[^a-z]/g,'')]??[value]))].slice(0,12)
+ return [...new Set(interests.filter(value=>! /^(?:practical|useful|thoughtful|gifts?|quality|luxury)$/i.test(value.trim())).flatMap(value=>{const exact=aliases[value.toLowerCase().replace(/[^a-z]/g,'')];if(exact)return exact;const words=value.toLowerCase().replace(/[^a-z ]/g,' ').split(/\s+/);const expanded=Object.entries(aliases).filter(([key])=>words.includes(key)).flatMap(([,terms])=>terms);return expanded.length?expanded:[value]}))].slice(0,12)
 }
 export const DISCOVERY_PLANNER_PROMPT=`You interpret a Vesna shopper request. Return JSON only:
 {"intent":"clarify|search|direct|journal|compare","queryTerms":["specific product uses or names"],"boostTags":[],"excludedTags":[],"patch":{},"question":null,"reset":false}.
