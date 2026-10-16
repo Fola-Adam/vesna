@@ -17,7 +17,7 @@ create policy "Members remove their own picks" on public.member_shortlist for de
 
 create or replace function public.change_member_shortlist(operation text, pick_ids uuid[] default '{}') returns jsonb
 language plpgsql security invoker set search_path='' as $$
-declare owner_id uuid := auth.uid(); current_ids uuid[]; before_ids uuid[]; removed_ids uuid[] := '{}'; added_count integer := 0; next_count integer;
+declare owner_id uuid := auth.uid(); current_ids uuid[]; before_ids uuid[]; removed_ids uuid[] := '{}'; added_ids uuid[] := '{}'; added_count integer := 0; next_count integer;
 begin
   if owner_id is null or coalesce(auth.jwt()->>'is_anonymous','false')='true' then
     raise exception 'Membership required' using errcode='42501';
@@ -46,7 +46,10 @@ begin
   end if;
   select coalesce(array_agg(product_id order by created_at,product_id),'{}'::uuid[]) into current_ids from public.member_shortlist where user_id=owner_id;
   select coalesce(array_agg(id),'{}'::uuid[]) into removed_ids from unnest(before_ids) as previous(id) where not(id=any(current_ids));
-  return jsonb_build_object('ids',current_ids,'userId',owner_id,'added',added_count,'removedIds',removed_ids);
+  if operation='add' then
+    select coalesce(array_agg(id order by first_ord),'{}'::uuid[]) into added_ids from (select id,min(ord) first_ord from unnest(pick_ids) with ordinality as requested(id,ord) where id=any(current_ids) and not(id=any(before_ids)) group by id) actual_additions;
+  end if;
+  return jsonb_build_object('ids',current_ids,'userId',owner_id,'added',added_count,'addedIds',added_ids,'removedIds',removed_ids);
 end;
 $$;
 revoke all on function public.change_member_shortlist(text,uuid[]) from public,anon;

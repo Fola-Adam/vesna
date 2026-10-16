@@ -106,3 +106,9 @@ test('ordinary shortlist advice does not get mistaken for a completed action',()
 test('a contextual tool call still resolves a single previously named pick',()=>{
  assert.equal(resolveVenusTool([sonos],'save_pick',{slug:sonos.slug},'Pop that onto my wishlist',[{role:'assistant',content:'Sonos Era 100 is a room speaker.'}]).action.id,sonos.id)
 })
+
+test('curly apostrophes and completed-save prose are not valid receipts',()=>{
+ assert.equal(actionClaimWithoutReceipt('I’ve saved that pick for you.'),true)
+ assert.equal(actionClaimWithoutReceipt('I saved that pick for you.'),true)
+ assert.equal(actionClaimWithoutReceipt('That pick was added to your shortlist.'),true)
+})

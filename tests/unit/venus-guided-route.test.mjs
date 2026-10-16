@@ -7,15 +7,15 @@ import {createRequire} from 'node:module'
 import ts from 'typescript'
 const require=createRequire(import.meta.url),Module=require('module')
 const dir=mkdtempSync(join(tmpdir(),'vesna-guided-'))
-for(const name of ['pricing','catalog-collections','venus-actions','venus-task','venus-discovery','venus-catalog','venus-readings'])writeFileSync(join(dir,name+'.js'),ts.transpileModule(readFileSync(new URL('../../lib/'+name+'.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021}}).outputText)
-writeFileSync(join(dir,'route.js'),ts.transpileModule(readFileSync(new URL('../../app/api/venus/route.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021}}).outputText)
-let replies=[],reads=0,detailReads=0,failSearch=false,ip=0
+for(const name of ['pricing','catalog-collections','venus-actions','venus-task','venus-discovery','venus-receipt','venus-catalog','venus-readings'])writeFileSync(join(dir,name+'.js'),ts.transpileModule(readFileSync(new URL('../../lib/'+name+'.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021,esModuleInterop:true}}).outputText)
+writeFileSync(join(dir,'route.js'),ts.transpileModule(readFileSync(new URL('../../app/api/venus/route.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021,esModuleInterop:true}}).outputText)
+let replies=[],reads=0,detailReads=0,failSearch=false,ip=0,memberUser=null,memberSavedIds=[],lastSearch=null
 const product={id:'11111111-1111-4111-8111-111111111111',slug:'coffee-dripper',name:'Coffee dripper',description:'A ceramic dripper for brewing coffee.',price:40,sale_price:null,item_type:'shop',is_featured:false,categories:{name:'Home'}}
 const oldLoad=Module._load
 Module._load=function(id,parent,main){
  if(id==='groq-sdk')return {Groq:class {chat={completions:{create:async()=>{const reply=replies.shift();if(reply instanceof Error)throw reply;assert.ok(reply,'unexpected model call');return {choices:[{finish_reason:'stop',message:{content:JSON.stringify(reply)}}]}}}}}}
- if(id==='@/lib/data')return {searchVenusCatalog:async()=>{reads++;if(failSearch)throw new Error('Database unavailable');return [product]},readVenusDetails:async()=>{detailReads++;return [product]}}
- if(id==='@/lib/supabase/server')return {createClient:async()=>({auth:{getUser:async()=>({data:{user:null}})}})}
+ if(id==='@/lib/data')return {searchVenusCatalog:async(input)=>{lastSearch=input;reads++;if(failSearch)throw new Error('Database unavailable');return [product]},readVenusDetails:async()=>{detailReads++;return [product]}}
+ if(id==='@/lib/supabase/server')return {createClient:async()=>({auth:{getUser:async()=>({data:{user:memberUser}})},from:()=>{const filters={};const builder={select(){return this},eq(k,v){filters[k]=v;return this},limit(){return this},abortSignal(){return this},maybeSingle:async()=>({data:memberSavedIds.includes(filters.product_id)?{product_id:filters.product_id}:null,error:null}),then(resolve){return Promise.resolve({data:memberSavedIds.map(product_id=>({product_id})),error:null}).then(resolve)}};return builder}})}
  if(id==='@/lib/venus-readings')return {selectVenusReadings:()=>[]}
  if(id==='@/lib/journal-server')return {readPublishedStories:async()=>[]}
  if(id.startsWith('@/lib/'))return require(join(dir,id.slice(6)+'.js'))
@@ -25,7 +25,7 @@ const {POST}=require(join(dir,'route.js'))
 const {mergeDiscovery}=require(join(dir,'venus-discovery.js'))
 process.env.GROQ_API_KEY='unit-test-placeholder'
 after(()=>{Module._load=oldLoad;rmSync(dir,{recursive:true,force:true})})
-async function request(message,task,productSlug){const response=await POST(new Request('https://preview.example/api/venus',{method:'POST',headers:{'Content-Type':'application/json','x-forwarded-for':String(++ip)},body:JSON.stringify({message,task,productSlug,history:[{role:'assistant',content:'Would you like me to save Coffee dripper?'}]})}));return (await response.text()).trim().split('\n').map(JSON.parse)}
+async function request(message,task,productSlug,cookie){const response=await POST(new Request('https://preview.example/api/venus',{method:'POST',headers:{'Content-Type':'application/json','x-forwarded-for':String(++ip),...(cookie?{cookie}:{})},body:JSON.stringify({message,task,productSlug,history:[{role:'assistant',content:'Would you like me to save Coffee dripper?'}]})}));return (await response.text()).trim().split('\n').map(JSON.parse)}
 const plan=(intent,patch={},question=null)=>({intent,patch,question,queryTerms:['coffee'],boostTags:[],excludedTags:[],reset:false})
 test('vague gift clarifies without a single catalog/detail read; pending yes cannot save',async()=>{
  replies=[plan('clarify',{},'Who is it for, and what do they enjoy?')];reads=detailReads=0
@@ -91,4 +91,41 @@ test('already cancelled request cannot search or emit an action',async()=>{
  const result=await POST(new Request('https://preview.example/api/venus',{method:'POST',headers:{'Content-Type':'application/json','x-forwarded-for':String(++ip)},body:JSON.stringify({message:'Find coffee'}),signal:AbortSignal.abort()}))
  const events=(await result.text()).trim().split('\n').map(JSON.parse)
  assert.equal(reads,0);assert.equal(events.some(e=>e.type==='action'),false);assert.ok(events.some(e=>e.type==='error'))
+})
+
+test('transcript: explanation stays bound to the offered set and yes please saves that exact set',async()=>{
+ const task={brief:'Coffee gift',refinements:[],selectionIds:[product.id],updatedAt:Date.now(),discovery:{...mergeDiscovery(null,{interests:['coffee'],budget:{amount:100,currency:'USD',mode:'total'}},null),proposal:'offered'}}
+ replies=[];reads=0
+ const explained=await request('Explain why each option fits, and tell me anything you’re unsure about.',task)
+ assert.equal(reads,0);assert.equal(explained.some(e=>e.type==='error'),false)
+ const current=explained.filter(e=>e.type==='task').at(-1).task
+ assert.equal(current.discovery.proposal,'offered');assert.deepEqual(current.selectionIds,[product.id])
+ const text=explained.filter(e=>e.type==='text').map(e=>e.text).join(' ')
+ assert.equal(text.includes('Ember'),false);assert.equal(text.includes('health-boosting'),false)
+ const saved=await request('Yes please, save those picks',current)
+ assert.deepEqual(saved.find(e=>e.type==='action').action.products.map(p=>p.id),[product.id])
+ const wrongCount=await request('save those two',current)
+ assert.equal(wrongCount.some(e=>e.type==='action'),false)
+})
+test('budget refinement preserves coffee focus and no-subscription lexical exclusion',async()=>{
+ const task={brief:'Gift for coffee-loving Dad',refinements:[],selectionIds:[],updatedAt:Date.now(),discovery:mergeDiscovery(null,{interests:['coffee']},null)}
+ replies=[plan('search',{interests:[],exclusions:['No subscriptions']}),{label:'Coffee gift',products:[{slug:product.slug}]}]
+ await request('Make it under $100 total. No subscriptions.',task)
+ assert.ok(lastSearch.focusTerms.includes('coffee'));assert.ok(lastSearch.excludedTerms.includes('subscriptions'))
+})
+test('last-added removal requires a signed receipt AND currently saved membership row',async()=>{
+ const {signVenusReceipt}=require(join(dir,'venus-receipt.js'))
+ const key='unit-fixture-key';const previousKey=process.env.VENUS_RECEIPT_SECRET;process.env.VENUS_RECEIPT_SECRET=key
+ memberUser={id:'33333333-3333-4333-8333-333333333333',email_confirmed_at:new Date().toISOString(),is_anonymous:false}
+ memberSavedIds=[product.id]
+ try{
+  const noReceipt=await request('remove the last pik you added to my shortlist')
+  assert.equal(noReceipt.some(e=>e.type==='action'),false)
+  const token=signVenusReceipt({userId:memberUser.id,addedIds:[product.id],at:Date.now()},key)
+  const removed=await request('Actually, remove the last pick you added',undefined,undefined,'vesna_venus_last_add='+token)
+  assert.equal(removed.find(e=>e.type==='action').action.id,product.id)
+  memberSavedIds=[]
+  const alreadyRemoved=await request('remove the last pick you added',undefined,undefined,'vesna_venus_last_add='+token)
+  assert.equal(alreadyRemoved.some(e=>e.type==='action'),false)
+ } finally {memberUser=null;memberSavedIds=[];if(previousKey===undefined)delete process.env.VENUS_RECEIPT_SECRET;else process.env.VENUS_RECEIPT_SECRET=previousKey}
 })

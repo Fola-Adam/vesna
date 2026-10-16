@@ -139,6 +139,7 @@ export function resolveVenusTool(catalog: ProductRow[], name: string, args: unkn
 }
 
 export function actionClaimWithoutReceipt(text: string) {
-  return /\b(?:i've|i have|i|we have|we|successfully)\s+(?:now\s+)?(?:saved|added|removed|cleared|updated)\b|\b(?:shortlist|wishlist|request|update)\b[^.!?\n]{0,100}\b(?:has been|have been|was|is now|will be)\s+(?:successfully\s+)?(?:processed|updated|completed|saved|added|removed|cleared)\b/i.test(text)
+  text=text.normalize('NFKC').replace(/[‘’]/g,"'")
+  return /\b(?:that|the|this) (?:pick|item|product) (?:was|has been|is now) (?:saved|added|removed)|\b(?:i've|i have|i|we have|we|successfully)\s+(?:now\s+)?(?:saved|added|removed|cleared|updated)\b|\b(?:shortlist|wishlist|request|update)\b[^.!?\n]{0,100}\b(?:has been|have been|was|is now|will be)\s+(?:successfully\s+)?(?:processed|updated|completed|saved|added|removed|cleared)\b/i.test(text)
 }
 

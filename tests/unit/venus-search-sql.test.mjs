@@ -51,3 +51,10 @@ test('SQL price rule matches null base, higher sale and zero price',async()=>{
 test('database rejects blank, null, oversized tags and oversized brand',async()=>{
  for(const statement of ["uses=array['   ']","uses=array[null::text]","uses=array[repeat('x',81)]","brand=repeat('x',101)"])await assert.rejects(()=>db.query("update products set "+statement+" where slug='coffee-dripper'"))
 })
+
+await db.exec(readFileSync(new URL('../../supabase/migrations/202610160002_venus_focused_retrieval.sql',import.meta.url),'utf8'))
+test('coffee focus and no subscriptions cannot be replaced by kombucha brewing',async()=>{
+ await db.exec("insert into products(id,slug,name,description,price,is_active,item_type) values (md5('kombucha')::uuid,'kombucha-kit','Kombucha Brewing Kit','Continuous brew system with SCOBY',65,true,'shop'),(md5('subscription')::uuid,'coffee-subscription','Coffee Subscription','Fresh coffee delivered weekly',48,true,'shop'),(md5('ember')::uuid,'ember-mug','Ember Mug','Temperature-control smart mug',89.99,true,'shop')")
+ const rows=(await db.query("select slug from venus_search_focused_products(array['coffee','brewing','mug'],array['coffee','mug'],array['subscriptions'],100)")).rows
+ assert.equal(rows.some(p=>p.slug==='kombucha-kit'),false);assert.equal(rows.some(p=>p.slug==='coffee-subscription'),false);assert.equal(rows.some(p=>p.slug==='ember-mug'),true)
+})

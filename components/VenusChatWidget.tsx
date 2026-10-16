@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useShortlist } from '@/lib/shortlist'
 import VenusActivity from './VenusActivity'
-import {isOfferConfirmation,mergeDiscovery} from '@/lib/venus-discovery'
+import {isOfferConfirmation,isSelectionDiscussion,mergeDiscovery} from '@/lib/venus-discovery'
 import { advanceVenusTask, readVenusTask, type VenusTaskState } from '@/lib/venus-task'
 import type { VenusActivity as Activity, VenusSelection } from '@/lib/venus-task'
 import type { VenusAction } from '@/lib/venus-actions'
@@ -117,7 +117,7 @@ export default function VenusChatWidget() {
     const taskAtRequest=taskRef.current
     const continued=advanceVenusTask(taskAtRequest,text)
     const selectionAtRequest=selectionRef.current
-    if(!isOfferConfirmation(text,taskAtRequest?.discovery??null)) {
+    if(!isOfferConfirmation(text,taskAtRequest?.discovery??null)&&!(taskAtRequest?.selectionIds.length&&!taskAtRequest.discovery?.pendingQuestion&&isSelectionDiscussion(text))) {
       selectionRef.current=null
       taskRef.current={...continued,discovery:mergeDiscovery(continued.discovery??null,{},continued.discovery?.pendingQuestion??null)}
       try {sessionStorage.setItem(taskStorageKey,JSON.stringify(taskRef.current))}catch{}
@@ -177,14 +177,14 @@ export default function VenusChatWidget() {
       if (action && ['save','remove','save_many','clear'].includes(action.kind) && !requireMember()) {setIsOpen(false);content='Join or sign in as a Vesnaian to save these picks. [Join or sign in](/member). Your shortlist has not changed.';action=null}
       if (action?.kind === 'save' || action?.kind === 'remove') {
         updateActivity({id:'shortlist',label:action.kind==='save' ? 'Adding to your shortlist' : 'Removing from your shortlist',state:'running'})
-        const successful = action.kind === 'save' ? await add(action.id) : await remove(action.id)
+        const successful = action.kind === 'save' ? await add(action.id,'venus') : await remove(action.id)
         updateActivity({id:'shortlist',label:successful ? (action.kind==='save' ? 'Verified pick saved in your account' : 'Verified pick removed from your account') : 'Could not verify the shortlist update',state:successful ? 'complete' : 'failed'})
         actionError = !successful
         content = successful ? (action.kind === 'save' ? `${action.name} is in your shortlist. [View your shortlist](/shortlist).` : `Removed ${action.name} from your shortlist. You can undo this below.`) : 'I could not verify the shortlist update. Refresh your shortlist before retrying.'
       }
       if (action?.kind === 'save_many') {
         updateActivity({id:'shortlist',label:'Adding the selected picks to your shortlist',state:'running'})
-        const result=await addMany(action.products.map(product=>product.id))
+        const result=await addMany(action.products.map(product=>product.id),'venus')
         updateActivity({id:'shortlist',label:result.success ? `Verified ${result.added} new picks saved in your account` : 'Could not verify the saved set',state:result.success ? 'complete' : 'failed'})
         if (result.success) { selectionRef.current=null; setMessages(current=>current.map(entry=>entry.selection && entry.selection===selectionAtRequest ? {...entry,selectionSaved:true} : entry)) }
         actionError=!result.success
