@@ -1,5 +1,6 @@
 "use client";
 
+import Icon from "@/components/Icon";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRevealOnScroll } from "@/hooks/use-reveal-on-scroll";
 
@@ -25,7 +26,7 @@ export default function TestimonialsCarousel() {
   const sectionRef = useRevealOnScroll();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const autoPlayRef = useRef<NodeJS.Timeout>();
+  const autoPlayRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const nextSlide = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length);
@@ -69,15 +70,13 @@ export default function TestimonialsCarousel() {
         <div className="relative">
           <div className="overflow-hidden">
             <div
-              className="flex transition-transform duration-500 ease-out"
+              className="flex transition-transform duration-300 ease-out motion-reduce:transition-none"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
               {testimonials.map((testimonial, index) => (
                 <div key={index} className="w-full flex-shrink-0 px-4">
                   <div className="max-w-3xl mx-auto text-center">
-                    <span className="material-symbols-outlined text-4xl lg:text-5xl text-primary/50 mb-6">
-                      format_quote
-                    </span>
+                    <Icon name="format_quote" className="text-4xl lg:text-5xl text-primary/50 mb-6" />
                     <p className="font-body-main text-lg lg:text-xl text-on-background italic mb-8 leading-relaxed">
                       &ldquo;{testimonial.quote}&rdquo;
                     </p>
@@ -124,7 +123,7 @@ export default function TestimonialsCarousel() {
             className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center border border-outline/30 text-on-background hover:bg-primary hover:text-on-primary transition-all focus-ring hidden lg:flex"
             aria-label="Previous testimonial"
           >
-            <span className="material-symbols-outlined">chevron_left</span>
+            <Icon name="chevron_left" className="" />
           </button>
           <button
             onClick={() => {
@@ -135,14 +134,14 @@ export default function TestimonialsCarousel() {
             className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center border border-outline/30 text-on-background hover:bg-primary hover:text-on-primary transition-all focus-ring hidden lg:flex"
             aria-label="Next testimonial"
           >
-            <span className="material-symbols-outlined">chevron_right</span>
+            <Icon name="chevron_right" className="" />
           </button>
         </div>
       </div>
 
       <style jsx global>{`
         .bg-green-wash {
-          background: linear-gradient(135deg, rgba(149, 212, 179, 0.03), transparent);
+          background: linear-gradient(135deg, rgba(195, 170, 123, 0.035), transparent);
         }
       `}</style>
     </section>

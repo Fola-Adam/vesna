@@ -1,4 +1,5 @@
-import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss"
+import animate from "tailwindcss-animate";
 
 const config: Config = {
   content: [
@@ -10,8 +11,15 @@ const config: Config = {
     extend: {
       colors: {
         // Base
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        background: "rgb(var(--background-rgb) / <alpha-value>)",
+        foreground: "rgb(var(--foreground-rgb) / <alpha-value>)",
+        paper: "rgb(var(--paper-rgb) / <alpha-value>)",
+        "paper-raised": "rgb(var(--paper-raised-rgb) / <alpha-value>)",
+        ink: "rgb(var(--ink-rgb) / <alpha-value>)",
+        "ink-muted": "rgb(var(--ink-muted-rgb) / <alpha-value>)",
+        "green-wash": "#edf0e7",
+        "on-primary": "var(--primary-foreground)",
+        "primary-ink": "rgb(var(--primary-ink-rgb) / <alpha-value>)",
         
         // Surface Colors
         surface: "var(--surface)",
@@ -21,8 +29,8 @@ const config: Config = {
         "surface-container-low": "var(--surface-container-low)",
         "surface-container-lowest": "var(--surface-container-lowest)",
         
-        // Primary - Gold
-        primary: "var(--primary)",
+        // Primary - Emerald
+        primary: "rgb(var(--primary-rgb) / <alpha-value>)",
         "primary-foreground": "var(--primary-foreground)",
         "primary-container": "var(--primary-container)",
         "on-primary-container": "var(--on-primary-container)",
@@ -31,8 +39,8 @@ const config: Config = {
         "on-primary-fixed": "var(--on-primary-fixed)",
         "on-primary-fixed-variant": "var(--on-primary-fixed-variant)",
         
-        // Secondary - Teal
-        secondary: "var(--secondary)",
+        // Secondary - Antique gold
+        secondary: "rgb(var(--secondary-rgb) / <alpha-value>)",
         "secondary-foreground": "var(--secondary-foreground)",
         "secondary-container": "var(--secondary-container)",
         "on-secondary-container": "var(--on-secondary-container)",
@@ -72,17 +80,13 @@ const config: Config = {
         ring: "var(--ring)",
       },
       fontFamily: {
-        audiowide: ["var(--font-audiowide)", "cursive"],
-        "display-hero": ["var(--font-audiowide)", "cursive"],
-        "body-main": ["var(--font-tenor-sans)", "sans-serif"],
-        "button-label": ["var(--font-button-label)", "sans-serif"],
-        "section-header": ["var(--font-button-label)", "sans-serif"],
-        spectral: ["var(--font-spectral)", "serif"],
-        cinzel: ["var(--font-cinzel)", "serif"],
-        playfair: ["var(--font-playfair)", "serif"],
+        "display-hero": ["var(--font-cormorant)", "serif"],
+        "body-main": ["var(--font-dm-sans)", "sans-serif"],
+        "button-label": ["var(--font-dm-sans)", "sans-serif"],
+        "section-header": ["var(--font-dm-sans)", "sans-serif"],
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 };
 export default config;

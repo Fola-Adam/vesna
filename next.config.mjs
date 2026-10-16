@@ -1,7 +1,16 @@
-import withPWA from 'next-pwa'
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    // Public deployment URLs are known at build time; Netlify's internal request
+    // URL may have a different origin in the server handler. No secrets here.
+    env: {
+        VESNA_ALLOWED_ORIGINS: [process.env.URL, process.env.DEPLOY_PRIME_URL, process.env.DEPLOY_URL].filter(Boolean).join(','),
+        // A non-secret build-context flag lets server-side data code make
+        // preview-only presentation adjustments without touching the catalog.
+        VESNA_NETLIFY_CONTEXT: process.env.CONTEXT ?? '',
+        VESNA_DISPATCH_ORIGIN: process.env.DEPLOY_PRIME_URL || process.env.URL || '',
+    },
+    // Turbopack is the default bundler in Next.js 16 (dev + build).
+
     // Image optimization
     images: {
         formats: ['image/webp', 'image/avif'],
@@ -12,6 +21,22 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'images.unsplash.com',
             },
+            // Supabase Storage — product images uploaded from the admin panel
+            {
+                protocol: 'https',
+                hostname: '*.supabase.co',
+                pathname: '/storage/v1/object/public/**',
+            },
+            { protocol: 'https', hostname: 'resource.logitech.com' },
+            { protocol: 'https', hostname: 'cdn.shopify.com' },
+            { protocol: 'https', hostname: 'www.pcrichard.com' },
+            { protocol: 'https', hostname: 'd1ncau8tqf99kp.cloudfront.net' },
+            { protocol: 'https', hostname: 'media.sonos.com' },
+            { protocol: 'https', hostname: 'www.hydroflask.com' },
+            { protocol: 'https', hostname: 'www.hatch.co' },
+            { protocol: 'https', hostname: 'image.benq.com' },
+            { protocol: 'https', hostname: 'fellowproducts.com' },
+            { protocol: 'https', hostname: 'ember.com' },
         ],
         minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
         dangerouslyAllowSVG: true,
@@ -20,16 +45,6 @@ const nextConfig = {
 
     // Compression
     compress: true,
-
-    // Experimental features for performance
-    experimental: {
-        // Optimize package imports for common libraries
-        optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-        // Server actions for progressive enhancement
-        serverActions: {
-            bodySizeLimit: '2mb',
-        },
-    },
 
     // Headers for caching and security
     async headers() {
@@ -53,6 +68,22 @@ const nextConfig = {
                         key: 'Referrer-Policy',
                         value: 'origin-when-cross-origin',
                     },
+                ],
+            },
+            {
+                source: '/unsubscribe',
+                headers: [
+                    { key: 'Referrer-Policy', value: 'no-referrer' },
+                    { key: 'Cache-Control', value: 'private, no-store' },
+                    { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
+                ],
+            },
+            {
+                source: '/dispatch/confirm',
+                headers: [
+                    { key: 'Referrer-Policy', value: 'no-referrer' },
+                    { key: 'Cache-Control', value: 'private, no-store' },
+                    { key: 'X-Robots-Tag', value: 'noindex, nofollow' },
                 ],
             },
             {
@@ -100,78 +131,10 @@ const nextConfig = {
         ]
     },
 
-    // Webpack optimization
-    webpack: (config, { dev, isServer }) => {
-        // Exclude native Node.js modules from server bundle
-        if (isServer) {
-            config.externals = [...(config.externals || []), 'onnxruntime-node', 'sharp']
-        }
-
-        // Optimize bundle size in production
-        if (!dev && !isServer) {
-            config.optimization = {
-                ...config.optimization,
-                splitChunks: {
-                    chunks: 'all',
-                    cacheGroups: {
-                        vendor: {
-                            test: /[\\/]node_modules[\\/]/,
-                            name: 'vendors',
-                            chunks: 'all',
-                        },
-                        common: {
-                            minChunks: 2,
-                            chunks: 'all',
-                            enforce: true,
-                        },
-                    },
-                },
-            }
-        }
-        return config
-    },
+    // NOTE: cacheComponents ('use cache') is intentionally NOT enabled globally:
+    // it conflicts with route-segment `runtime` exports on our Node API routes
+    // (/api/venus loads ONNX embeddings, which cannot run on Edge).
+    // Static pages use the standard `export const revalidate` ISR instead.
 }
 
-// PWA configuration
-const pwaConfig = {
-    dest: 'public',
-    register: true,
-    skipWaiting: true,
-    disable: process.env.NODE_ENV === 'development',
-    runtimeCaching: [
-        {
-            urlPattern: /^https?.*/,
-            handler: 'NetworkFirst',
-            options: {
-                cacheName: 'offlineCache',
-                expiration: {
-                    maxEntries: 200,
-                },
-            },
-        },
-        {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif|ico)$/,
-            handler: 'CacheFirst',
-            options: {
-                cacheName: 'image-cache',
-                expiration: {
-                    maxEntries: 200,
-                    maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-                },
-            },
-        },
-        {
-            urlPattern: /\.(?:woff|woff2|ttf|otf|eot)$/,
-            handler: 'CacheFirst',
-            options: {
-                cacheName: 'font-cache',
-                expiration: {
-                    maxEntries: 50,
-                    maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-                },
-            },
-        },
-    ],
-}
-
-export default withPWA(pwaConfig)(nextConfig)
+export default nextConfig

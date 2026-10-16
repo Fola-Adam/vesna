@@ -1,109 +1,75 @@
-"use client";
+'use client'
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import Link from "next/link";
+import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import Icon from './Icon'
+import { useShortlist } from '@/lib/shortlist'
+import VesnaWordmark from './VesnaWordmark'
+
+const navLinks = [
+  { href: '/', label: 'Home' }, { href: '/picks', label: 'Picks' },
+  { href: '/journal', label: 'Journal' }, { href: '/about', label: 'About' },
+  { href: '/archive', label: 'Archive' }, { href: '/shortlist', label: 'Shortlist' }, { href: '/member', label: 'Membership' },
+]
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const isMenuOpenRef = useRef(false);
-
-  const closeMenu = useCallback(() => setIsMobileMenuOpen(false), []);
-
-  useEffect(() => {
-    isMenuOpenRef.current = isMobileMenuOpen;
-  }, [isMobileMenuOpen]);
+  const pathname = usePathname()
+  const { ids, user } = useShortlist()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-      if (isMenuOpenRef.current) closeMenu();
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [closeMenu]);
-
-  const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/picks", label: "Picks" },
-    { href: "/journal", label: "Journal" },
-    { href: "/about", label: "About" },
-    { href: "/archive", label: "Archive" },
-  ];
+    if (!isMobileMenuOpen) return
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    menuRef.current?.querySelector<HTMLAnchorElement>('a')?.focus()
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false)
+        buttonRef.current?.focus()
+      }
+      if (event.key === 'Tab') {
+        const links = [...(menuRef.current?.querySelectorAll<HTMLAnchorElement>('a') ?? [])]
+        const first = buttonRef.current
+        const last = links[links.length - 1]
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault(); last?.focus()
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault(); first?.focus()
+        }
+      }
+    }
+    const desktop = window.matchMedia('(min-width: 1024px)')
+    const onResize = () => { if (desktop.matches) setIsMobileMenuOpen(false) }
+    document.addEventListener('keydown', onKeyDown)
+    desktop.addEventListener('change', onResize)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', onKeyDown)
+      desktop.removeEventListener('change', onResize)
+    }
+  }, [isMobileMenuOpen])
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled
-          ? "bg-[#0a0a0a] backdrop-blur-md border-b border-[#242424]"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-8 lg:px-20">
-        <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="font-audiowide text-xl lg:text-2xl text-on-background tracking-[0.3em] hover:text-primary transition-colors logo-pulse"
-          >
-            VESN<span className="inline-block">Λ</span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="font-button-label text-xs uppercase tracking-[0.15em] text-on-surface-variant hover:text-on-background transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 text-on-surface-variant hover:text-on-background transition-colors"
-            aria-label="Toggle menu"
-          >
-            <span className="material-symbols-outlined text-2xl">
-              {isMobileMenuOpen ? "close" : "menu"}
-            </span>
-          </button>
-        </div>
+    <nav aria-label="Main navigation" className="isolate sticky inset-x-0 top-0 z-50 border-b border-secondary/25 bg-[#10382d] text-paper shadow-sm">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-8 lg:h-20 lg:px-20">
+        <Link href="/" aria-label="Vesna home" className="shrink-0 font-display-hero text-2xl font-semibold tracking-[0.12em] text-paper transition-colors hover:text-secondary focus-ring sm:text-3xl" onClick={() => setIsMobileMenuOpen(false)}><VesnaWordmark /></Link>
+        <div className="hidden lg:flex items-center gap-4 xl:gap-6">{navLinks.map(link => {
+          const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(`${link.href}/`)) || (link.href === '/picks' && pathname.startsWith('/shop'))
+          return <Link key={link.href} href={link.href} aria-current={active ? 'page' : undefined} className={`nav-underline-anim font-button-label text-xs uppercase tracking-widest transition-colors hover:text-secondary focus-ring ${active ? 'text-secondary' : 'text-paper/90'}`}>{link.href === '/member' ? (user ? 'Your account' : 'Join Vesna') : link.label}{link.href === '/shortlist' && <span className="ml-1.5 text-secondary">({ids.length})</span>}</Link>
+        })}</div>
+        <button ref={buttonRef} data-mobile-toggle aria-label="Toggle menu" aria-expanded={isMobileMenuOpen} aria-controls="mobile-navigation"
+          onClick={() => setIsMobileMenuOpen(open => !open)} className="inline-flex min-h-11 min-w-11 items-center justify-center p-2 text-2xl text-paper focus-ring lg:hidden"><Icon name={isMobileMenuOpen ? 'close' : 'menu'} /></button>
       </div>
-
-      {/* Mobile Menu — full-screen fixed panel */}
-      <div
-        className={`lg:hidden fixed top-16 lg:top-20 bottom-0 left-0 right-0 z-50 bg-[#0a0a0a] transition-all duration-300 overflow-y-auto ${
-          isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
-        }`}
-      >
-        <div className="px-6 py-6 space-y-2">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={closeMenu}
-              className="block font-button-label text-sm uppercase tracking-[0.15em] text-on-surface-variant hover:text-on-background transition-colors py-4 border-b border-[#242424]/50 last:border-0"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </div>
+      <div ref={menuRef} id="mobile-navigation" aria-hidden={!isMobileMenuOpen} inert={!isMobileMenuOpen}
+        className={`fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto bg-[#10382d]/[0.98] px-4 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none sm:px-6 lg:hidden ${isMobileMenuOpen ? 'pointer-events-auto translate-y-0 opacity-100' : 'pointer-events-none -translate-y-2 opacity-0'}`}>
+        {navLinks.map(link => {
+          const active = pathname === link.href || (link.href !== '/' && pathname.startsWith(`${link.href}/`)) || (link.href === '/picks' && pathname.startsWith('/shop'))
+          return <Link key={link.href} href={link.href} aria-current={active ? 'page' : undefined} onClick={() => setIsMobileMenuOpen(false)} className={`block border-b border-paper/15 py-5 font-button-label text-sm uppercase tracking-widest hover:text-secondary focus-ring ${active ? 'text-secondary' : 'text-paper/90'}`}>{link.href === '/member' ? (user ? 'Your account' : 'Join Vesna') : link.label}{link.href === '/shortlist' && <span className="ml-1.5 text-secondary">({ids.length})</span>}</Link>
+        })}
       </div>
-
-      <style jsx global>{`
-        @keyframes logoPulse {
-          0%, 100% { text-shadow: 0 0 0 rgba(230, 195, 100, 0); }
-          50% { text-shadow: 0 0 20px rgba(230, 195, 100, 0.4); }
-        }
-        .logo-pulse:hover {
-          animation: logoPulse 1.5s ease-in-out infinite;
-        }
-      `}</style>
     </nav>
-  );
+  )
 }
