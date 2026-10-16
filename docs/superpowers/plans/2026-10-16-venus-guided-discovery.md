@@ -63,3 +63,15 @@ Files: components/VenusChatWidget.tsx, lib/venus-stream.ts, lib/venus-task.ts.
 ## Execution ledger
 
 - Planning: Three reviews completed. Ruling: lexical/tag retrieval ships independently; legacy embeddings excluded because provenance and runtime are unverified.
+
+- Completed implementation: planner/validated patches, pending-question handling, explicit offer invalidation, deterministic natural budgets, indexed RPC and bounded detail readers, metadata editing, per-pick rationale, cancellation/deadline propagation.
+- Three agents reviewed the initial design; all supplied blocking corrections were incorporated. Follow-up reviews caught and fixed navigation/removal, named page-context lookup and named comparison regressions.
+- Live migration venus_guided_discovery_search applied additively. GIN index and anon-only public RPC grants verified; legacy vectors/RPC untouched. No editorial content backfill or fabricated tags.
+- Targeted tests include a 210-product SQL fixture, RLS caller restriction, sale-price edge cases, metadata normalization, pending yes, failed refinement then yes, exact confirmation, named comparisons and product-page precedence.
+- Preview live checks: vague gift request asks recipient/interests with only brief activity; explicit 500 dollars retained immediately. Dad/coffee retrieves bounded candidates. Refinement to $100 total returns $48 coffee pick; yes emits the exact action. Gardening inspects 2 candidates; rollerskating returns no match. EUR asks USD budget rather than converting. Guest save endpoint returns 401.
+- Browser verification: clarification visible; one recommendation attempt failed validation and preserved brief, retry succeeded with 3 candidates inspected and 2 recommendations. Screenshot saved locally at docs/venus-guided-discovery-preview.jpg. Browser left open.
+- Semantic retrieval remains disabled because legacy embedding provenance/runtime are unverified. Authenticated email/sign-in and actual account write check remains an existing separate pending item; no email sent in this task.
+- Build 457057501035f4f9b2b2879576fa515f15f5c1dd passed ves-na Deploy Preview. Production not published or merged.
+
+- Final verification: 47 targeted tests pass; TypeScript passes; lint has zero errors and one existing product-image preview warning. Natural budget preservation, an already-cancelled request and metadata bounds have explicit regressions.
+- Final small polish: singular activity labels and user-facing no-match copy. No-match copy avoids exposing implementation details; semantic unavailability remains documented here.

@@ -1,7 +1,7 @@
 # Venus guided discovery and targeted retrieval
 
 Date: 16 October 2026
-Status: proposed design for review; implementation has not started.
+Status: reviewed by three independent agents; guided discovery implemented on the preview branch.
 Target: Fola-Adam/vesna, existing PR 2 preview. No production deployment.
 
 ## Outcome and agreed requirements

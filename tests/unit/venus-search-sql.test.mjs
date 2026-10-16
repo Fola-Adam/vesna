@@ -47,3 +47,7 @@ test('SQL price rule matches null base, higher sale and zero price',async()=>{
  const rows=(await db.query("select slug,price from venus_search_products(array['coffee'],40)")).rows
  assert.equal(Number(rows.find(p=>p.slug==='zero-coffee').price),0);assert.equal(Number(rows.find(p=>p.slug==='higher-coffee').price),30);assert.equal(rows.some(p=>p.slug==='null-coffee'),false)
 })
+
+test('database rejects blank, null, oversized tags and oversized brand',async()=>{
+ for(const statement of ["uses=array['   ']","uses=array[null::text]","uses=array[repeat('x',81)]","brand=repeat('x',101)"])await assert.rejects(()=>db.query("update products set "+statement+" where slug='coffee-dripper'"))
+})

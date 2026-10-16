@@ -85,3 +85,10 @@ test('explicit named comparison searches rather than comparing prior selection',
  await request('Compare Sony WH-1000XM6 and Sonos Era 100',task)
  assert.equal(reads,1)
 })
+
+test('already cancelled request cannot search or emit an action',async()=>{
+ reads=0;replies=[]
+ const result=await POST(new Request('https://preview.example/api/venus',{method:'POST',headers:{'Content-Type':'application/json','x-forwarded-for':String(++ip)},body:JSON.stringify({message:'Find coffee'}),signal:AbortSignal.abort()}))
+ const events=(await result.text()).trim().split('\n').map(JSON.parse)
+ assert.equal(reads,0);assert.equal(events.some(e=>e.type==='action'),false);assert.ok(events.some(e=>e.type==='error'))
+})

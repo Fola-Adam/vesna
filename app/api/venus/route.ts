@@ -81,7 +81,7 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
   activity('search','Searching uses, names and approved tags')
   const candidates=await searchVenusCatalog({queryTerms:plan.queryTerms,boostTags:plan.boostTags,excludedTags:plan.excludedTags,maxPrice:budget?.amount??null,broad:task.discovery!.surprise},signal)
   activity('search',`Found ${candidates.length} matching candidate${candidates.length===1?'':'s'}`,'complete')
-  if(!candidates.length){send({type:'selection',selection:{label:'No current selection',products:[]}});done('I could not find a supported match in the current collection. Would you like to change the purpose or budget? Meaning-based search is not enabled yet, so describing the intended use another way may also help.');return}
+  if(!candidates.length){send({type:'selection',selection:{label:'No current selection',products:[]}});done('I could not find a supported match in the current collection. Would you like to change the purpose or budget? You can also describe the type of object or intended use another way.');return}
   activity('details',`Inspecting ${Math.min(candidates.length,8)} matching pick${candidates.length===1?'':'s'}`)
   catalog=await readVenusDetails(candidates.slice(0,8).map(p=>p.id),signal)
   activity('details',`Read details for ${catalog.length} matching pick${catalog.length===1?'':'s'}`,'complete')
@@ -126,7 +126,7 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
 }
 export async function POST(request:Request){
  const encoder=new TextEncoder();let cancelled=false;const abort=new AbortController();const deadline=Date.now()+24000
- const timer=setTimeout(()=>abort.abort(),24000);request.signal.addEventListener('abort',()=>abort.abort(),{once:true})
+ const timer=setTimeout(()=>abort.abort(),24000);request.signal.addEventListener('abort',()=>abort.abort(),{once:true});if(request.signal.aborted)abort.abort()
  return new Response(new ReadableStream<Uint8Array>({async start(controller){
   const send=(e:VenusEvent)=>{if((e.type==='action'||e.type==='selection'||e.type==='task'&&e.task.discovery?.proposal==='offered')&&(abort.signal.aborted||Date.now()>=deadline))throw new Error('Venus ran out of time. Please try again.');if(!cancelled)controller.enqueue(encoder.encode(JSON.stringify(e)+'\n'))}
   const heartbeat=setInterval(()=>send({type:'text',text:''}),4000)
