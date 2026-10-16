@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { createRequire } from 'node:module'
 import ts from 'typescript'
 const directory = mkdtempSync(join(tmpdir(), 'vesna-stream-'))
-for (const name of ['pricing','catalog-collections','venus-actions', 'venus-task', 'venus-stream']) writeFileSync(join(directory, `${name}.js`), ts.transpileModule(readFileSync(new URL(`../../lib/${name}.ts`, import.meta.url), 'utf8'), {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021}}).outputText)
+for (const name of ['pricing','catalog-collections','venus-actions', 'venus-task', 'venus-discovery', 'venus-stream']) writeFileSync(join(directory, `${name}.js`), ts.transpileModule(readFileSync(new URL(`../../lib/${name}.ts`, import.meta.url), 'utf8'), {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021}}).outputText)
 const { readVenusStream } = createRequire(import.meta.url)(join(directory, 'venus-stream.js'))
 after(() => rmSync(directory, {recursive:true,force:true}))
 import assert from 'node:assert/strict'

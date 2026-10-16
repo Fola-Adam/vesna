@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useShortlist } from '@/lib/shortlist'
 import VenusActivity from './VenusActivity'
+import {isOfferConfirmation,mergeDiscovery} from '@/lib/venus-discovery'
 import { advanceVenusTask, readVenusTask, type VenusTaskState } from '@/lib/venus-task'
 import type { VenusActivity as Activity, VenusSelection } from '@/lib/venus-task'
 import type { VenusAction } from '@/lib/venus-actions'
@@ -113,11 +114,16 @@ export default function VenusChatWidget() {
   async function sendMessage(text: string) {
     if (!text || isTyping || requestRef.current || memberLoading) return
     const requestVersion=conversationVersion.current
-    const continued=advanceVenusTask(taskRef.current,text)
-    if(taskRef.current && continued.brief!==taskRef.current.brief) selectionRef.current=null
+    const taskAtRequest=taskRef.current
+    const continued=advanceVenusTask(taskAtRequest,text)
+    const selectionAtRequest=selectionRef.current
+    if(!isOfferConfirmation(text,taskAtRequest?.discovery??null)) {
+      selectionRef.current=null
+      taskRef.current={...continued,discovery:mergeDiscovery(continued.discovery??null,{},continued.discovery?.pendingQuestion??null)}
+      try {sessionStorage.setItem(taskStorageKey,JSON.stringify(taskRef.current))}catch{}
+    }
     pinnedRef.current = true
     setShowLatest(false)
-    const selectionAtRequest=selectionRef.current
     const controller = new AbortController()
     requestRef.current = controller
     setInputValue('')
@@ -140,7 +146,7 @@ export default function VenusChatWidget() {
     try {
       const response = await fetch('/api/venus', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-        body: JSON.stringify({ message: text, productSlug, shortlistIds, task:taskRef.current, selectionIds: selectionRef.current?.products.map(product=>product.id) ?? continued.selectionIds, history: messages.filter(message => !message.error).slice(-10).map(message => ({ role: message.role, content: message.content })) }),
+        body: JSON.stringify({ message: text, productSlug, shortlistIds, task:taskAtRequest, selectionIds: selectionAtRequest?.products.map(product=>product.id) ?? continued.selectionIds, history: messages.filter(message => !message.error).slice(-10).map(message => ({ role: message.role, content: message.content })) }),
       })
       if (!response.ok) {
         const result = await response.json().catch(() => null)
@@ -149,7 +155,10 @@ export default function VenusChatWidget() {
       if (!response.body) throw new Error('The response was empty. Please try again.')
       streamFlushRef.current = setInterval(() => setStreamText(streamContentRef.current), 80)
       await readVenusStream(response.body, event => {
-        if (event.type === 'task') receivedTaskRef.current=event.task
+        if (event.type === 'task') {
+          receivedTaskRef.current=event.task
+          if(event.task.discovery?.proposal!=='offered') {taskRef.current=event.task;selectionRef.current=null;try{sessionStorage.setItem(taskStorageKey,JSON.stringify(event.task))}catch{}}
+        }
         if (event.type === 'activity') updateActivity(event.activity)
         if (event.type === 'selection') receivedSelectionRef.current = event.selection
         if (event.type === 'text') streamContentRef.current += event.text
@@ -254,7 +263,7 @@ export default function VenusChatWidget() {
                 <VenusActivity activities={message.activities ?? []} />
                 {message.selection && message.selection.products.length > 0 && <section aria-label="Selected picks" className="mt-3 w-full rounded-xl border border-primary-ink/20 bg-paper-raised p-4">
                   <p className="text-sm font-semibold text-primary-ink">{message.selection.label}</p><p className="mt-1 text-xs text-ink-muted">{message.selection.products.every(product=>product.price!=null) ? `Listed subtotal: $${(message.selection.products.reduce((sum,product)=>sum+Math.round(product.price!*100),0)/100).toFixed(2)}` : 'Some prices are not recorded; a complete total is unavailable.'}</p>
-                  <ul className="mt-3 divide-y divide-ink/10">{message.selection.products.map(product=><li key={product.id} className="py-3"><a href={`/shop/${product.slug}`} className="text-sm font-semibold text-ink underline underline-offset-4" onClick={()=>setIsOpen(false)}>{product.name}</a>{product.price != null && <span className="ml-2 text-xs font-medium text-primary-ink">${product.price.toFixed(2)}</span>}<p className="mt-1 text-xs leading-6 text-ink-muted">Recorded detail: {product.evidence}</p></li>)}</ul>
+                  <ul className="mt-3 divide-y divide-ink/10">{message.selection.products.map(product=><li key={product.id} className="py-3"><a href={`/shop/${product.slug}`} className="text-sm font-semibold text-ink underline underline-offset-4" onClick={()=>setIsOpen(false)}>{product.name}</a>{product.price != null && <span className="ml-2 text-xs font-medium text-primary-ink">${product.price.toFixed(2)}</span>}{product.rationale && <p className="mt-2 text-sm leading-6 text-ink">{product.rationale}</p>}<p className="mt-1 text-xs leading-6 text-ink-muted">Recorded detail: {product.evidence}</p></li>)}</ul>
                   <button type="button" disabled={isTyping || message.selectionSaved || message.selection !== selectionRef.current} onClick={()=>{if(requireMember())void sendMessage('Save these picks');else setIsOpen(false)}} className="mt-3 min-h-11 rounded-full bg-primary-ink px-5 text-sm font-medium text-paper focus-ring disabled:opacity-50">{message.selectionSaved ? 'Saved to shortlist' : message.selection !== selectionRef.current ? 'Selection superseded' : 'Save these picks'}</button>
                   <p className="mt-2 text-xs leading-5 text-ink-muted">Ask for a different budget or exclude an item. Listed prices exclude delivery and taxes.</p>
                 </section>}

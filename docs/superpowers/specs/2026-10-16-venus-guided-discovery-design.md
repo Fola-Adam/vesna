@@ -93,3 +93,13 @@ Preview intentionally uses the production Supabase catalog, so a migration chang
 ## Scope boundaries
 
 No new AI provider, external search service, purchases, vendor accounts or autonomous catalog edits. No production publish or merge. General long-term member profiling and cross-device chat history are deferred. This design does not claim that better retrieval alone guarantees recommendation quality; evaluate real fit separately from request success.
+
+## Review decisions (three independent agents, 16 October)
+
+- Guided tasks carry explicit proposal eligibility and pending question state; context selections are not actionable offers. Invalidate on a non-confirmation turn before planning, including failures. Disable assistant-prose offer recovery for guided tasks. Client persists invalidation immediately; a new selection is committed only after done.
+- Planner merges bounded field patches, retains supplied budget/constraints on short answers, and never authorizes writes. A yes answering a question is not a save confirmation. Structured USD budget is authoritative; unsupported currency prompts clarification.
+- All reads explicitly filter active/nonarchive rows, even for admin sessions. SQL clamps query and result limits and accepts only typed parameters. Validation uses inspected detail records, never the whole catalog.
+- One request deadline starts before planning and is propagated to network operations. Outages are not zero matches.
+- Live audit: 31 active nonarchive records, 19 legacy vectors, no HNSW index, no structured tags. Legacy vector freshness/model provenance cannot be verified. Initial release uses indexed lexical/tag/usage retrieval; semantic retrieval remains explicitly disabled. No request-time transformer download. Existing embeddings and RPC are preserved.
+- Current POST reporter streams task events directly; the review concern about lost task events is addressed by preserving that reporter on every early return, not duplicating task events.
+- User authorized implementation after these reviews. Execution is inline, with the three reviewers available for final checks.

@@ -12,6 +12,7 @@ import { SELECTION_BASES, validSpecifications, type SelectionBasis } from '@/lib
 
 interface Category { id: string; name: string }
 interface ProductFormData {
+  brand?:string; uses?:string[]; interests?:string[]; occasions?:string[]; recipient_tags?:string[]
   name: string; slug: string; description: string | null; price: string; sale_price: string
   affiliate_link: string | null; category_id: string | null; image_urls: string[]
   why_victory: string | null; item_type: 'curated' | 'shop' | 'archive'
@@ -32,6 +33,7 @@ function toSlug(value: string) {
 export default function ProductForm({ categories, initialData }: ProductFormProps) {
   const router = useRouter()
   const supabase = createClient()
+  const [metadataText,setMetadataText]=useState({uses:(initialData?.uses||[]).join(', '),interests:(initialData?.interests||[]).join(', '),occasions:(initialData?.occasions||[]).join(', '),recipient_tags:(initialData?.recipient_tags||[]).join(', ')})
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [manualSlug, setManualSlug] = useState(!!initialData)
@@ -40,6 +42,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
   const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files])
   useEffect(() => () => previews.forEach(URL.revokeObjectURL), [previews])
   const [form, setForm] = useState<ProductFormData>({
+    brand:initialData?.brand||'', uses:initialData?.uses||[],interests:initialData?.interests||[],occasions:initialData?.occasions||[],recipient_tags:initialData?.recipient_tags||[],
     name: initialData?.name || '', slug: initialData?.slug || '', description: initialData?.description || null,
     price: initialData?.price || '', sale_price: initialData?.sale_price || '', affiliate_link: initialData?.affiliate_link || null,
     category_id: initialData?.category_id || null, image_urls: initialData?.image_urls || [],
@@ -95,6 +98,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
       }
 
       const payload = {
+        brand:form.brand?.trim()||null,uses:form.uses,interests:form.interests,occasions:form.occasions,recipient_tags:form.recipient_tags,
         name: form.name, slug: form.slug, description: form.description || null,
         price: form.price ? Number.parseFloat(form.price) : null,
         sale_price: form.sale_price ? Number.parseFloat(form.sale_price) : null,
@@ -156,6 +160,8 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
           <Field label="Why Victory picked it"><Textarea value={form.why_victory || ''} onChange={(e) => updateField('why_victory', e.target.value || null)} rows={3} placeholder="A personal note from the curator." /></Field>
           <section className="space-y-5 border-t border-outline-variant pt-6">
             <div><h2 className="font-medium text-on-background">The editorial details</h2><p className="mt-1 text-sm text-on-surface-variant">Help readers choose with confidence. Add verified facts and honest limitations. Empty fields stay hidden.</p></div>
+            <Field label="Brand"><Input maxLength={100} value={form.brand||''} onChange={e=>updateField('brand',e.target.value)} /></Field>
+            {(['uses','interests','occasions','recipient_tags'] as const).map(key=><Field key={key} label={{uses:'Uses',interests:'Interests',occasions:'Occasions',recipient_tags:'Recipient suitability'}[key]}><Input aria-label={{uses:'Uses',interests:'Interests',occasions:'Occasions',recipient_tags:'Recipient suitability'}[key]} value={metadataText[key]} maxLength={1000} onChange={e=>{setMetadataText(current=>({...current,[key]:e.target.value}));updateField(key,e.target.value.split(',').map(tag=>tag.trim().toLowerCase()).filter(Boolean).slice(0,12).map(tag=>tag.slice(0,80)))}} /><p className="mt-1 text-xs text-ink-muted">Comma-separated, up to 12 verified tags. Add only suitability supported by product facts.</p></Field>)}
             <Field label="Who this suits"><Textarea maxLength={2000} rows={3} value={form.best_for} onChange={e => updateField('best_for', e.target.value)} placeholder="Describe the person or situation this pick is well suited to." /></Field>
             <Field label="What to consider"><Textarea maxLength={2000} rows={3} value={form.considerations} onChange={e => updateField('considerations', e.target.value)} placeholder="Trade-offs, limitations, compatibility, or who should choose something else." /></Field>
             <Field label="Basis for selection"><select aria-label="Basis for selection" value={form.selection_basis} onChange={e => updateField('selection_basis', e.target.value as SelectionBasis)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm">{Object.entries(SELECTION_BASES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></Field>

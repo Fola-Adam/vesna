@@ -1,22 +1,25 @@
+import { readDiscovery, type DiscoveryBrief } from './venus-discovery'
 import type { ProductRow } from './data'
 import { effectivePricing } from './pricing'
 import type { VenusActionPlan } from './venus-actions'
 
 export type VenusActivity = { id: string; label: string; state: 'running' | 'complete' | 'failed' }
-export type VenusSelection = { label: string; products: { id: string; name: string; slug: string; price: number | null; evidence: string }[] }
-export type VenusTaskState = { brief: string; refinements: string[]; selectionIds: string[]; updatedAt: number }
+export type VenusSelection = { label: string; products: { id: string; name: string; slug: string; price: number | null; evidence: string; rationale?:string }[] }
+export type VenusTaskState = { brief: string; refinements: string[]; selectionIds: string[]; updatedAt: number; discovery?: DiscoveryBrief }
 export function readVenusTask(value: unknown): VenusTaskState | null {
   if (!value || typeof value !== 'object') return null
   const task = value as VenusTaskState
   if (typeof task.brief !== 'string' || task.brief.length > 2000 || !Array.isArray(task.refinements) || task.refinements.length > 8 || !task.refinements.every(item=>typeof item==='string' && item.length<=500) || !Array.isArray(task.selectionIds) || task.selectionIds.length>20 || !task.selectionIds.every(id=>typeof id==='string' && /^[0-9a-f-]{36}$/i.test(id)) || !Number.isFinite(task.updatedAt) || task.updatedAt>Date.now()+60000 || Date.now()-task.updatedAt>86400000) return null
+  if(task.discovery!==undefined && !readDiscovery(task.discovery))return null
   return task
 }
 export function advanceVenusTask(value: unknown, message: string): VenusTaskState {
   const previous = readVenusTask(value)
   const followup = /\b(?:these|those|them|it|that|this|cheaper|instead|exclude|except|without|refine|swap|replace|keep|remaining|previous|both)\b/i.test(message) || /^(?:yes|yep|yeah|sure|okay|ok|go ahead|do it|under|below|budget|only|prioritize|make it)\b/i.test(message)
-  return previous && followup ? {...previous,refinements:[...previous.refinements,message.slice(0,500)].slice(-8),updatedAt:Date.now()} : {brief:message,refinements:[],selectionIds:[],updatedAt:Date.now()}
+  return previous && (followup || !!previous.discovery) ? {...previous,refinements:[...previous.refinements,message.slice(0,500)].slice(-8),updatedAt:Date.now()} : {brief:message,refinements:[],selectionIds:[],updatedAt:Date.now()}
 }
 export function taskBudget(task: VenusTaskState) {
+  if(task.discovery) return task.discovery.budget?.currency==='USD' ? {amount:task.discovery.budget.amount,mode:task.discovery.budget.mode} : null
   const entries=[task.brief,...task.refinements]
   let budget:{amount:number;mode:'total'|'per-item'}|null=null
   let lastMode:'total'|'per-item'='per-item'

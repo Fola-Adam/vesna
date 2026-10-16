@@ -16,6 +16,11 @@ import { cache } from 'react'
  */
 
 export interface ProductRow {
+  brand?: string | null
+  uses?: string[]
+  interests?: string[]
+  occasions?: string[]
+  recipient_tags?: string[]
   id: string
   slug: string
   name: string
@@ -37,6 +42,7 @@ export interface ProductRow {
 const SELECT_FIELDS = `
   id, slug, name, description, price, sale_price, affiliate_link,
   image_urls, why_victory, best_for, considerations, specifications, selection_basis, item_type, is_featured,
+  brand, uses, interests, occasions, recipient_tags,
   categories ( name )
 `
 
@@ -157,4 +163,20 @@ export async function getProductById(id: string): Promise<ProductRow | null> {
 export async function getProductSlugs(): Promise<string[]> {
   const products = await getProducts()
   return products.map((p) => p.slug)
+}
+
+/** Bounded public detail reads; caller privileges cannot admit inactive/archive rows. */
+export async function readVenusDetails(keys:string[],signal:AbortSignal,by:'id'|'slug'='id',confirmation=false):Promise<ProductRow[]> {
+ const values=[...new Set(keys)].slice(0,confirmation?20:8)
+ if(!values.length)return []
+ const fields=confirmation?'id,name,slug,price,sale_price,item_type':SELECT_FIELDS
+ const {data,error}=await createPublicClient().from('products').select(fields).in(by,values).eq('is_active',true).neq('item_type','archive').limit(confirmation?20:8).abortSignal(signal)
+ if(error||!data)throw error??new Error('Product details unavailable')
+ return data.map(row=>normalize(row as unknown as Record<string,unknown>))
+}
+export type VenusSearchSummary={id:string;slug:string;name:string;price:number|null;category:string|null;excerpt:string;uses:string[];interests:string[];score:number}
+export async function searchVenusCatalog(input:{queryTerms:string[];boostTags:string[];excludedTags:string[];maxPrice:number|null;broad:boolean},signal:AbortSignal):Promise<VenusSearchSummary[]> {
+ const {data,error}=await createPublicClient().rpc('venus_search_products',{search_terms:input.queryTerms,max_price:input.maxPrice,boost_tags:input.boostTags,excluded_tags:input.excludedTags,broad:input.broad,match_count:12}).abortSignal(signal)
+ if(error||!data)throw error??new Error('Catalog search unavailable')
+ return (data as VenusSearchSummary[]).slice(0,12)
 }

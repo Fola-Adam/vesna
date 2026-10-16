@@ -7,7 +7,7 @@ import { cookies } from 'next/headers'
  * NOTE (Next.js 15+): `cookies()` is now async, so this function is async too.
  * Call sites must `await createClient()`.
  */
-export async function createClient() {
+export async function createClient(signal?:AbortSignal) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
@@ -18,6 +18,7 @@ export async function createClient() {
   const cookieStore = await cookies()
 
   return createServerClient(supabaseUrl, supabaseKey, {
+    ...(signal?{global:{fetch:(input:RequestInfo|URL,init?:RequestInit)=>fetch(input,{...init,signal})}}:{}),
     cookies: {
       getAll() {
         return cookieStore.getAll()

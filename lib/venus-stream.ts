@@ -40,7 +40,7 @@ function parseEvent(line: string): VenusEvent {
   if (!event || typeof event !== 'object') throw new Error('Invalid assistant response.')
   if (event.type === 'task' && readVenusTask(event.task)) return event
   if (event.type === 'activity' && event.activity && /^[a-z-]{1,40}$/.test(event.activity.id) && typeof event.activity.label === 'string' && event.activity.label.length <= 200 && ['running','complete','failed'].includes(event.activity.state)) return event
-  if (event.type === 'selection' && event.selection && typeof event.selection.label === 'string' && event.selection.label.length <= 150 && Array.isArray(event.selection.products) && event.selection.products.length <= 20 && event.selection.products.every(product => typeof product.evidence === 'string' && product.evidence.length <= 500 && validVenusAction({...product,kind:'save'}))) return event
+  if (event.type === 'selection' && event.selection && typeof event.selection.label === 'string' && event.selection.label.length <= 150 && Array.isArray(event.selection.products) && event.selection.products.length <= 20 && event.selection.products.every(product => typeof product.evidence === 'string' && product.evidence.length <= 500 && (product.rationale===undefined || typeof product.rationale==='string' && product.rationale.length<=400) && validVenusAction({...product,kind:'save'}))) return event
   if (event.type === 'text' && typeof event.text === 'string') return event
   if (event.type === 'action' && validVenusAction(event.action)) return event
   if (event.type === 'done') return event

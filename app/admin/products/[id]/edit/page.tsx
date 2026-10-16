@@ -36,6 +36,7 @@ export default async function EditProductPage({
         categories={categoriesResult.data || []}
         initialData={{
           id: product.id,
+          brand:product.brand||'',uses:product.uses||[],interests:product.interests||[],occasions:product.occasions||[],recipient_tags:product.recipient_tags||[],
           name: product.name,
           slug: product.slug,
           description: product.description,
