@@ -7,7 +7,7 @@ import {createRequire} from 'node:module'
 import ts from 'typescript'
 const directory=mkdtempSync(join(tmpdir(),'vesna-discovery-'))
 writeFileSync(join(directory,'discovery.js'),ts.transpileModule(readFileSync(new URL('../../lib/venus-discovery.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021}}).outputText)
-const {readDiscovery,mergeDiscovery,readDiscoveryPlan,isOfferConfirmation}=createRequire(import.meta.url)(join(directory,'discovery.js'))
+const {readDiscovery,mergeDiscovery,budgetFromText,readDiscoveryPlan,isOfferConfirmation}=createRequire(import.meta.url)(join(directory,'discovery.js'))
 after(()=>rmSync(directory,{recursive:true,force:true}))
 test('short answers preserve recipient purpose and budget while invalidating prior offers',()=>{
  const initial=mergeDiscovery(null,{purpose:'gift',budget:{amount:500,currency:'USD',mode:'per-item'}},'Who is it for?')
@@ -32,4 +32,12 @@ test('explicit correction removes one exclusion while retaining other preference
  const initial=mergeDiscovery(null,{recipient:'Dad',exclusions:['tech','plastic'],budget:{amount:100,currency:'USD',mode:'total'}},null)
  const corrected=mergeDiscovery(initial,{removeExclusions:['tech']},null)
  assert.deepEqual(corrected.exclusions,['plastic']);assert.equal(corrected.recipient,'Dad');assert.equal(corrected.budget.amount,100)
+})
+
+test('explicit natural budgets survive omitted planner patches and mode answers',()=>{
+ assert.deepEqual(budgetFromText('A gift under 500 dollars',null),{amount:500,currency:'USD',mode:'per-item'})
+ assert.deepEqual(budgetFromText('$500',null),{amount:500,currency:'USD',mode:'per-item'})
+ assert.deepEqual(budgetFromText('under €100 total',null),{amount:100,currency:'EUR',mode:'total'})
+ assert.equal(budgetFromText('yes, total',{amount:500,currency:'USD',mode:'per-item'}).mode,'total')
+ assert.equal(budgetFromText('Dad loves coffee',null),undefined)
 })

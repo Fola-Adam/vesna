@@ -28,9 +28,9 @@ after(()=>{Module._load=oldLoad;rmSync(dir,{recursive:true,force:true})})
 async function request(message,task,productSlug){const response=await POST(new Request('https://preview.example/api/venus',{method:'POST',headers:{'Content-Type':'application/json','x-forwarded-for':String(++ip)},body:JSON.stringify({message,task,productSlug,history:[{role:'assistant',content:'Would you like me to save Coffee dripper?'}]})}));return (await response.text()).trim().split('\n').map(JSON.parse)}
 const plan=(intent,patch={},question=null)=>({intent,patch,question,queryTerms:['coffee'],boostTags:[],excludedTags:[],reset:false})
 test('vague gift clarifies without a single catalog/detail read; pending yes cannot save',async()=>{
- replies=[plan('clarify',{purpose:'gift',budget:{amount:500,currency:'USD',mode:'per-item'}},'Who is it for, and what do they enjoy?')];reads=detailReads=0
+ replies=[plan('clarify',{},'Who is it for, and what do they enjoy?')];reads=detailReads=0
  const first=await request('Find a good gift under 500 dollars');assert.equal(reads,0);assert.equal(detailReads,0);assert.ok(first.some(e=>e.type==='text'&&e.text.includes('Who')))
- const task=first.filter(e=>e.type==='task').at(-1).task
+ const task=first.filter(e=>e.type==='task').at(-1).task;assert.equal(task.discovery.budget.amount,500)
  replies=[plan('clarify',{},'Who will receive the gift?')]
  const yes=await request('yes',task);assert.equal(yes.some(e=>e.type==='action'),false);assert.equal(reads,0)
 })
@@ -77,4 +77,11 @@ test('misclassified pending affirmation cannot fall into legacy prose confirmati
  const task={brief:'Coffee gift',refinements:[],selectionIds:[product.id],updatedAt:Date.now(),discovery:mergeDiscovery(null,{interests:['coffee']},'Who is the gift for?')}
  replies=[plan('direct')]
  assert.equal((await request('yes',task)).some(e=>e.type==='action'),false)
+})
+
+test('explicit named comparison searches rather than comparing prior selection',async()=>{
+ const task={brief:'Earlier options',refinements:[],selectionIds:[product.id, '22222222-2222-4222-8222-222222222222'],updatedAt:Date.now(),discovery:mergeDiscovery(null,{},null)}
+ replies=[{...plan('compare'),queryTerms:['Sony WH-1000XM6','Sonos Era 100']}];reads=0
+ await request('Compare Sony WH-1000XM6 and Sonos Era 100',task)
+ assert.equal(reads,1)
 })

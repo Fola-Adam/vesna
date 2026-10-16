@@ -1,7 +1,7 @@
 import {createClient as createMemberClient} from '@/lib/supabase/server'
 import {readVenusDetails,searchVenusCatalog,type ProductRow} from '@/lib/data'
 import {advanceVenusTask,readVenusTask,groundSelectionEvidence,catalogToolRecords,confirmVenusSelection,taskBudget,validateSelection} from '@/lib/venus-task'
-import {readDiscoveryPlan,mergeDiscovery,isOfferConfirmation,DISCOVERY_PLANNER_PROMPT} from '@/lib/venus-discovery'
+import {readDiscoveryPlan,mergeDiscovery,budgetFromText,isOfferConfirmation,DISCOVERY_PLANNER_PROMPT} from '@/lib/venus-discovery'
 import {actionClaimWithoutReceipt,compareVenusPicks,planVenusAction,resolveVenusTool} from '@/lib/venus-actions'
 import {selectVenusProducts} from '@/lib/venus-catalog'
 import {readPublishedStories} from '@/lib/journal-server'
@@ -44,6 +44,8 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
  const planned=await groq.chat.completions.create({model:'openai/gpt-oss-120b',max_completion_tokens:1600,reasoning_effort:'low',include_reasoning:false,response_format:{type:'json_object'},messages:[{role:'system',content:DISCOVERY_PLANNER_PROMPT},{role:'user',content:JSON.stringify({message,brief:task.discovery,originalRequest:task.brief,history,productSlug:body.productSlug,pendingQuestion:previous?.discovery?.pendingQuestion})}]},{signal,timeout:timeout(6000)})
  const plan=readDiscoveryPlan(JSON.parse(planned.choices[0]?.message?.content??'null'))
  if(!plan)throw new Error('Venus could not understand that request. Please try rephrasing it.')
+ const explicitBudget=budgetFromText(message,task.discovery?.budget??null)
+ if(explicitBudget!==undefined)plan.patch.budget=explicitBudget
  const explicitReset=/\b(?:start over|new topic|forget (?:that|the previous)|instead I (?:want|need))\b/i.test(message)
  if(plan.reset&&(explicitReset||!previous?.discovery?.pendingQuestion)){task={...advanceVenusTask(null,message),discovery:mergeDiscovery(null,plan.patch,plan.question),selectionIds:[]}}
  else task={...task,discovery:mergeDiscovery(task.discovery??null,plan.patch,plan.intent==='clarify'?plan.question:null)}
@@ -69,7 +71,8 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
  let catalog:ProductRow[]=[]
  const contextual=/\b(?:these|those|them|both|it|this|that)\b/i.test(message)
  const referenceIds=task.selectionIds
- const compareIds=referenceIds.length?referenceIds:savedIds
+ const comparesSaved=plan.intent==='compare'&&/\b(?:my shortlist|my wishlist|saved picks)\b/i.test(message)
+ const compareIds=plan.intent==='compare'?(comparesSaved?savedIds:contextual?referenceIds:[]):referenceIds
  if(plan.intent==='compare'&&compareIds.length>3){done('Choose two or three picks to compare so I can give each a useful comparison.');return}
  if((plan.intent==='compare'||plan.intent==='direct'&&contextual)&&compareIds.length)catalog=await readVenusDetails(compareIds,signal)
  else if(plan.intent==='direct'&&contextual&&typeof body.productSlug==='string'&&/^[a-z0-9-]{1,160}$/.test(body.productSlug))catalog=await readVenusDetails([body.productSlug],signal,'slug')
@@ -77,14 +80,20 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
   if(!plan.queryTerms.length&&!task.discovery!.surprise){done('What will you use it for, or what does the person enjoy? That will help me narrow the collection.');return}
   activity('search','Searching uses, names and approved tags')
   const candidates=await searchVenusCatalog({queryTerms:plan.queryTerms,boostTags:plan.boostTags,excludedTags:plan.excludedTags,maxPrice:budget?.amount??null,broad:task.discovery!.surprise},signal)
-  activity('search',`Found ${candidates.length} matching candidates`,'complete')
+  activity('search',`Found ${candidates.length} matching candidate${candidates.length===1?'':'s'}`,'complete')
   if(!candidates.length){send({type:'selection',selection:{label:'No current selection',products:[]}});done('I could not find a supported match in the current collection. Would you like to change the purpose or budget? Meaning-based search is not enabled yet, so describing the intended use another way may also help.');return}
-  activity('details',`Inspecting ${Math.min(candidates.length,8)} matching picks`)
+  activity('details',`Inspecting ${Math.min(candidates.length,8)} matching pick${candidates.length===1?'':'s'}`)
   catalog=await readVenusDetails(candidates.slice(0,8).map(p=>p.id),signal)
-  activity('details',`Read details for ${catalog.length} matching picks`,'complete')
+  activity('details',`Read details for ${catalog.length} matching pick${catalog.length===1?'':'s'}`,'complete')
  }
  if(!catalog.length){done('Those picks are no longer available. Ask me to find current alternatives.');return}
- if(plan.intent==='compare'&&catalog.length>=2){const products=selectVenusProducts(catalog,'Compare options',[],null,3);send({type:'products',products});done(compareVenusPicks(products));return}
+ if(plan.intent==='compare'){
+  const fold=(text:string)=>text.normalize('NFKC').toLowerCase().replace(/[^a-z0-9]/g,'')
+  const named=catalog.filter(product=>fold(message).includes(fold(product.name)))
+  const targets=named.length>=2?named:compareIds.length?catalog:[]
+  if(targets.length<2||targets.length>3){send({type:'products',products:selectVenusProducts(catalog,'Compare options',[],null,3)});done('Which two or three picks would you like me to compare? Name the exact products or choose them on your Shortlist.');return}
+  const products=selectVenusProducts(targets,'Compare options',[],null,3);send({type:'products',products});done(compareVenusPicks(products));return
+ }
  // Direct actions still require explicit user intent and are validated against inspected records.
  if(plan.intent==='direct'){
   const direct=planVenusAction(catalog,message,history,typeof body.productSlug==='string'?body.productSlug:null,savedIds)
@@ -106,7 +115,7 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
    if(!selection||selection.products.length>8){feedback.push('Rejected: use distinct current inspected slugs, populated evidence, and obey the combined total budget. Return no products if the constraints cannot be supported.');continue}
    selection.products=selection.products.map(p=>{const reason=value.products.find((v:{slug?:string})=>v.slug===p.slug)?.reason;return {...p,...(typeof reason==='string'&&reason.length<=400&&!actionClaimWithoutReceipt(reason)?{rationale:reason}:{})}})
    task={...task,selectionIds:selection.products.map(p=>p.id),discovery:{...task.discovery!,proposal:'offered'}}
-   send({type:'task',task});send({type:'selection',selection});activity('consider',`Verified ${selection.products.length} picks against recorded details and prices`,'complete');done(task.discovery!.surprise?'Here is a small, broad selection. Tell me what appeals to you, or confirm these picks.':'Here are the considered options. Tell me what to change, or confirm the displayed set.');return
+   send({type:'task',task});send({type:'selection',selection});activity('consider',`Verified ${selection.products.length} pick${selection.products.length===1?'':'s'} against recorded details and prices`,'complete');done(task.discovery!.surprise?'Here is a small, broad selection. Tell me what appeals to you, or confirm these picks.':'Here are the considered options. Tell me what to change, or confirm the displayed set.');return
   }
   const calls=result?.message?.tool_calls??[]
   if(calls.length>1)throw new Error('Venus returned conflicting actions. Please try again.')
