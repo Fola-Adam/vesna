@@ -160,7 +160,7 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
    if(!selection||selection.products.length>8){feedback.push('Rejected: use distinct current inspected slugs, populated evidence, and obey the combined total budget. Return no products if the constraints cannot be supported.');continue}
    // Generated fit claims can invent duration/compatibility even with a valid slug.
    // Show only recorded editorial suitability; the model still selects the set.
-   selection.products=selection.products.map(p=>{const source=catalog.find(record=>record.id===p.id);const reason=source?.best_for||source?.why_victory;return {...p,...(reason?{rationale:reason.slice(0,1000)}:{})}})
+   selection.products=selection.products.map(p=>{const source=catalog.find(record=>record.id===p.id);const reason=source?.best_for||source?.why_victory;return {...p,...(reason?{rationale:reason.slice(0,400)}:{})}})
    task={...task,selectionIds:selection.products.map(p=>p.id),discovery:{...task.discovery!,proposal:'offered'}}
    send({type:'task',task});send({type:'selection',selection});activity('consider',`Verified ${selection.products.length} pick${selection.products.length===1?'':'s'} against recorded details and prices`,'complete');done(task.discovery!.surprise?'Here is a small, broad selection. Tell me what appeals to you, or confirm these picks.':'Here are the considered options. Tell me what to change, or confirm the displayed set.');return
   }

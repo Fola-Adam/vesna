@@ -65,6 +65,14 @@ test('generated duration claims cannot leak into recommendation cards',async()=>
  assert.equal(selected.rationale,undefined);assert.equal(selected.evidence,product.description)
  assert.equal(JSON.stringify(result).includes('48 hours'),false)
 })
+test('recorded suitability is capped to the stream rationale limit',async()=>{
+ const previous=product.best_for;product.best_for='Recorded suitability. '.repeat(30)
+ replies=[plan('search'),{label:'Coffee',products:[{slug:product.slug}]}]
+ const result=await request('Find coffee equipment under $100')
+ const selected=result.find(e=>e.type==='selection').selection.products[0]
+ assert.equal(selected.rationale.length,400)
+ product.best_for=previous
+})
 test('short clarification answer retains cap and yields inspected selection and exact confirmation',async()=>{
  const task={brief:'Find a gift under $500',refinements:[],selectionIds:[],updatedAt:Date.now(),discovery:mergeDiscovery(null,{purpose:'gift',budget:{amount:500,currency:'USD',mode:'per-item'}},'Who is it for?')}
  replies=[plan('search',{recipient:'Dad',interests:['coffee']}),{label:'Coffee gift',products:[{slug:'coffee-dripper',reason:'For his coffee brewing.'}]}]
