@@ -7,10 +7,15 @@ import {createRequire} from 'node:module'
 import ts from 'typescript'
 const directory=mkdtempSync(join(tmpdir(),'vesna-task-'))
 for(const name of ['pricing','venus-task','venus-discovery']) writeFileSync(join(directory,`${name}.js`),ts.transpileModule(readFileSync(new URL(`../../lib/${name}.ts`,import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021}}).outputText)
-const {advanceVenusTask,groundSelectionEvidence,taskBudget,validateSelection,confirmVenusSelection}=createRequire(import.meta.url)(join(directory,'venus-task.js'))
+const {advanceVenusTask,groundSelectionEvidence,taskBudget,validateSelection,confirmVenusSelection,catalogToolRecords}=createRequire(import.meta.url)(join(directory,'venus-task.js'))
 after(()=>rmSync(directory,{recursive:true,force:true}))
 const catalog=[{id:'11111111-1111-4111-8111-111111111111',name:'Small kettle',slug:'small-kettle',price:70,sale_price:null,item_type:'curated',description:'A compact kettle for making hot drinks.'},{id:'22222222-2222-4222-8222-222222222222',name:'Coffee dripper',slug:'coffee-dripper',price:40,sale_price:null,item_type:'curated',description:'A ceramic dripper for filter coffee.'}]
 const selection={label:'Coffee setup',products:catalog.map(product=>({slug:product.slug,evidence:product.description}))}
+
+test('curator receives bounded approved use and interest metadata',()=>{
+ const [record]=catalogToolRecords([{...catalog[0],uses:['pour-over brewing'],interests:['coffee'],brand:'Maker'}])
+ assert.deepEqual(record.uses,['pour-over brewing']);assert.deepEqual(record.interests,['coffee']);assert.equal(record.brand,'Maker')
+})
 test('total budgets reject a set that passes each per-item limit',()=>{
  const total=advanceVenusTask(null,'Find a coffee setup under $100 total')
  assert.equal(taskBudget(total).mode,'total')

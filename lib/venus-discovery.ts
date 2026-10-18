@@ -40,8 +40,10 @@ export function isOfferConfirmation(message:string,state:DiscoveryBrief|null):bo
  return /^(?:(?:yes|yep|yeah|sure|okay|ok)(?: (?:pls|please|plz))?(?:[,;:]? (?:add|save) (?:these|those|them)(?: (?:two|three|all|\d+))?(?: picks)?(?: to my (?:shortlist|wishlist))?)?|(?:save|add) (?:these|those|them)(?: (?:two|three|all|\d+))?(?: picks)?(?: to my (?:shortlist|wishlist))?|go ahead|do it)$/i.test(text)
 }
 export function focusTermsForInterests(interests:string[]):string[] {
- const aliases:Record<string,string[]>={coffee:['coffee','espresso','pour over','hot drink','mug','kettle','grinder'],gardening:['garden','plant','seeds','soil','growing','pruning'],rollerskating:['roller skate','rollerblade','skating','skates']}
- return [...new Set(interests.filter(value=>! /^(?:practical|useful|thoughtful|gifts?|quality|luxury)$/i.test(value.trim())).flatMap(value=>{const exact=aliases[value.toLowerCase().replace(/[^a-z]/g,'')];if(exact)return exact;const words=value.toLowerCase().replace(/[^a-z ]/g,' ').split(/\s+/);const expanded=Object.entries(aliases).filter(([key])=>words.includes(key)).flatMap(([,terms])=>terms);return expanded.length?expanded:[value]}))].slice(0,12)
+ // Extract open-ended concepts; editorial tags supply domain relationships.
+ // No activity-specific dictionary: pottery and bird watching work like coffee.
+ const generic=new Set('a an and or the for of to in on with my his her their likes loves enjoys interested interest related practical useful thoughtful gift gifts quality luxury things products items'.split(' '))
+ return [...new Set(interests.flatMap(value=>value.normalize('NFKC').toLowerCase().match(/[\p{L}\p{N}]+/gu)??[]).filter(term=>term.length>1&&!generic.has(term)))].slice(0,12)
 }
 export const DISCOVERY_PLANNER_PROMPT=`You interpret a Vesna shopper request. Return JSON only:
 {"intent":"clarify|search|direct|journal|compare","queryTerms":["specific product uses or names"],"boostTags":[],"excludedTags":[],"patch":{},"question":null,"reset":false}.

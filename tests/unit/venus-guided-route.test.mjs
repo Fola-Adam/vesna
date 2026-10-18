@@ -34,6 +34,37 @@ test('vague gift clarifies without a single catalog/detail read; pending yes can
  replies=[plan('clarify',{},'Who will receive the gift?')]
  const yes=await request('yes',task);assert.equal(yes.some(e=>e.type==='action'),false);assert.equal(reads,0)
 })
+
+test('a no-match reply clears stale IDs and explanation never calls planner again',async()=>{
+ const task={brief:'Coffee gift',refinements:[],selectionIds:[product.id],updatedAt:Date.now(),discovery:{...mergeDiscovery(null,{interests:['coffee']},null),proposal:'offered'}}
+ replies=[plan('search'),{label:'None',message:'The entire catalog contains no coffee products.',products:[]},{label:'None',products:[]}]
+ const result=await request('Under $10 total',task)
+ const next=result.filter(e=>e.type==='task').at(-1).task
+ assert.deepEqual(next.selectionIds,[])
+ assert.equal(result.some(e=>e.type==='text'&&e.text.includes('entire catalog')),false)
+ replies=[]
+ const explanation=await request('Explain why each selected pick fits. Don’t change the selection',next)
+ assert.ok(explanation.some(e=>e.type==='text'&&e.text.includes('no current selection')))
+ assert.equal(explanation.some(e=>e.type==='error'),false)
+})
+
+test('malformed planner output is retried once and cannot silently reset the retained brief',async()=>{
+ const task={brief:'Coffee gift for Dad',refinements:[],selectionIds:[],updatedAt:Date.now(),discovery:mergeDiscovery(null,{recipient:'Dad',interests:['coffee']},null)}
+ replies=[{intent:'invalid'}, {...plan('search'),reset:true},{label:'Coffee',products:[{slug:product.slug}]}]
+ const result=await request('Under $100 total',task)
+ const next=result.filter(e=>e.type==='task').at(-1).task
+ assert.equal(next.discovery.recipient,'Dad');assert.deepEqual(next.discovery.interests,['coffee'])
+ assert.equal(next.discovery.budget.amount,100)
+ assert.ok(result.some(e=>e.type==='selection'&&e.selection.products.length===1))
+})
+
+test('generated duration claims cannot leak into recommendation cards',async()=>{
+ replies=[plan('search'),{label:'Coffee',products:[{slug:product.slug,reason:'Keeps coffee hot for 48 hours and cures fatigue.'}]}]
+ const result=await request('Find coffee equipment under $100')
+ const selected=result.find(e=>e.type==='selection').selection.products[0]
+ assert.equal(selected.rationale,undefined);assert.equal(selected.evidence,product.description)
+ assert.equal(JSON.stringify(result).includes('48 hours'),false)
+})
 test('short clarification answer retains cap and yields inspected selection and exact confirmation',async()=>{
  const task={brief:'Find a gift under $500',refinements:[],selectionIds:[],updatedAt:Date.now(),discovery:mergeDiscovery(null,{purpose:'gift',budget:{amount:500,currency:'USD',mode:'per-item'}},'Who is it for?')}
  replies=[plan('search',{recipient:'Dad',interests:['coffee']}),{label:'Coffee gift',products:[{slug:'coffee-dripper',reason:'For his coffee brewing.'}]}]

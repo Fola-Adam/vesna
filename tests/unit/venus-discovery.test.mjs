@@ -7,7 +7,7 @@ import {createRequire} from 'node:module'
 import ts from 'typescript'
 const directory=mkdtempSync(join(tmpdir(),'vesna-discovery-'))
 writeFileSync(join(directory,'discovery.js'),ts.transpileModule(readFileSync(new URL('../../lib/venus-discovery.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021}}).outputText)
-const {readDiscovery,mergeDiscovery,budgetFromText,isSelectionDiscussion,readDiscoveryPlan,isOfferConfirmation}=createRequire(import.meta.url)(join(directory,'discovery.js'))
+const {readDiscovery,mergeDiscovery,budgetFromText,isSelectionDiscussion,readDiscoveryPlan,isOfferConfirmation,focusTermsForInterests}=createRequire(import.meta.url)(join(directory,'discovery.js'))
 after(()=>rmSync(directory,{recursive:true,force:true}))
 test('short answers preserve recipient purpose and budget while invalidating prior offers',()=>{
  const initial=mergeDiscovery(null,{purpose:'gift',budget:{amount:500,currency:'USD',mode:'per-item'}},'Who is it for?')
@@ -50,4 +50,11 @@ test('explanations preserve the set while refinements invalidate it; coffee surv
  assert.equal(isOfferConfirmation('save those two',{...mergeDiscovery(null,{},null),proposal:'offered'}),true)
  const state=mergeDiscovery(null,{interests:['coffee']},null)
  assert.deepEqual(mergeDiscovery(state,{interests:[]},null).interests,['coffee'])
+})
+
+test('interest focus handles arbitrary phrases without a hobby-specific dictionary',()=>{
+ assert.deepEqual(focusTermsForInterests(['coffee-related practical gifts']),['coffee'])
+ assert.deepEqual(focusTermsForInterests(['ceramic pottery','bird watching']),['ceramic','pottery','bird','watching'])
+ assert.deepEqual(focusTermsForInterests(['practical','thoughtful gifts']),[])
+ assert.ok(focusTermsForInterests(Array(20).fill('pottery studio')).length<=12)
 })

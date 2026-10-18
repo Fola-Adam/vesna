@@ -58,3 +58,21 @@ test('coffee focus and no subscriptions cannot be replaced by kombucha brewing',
  const rows=(await db.query("select slug from venus_search_focused_products(array['coffee','brewing','mug'],array['coffee','mug'],array['subscriptions'],100)")).rows
  assert.equal(rows.some(p=>p.slug==='kombucha-kit'),false);assert.equal(rows.some(p=>p.slug==='coffee-subscription'),false);assert.equal(rows.some(p=>p.slug==='ember-mug'),true)
 })
+
+test('reviewed catalog tags close the hot-drink/coffee gap and preserve manual edits',async()=>{
+ await db.exec(`insert into products(id,slug,name,description,price,sale_price,is_active,item_type) values
+ (md5('real-ember')::uuid,'ember-mug-2-10oz','Ember Mug 2 (10 oz)','Temperature-control smart mug with charging coaster. Price checked 8 Oct 2026 (USD); current listed sale $89.99 from $149.95.',149.95,89.99,true,'shop'),
+ (md5('plant')::uuid,'smart-plant-pot','Smart Plant Pot','Self-watering with moisture sensors and app integration.',95,null,true,'shop')`)
+ const seed=readFileSync(new URL('../../supabase/catalog-discovery-tags.sql',import.meta.url),'utf8')
+ assert.equal((await db.query(seed)).rows.length,2)
+ const coffee=(await db.query("select slug from venus_search_focused_products(array['coffee'],array['coffee'],array['subscription'],100)")).rows
+ assert.ok(coffee.some(p=>p.slug==='ember-mug-2-10oz'));assert.equal(coffee.some(p=>p.slug==='kombucha-kit'),false)
+ const garden=(await db.query("select slug from venus_search_focused_products(array['gardening'],array['gardening'],'{}',100)")).rows
+ assert.ok(garden.some(p=>p.slug==='smart-plant-pot'))
+ assert.equal((await db.query(seed)).rows.length,0)
+ await db.exec("update products set uses=array['manual use'],interests=array['manual interest'] where slug='smart-plant-pot'")
+ await db.query(seed)
+ assert.deepEqual((await db.query("select uses,interests from products where slug='smart-plant-pot'")).rows[0],{uses:['manual use'],interests:['manual interest']})
+ await db.exec("update products set description='Edited description',uses='{}',interests='{}' where slug='smart-plant-pot'")
+ assert.equal((await db.query(seed)).rows.length,0)
+})

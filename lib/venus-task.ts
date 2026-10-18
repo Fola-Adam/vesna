@@ -92,6 +92,7 @@ export function validateSelection(catalog: ProductRow[], value: unknown, message
 export function catalogToolRecords(catalog: ProductRow[]) {
   return catalog.filter(product => product.item_type !== 'archive').map(product => ({
     slug: product.slug, name: product.name, category: product.categories?.name ?? null,
+    brand: product.brand?.slice(0,100), uses:(product.uses??[]).slice(0,12), interests:(product.interests??[]).slice(0,12),
     price: effectivePricing(product).price, description: product.description?.slice(0, 1000),
     best_for: product.best_for?.slice(0, 1000), why_victory: product.why_victory?.slice(0, 1000),
     specifications: product.specifications?.slice(0, 1500), considerations: product.considerations?.slice(0, 1000),

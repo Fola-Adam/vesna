@@ -117,7 +117,7 @@ export default function VenusChatWidget() {
     const taskAtRequest=taskRef.current
     const continued=advanceVenusTask(taskAtRequest,text)
     const selectionAtRequest=selectionRef.current
-    if(!isOfferConfirmation(text,taskAtRequest?.discovery??null)&&!(taskAtRequest?.selectionIds.length&&!taskAtRequest.discovery?.pendingQuestion&&isSelectionDiscussion(text))) {
+    if(!isOfferConfirmation(text,taskAtRequest?.discovery??null)&&!(taskAtRequest?.selectionIds.length&&taskAtRequest.discovery?.proposal==='offered'&&!taskAtRequest.discovery.pendingQuestion&&isSelectionDiscussion(text))) {
       selectionRef.current=null
       taskRef.current={...continued,discovery:mergeDiscovery(continued.discovery??null,{},continued.discovery?.pendingQuestion??null)}
       try {sessionStorage.setItem(taskStorageKey,JSON.stringify(taskRef.current))}catch{}
@@ -261,6 +261,7 @@ export default function VenusChatWidget() {
                   {message.role === 'user' ? <p className="whitespace-pre-wrap !mb-0">{message.content}</p> : <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>}
                 </div>
                 <VenusActivity activities={message.activities ?? []} />
+                {message.selection && !message.selection.products.length && <p role="status" className="mt-3 rounded-xl border border-ink/15 bg-paper-raised p-4 text-sm font-medium text-ink">No set selected. Your shortlist has not changed.</p>}
                 {message.selection && message.selection.products.length > 0 && <section aria-label="Selected picks" className="mt-3 w-full rounded-xl border border-primary-ink/20 bg-paper-raised p-4">
                   <p className="text-sm font-semibold text-primary-ink">{message.selection.label}</p><p className="mt-1 text-xs text-ink-muted">{message.selection.products.every(product=>product.price!=null) ? `Listed subtotal: $${(message.selection.products.reduce((sum,product)=>sum+Math.round(product.price!*100),0)/100).toFixed(2)}` : 'Some prices are not recorded; a complete total is unavailable.'}</p>
                   <ul className="mt-3 divide-y divide-ink/10">{message.selection.products.map(product=><li key={product.id} className="py-3"><a href={`/shop/${product.slug}`} className="text-sm font-semibold text-ink underline underline-offset-4" onClick={()=>setIsOpen(false)}>{product.name}</a>{product.price != null && <span className="ml-2 text-xs font-medium text-primary-ink">${product.price.toFixed(2)}</span>}{product.rationale && <p className="mt-2 text-sm leading-6 text-ink">{product.rationale}</p>}<p className="mt-1 text-xs leading-6 text-ink-muted">Recorded detail: {product.evidence}</p></li>)}</ul>

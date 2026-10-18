@@ -2,7 +2,7 @@ import {readVenusReceipt} from '@/lib/venus-receipt'
 import {createClient as createMemberClient} from '@/lib/supabase/server'
 import {readVenusDetails,searchVenusCatalog,type ProductRow} from '@/lib/data'
 import {advanceVenusTask,readVenusTask,groundSelectionEvidence,catalogToolRecords,confirmVenusSelection,taskBudget,validateSelection} from '@/lib/venus-task'
-import {readDiscoveryPlan,isSelectionDiscussion,focusTermsForInterests,mergeDiscovery,budgetFromText,isOfferConfirmation,DISCOVERY_PLANNER_PROMPT} from '@/lib/venus-discovery'
+import {readDiscoveryPlan,isSelectionDiscussion,focusTermsForInterests,mergeDiscovery,budgetFromText,isOfferConfirmation,DISCOVERY_PLANNER_PROMPT,type DiscoveryPlan} from '@/lib/venus-discovery'
 import {actionClaimWithoutReceipt,compareVenusPicks,planVenusAction,resolveVenusTool} from '@/lib/venus-actions'
 import {selectVenusProducts} from '@/lib/venus-catalog'
 import {readPublishedStories} from '@/lib/journal-server'
@@ -24,10 +24,13 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
  let task=advanceVenusTask(previous,message)
  const confirmation=isOfferConfirmation(message,previous?.discovery??null)
  const oldIds=previous?.selectionIds??[]
- const discussion=!!oldIds.length&&!previous?.discovery?.pendingQuestion&&isSelectionDiscussion(message)
+ const discussion=!!oldIds.length&&previous?.discovery?.proposal==='offered'&&!previous.discovery.pendingQuestion&&isSelectionDiscussion(message)
  if(!confirmation&&!discussion)task={...task,discovery:mergeDiscovery(task.discovery??null,{},task.discovery?.pendingQuestion??null)}
+ const explicitBudget=budgetFromText(message,task.discovery?.budget??null)
+ if(!confirmation&&!discussion&&explicitBudget!==undefined)task={...task,discovery:{...mergeDiscovery(task.discovery??null,{},task.discovery?.pendingQuestion??null),budget:explicitBudget}}
  send({type:'task',task}) // invalidate before any operation that can fail
- if(isSelectionDiscussion(message)&&!oldIds.length){done('There is no current selection to explain—the last search did not produce a selected set. I can search again using your existing preferences; I have not changed your shortlist.');return}
+ const noSelection=(text:string)=>{task={...task,selectionIds:[],discovery:{...mergeDiscovery(task.discovery??null,{},null),proposal:'none'}};send({type:'task',task});send({type:'selection',selection:{label:'No current selection',products:[]}});done(text)}
+ if(isSelectionDiscussion(message)&&!discussion){noSelection('There is no current selection to explain—the last search did not produce a selected set, or the previous set needs refreshing. I can search again using your existing preferences; I have not changed your shortlist.');return}
  if(confirmation){
   activity('verify','Checking the selected picks and current prices')
   const catalog=await readVenusDetails(oldIds,signal,'id',true)
@@ -71,13 +74,16 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
  const {Groq}=await import('groq-sdk');const groq=new Groq({apiKey:process.env.GROQ_API_KEY,maxRetries:0})
  const timeout=(cap:number)=>{const remaining=deadline-Date.now();if(remaining<=0||signal.aborted)throw new Error('Venus ran out of time. Please try again.');return Math.min(cap,remaining)}
  activity('brief','Understanding your brief')
- const planned=await groq.chat.completions.create({model:'openai/gpt-oss-120b',max_completion_tokens:1600,reasoning_effort:'low',include_reasoning:false,response_format:{type:'json_object'},messages:[{role:'system',content:DISCOVERY_PLANNER_PROMPT},{role:'user',content:JSON.stringify({message,brief:task.discovery,originalRequest:task.brief,history,productSlug:body.productSlug,pendingQuestion:previous?.discovery?.pendingQuestion})}]},{signal,timeout:timeout(6000)})
- const plan=readDiscoveryPlan(JSON.parse(planned.choices[0]?.message?.content??'null'))
- if(!plan){console.error('Venus planner returned an invalid structured response',{finishReason:planned.choices[0]?.finish_reason});throw new Error('Venus could not process its AI response. Your request was not changed. Please try again.')}
- const explicitBudget=budgetFromText(message,task.discovery?.budget??null)
+ let plan:DiscoveryPlan|null=null
+ for(let attempt=0;attempt<2&&!plan;attempt++){
+  const planned=await groq.chat.completions.create({model:'openai/gpt-oss-120b',max_completion_tokens:1600,reasoning_effort:'low',include_reasoning:false,response_format:{type:'json_object'},messages:[{role:'system',content:DISCOVERY_PLANNER_PROMPT+(attempt?' Your prior response failed schema validation. Return the exact requested JSON fields and allowed intent; no prose.':'')},{role:'user',content:JSON.stringify({message,brief:task.discovery,originalRequest:task.brief,history,productSlug:body.productSlug,pendingQuestion:previous?.discovery?.pendingQuestion})}]},{signal,timeout:timeout(6000)})
+  try{if(planned.choices[0]?.finish_reason!=='length')plan=readDiscoveryPlan(JSON.parse(planned.choices[0]?.message?.content??'null'))}catch{}
+  if(!plan){console.error('Venus planner returned an invalid structured response',{attempt:attempt+1,finishReason:planned.choices[0]?.finish_reason});if(!attempt)activity('brief','Retrying an invalid AI response')}
+ }
+ if(!plan)throw new Error('Venus could not process its AI response. Your brief is retained; please try again.')
  if(explicitBudget!==undefined)plan.patch.budget=explicitBudget
  const explicitReset=/\b(?:start over|new topic|forget (?:that|the previous)|instead I (?:want|need))\b/i.test(message)
- if(plan.reset&&(explicitReset||!previous?.discovery?.pendingQuestion)){task={...advanceVenusTask(null,message),discovery:mergeDiscovery(null,plan.patch,plan.question),selectionIds:[]}}
+ if(explicitReset){task={...advanceVenusTask(null,message),discovery:mergeDiscovery(null,plan.patch,plan.question),selectionIds:[]}}
  else task={...task,discovery:mergeDiscovery(task.discovery??null,plan.patch,plan.intent==='clarify'?plan.question:null)}
  if(task.discovery!.budget&&task.discovery!.budget!.currency!=='USD')task.discovery!.pendingQuestion='The collection lists prices in US dollars. What USD budget should I use?'
  send({type:'task',task});activity('brief','Updated your brief','complete')
@@ -114,7 +120,8 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
   const queryTerms=plan.intent==='direct'?plan.queryTerms:[...new Set([...focusTerms,...plan.queryTerms])].slice(0,12)
   const candidates=await searchVenusCatalog({queryTerms,focusTerms:plan.intent==='direct'?[]:focusTerms,excludedTerms:plan.intent==='direct'?[]:excludedTerms,boostTags:plan.boostTags,excludedTags:plan.excludedTags,maxPrice:budget?.amount??null,broad:task.discovery!.surprise},signal)
   activity('search',`Found ${candidates.length} matching candidate${candidates.length===1?'':'s'}`,'complete')
-  if(!candidates.length){send({type:'selection',selection:{label:'No current selection',products:[]}});done('I could not find a supported match in the current collection. Would you like to change the purpose or budget? You can also describe the type of object or intended use another way.');return}
+  console.info('Venus retrieval',{candidateSlugs:candidates.map(p=>p.slug),interestCount:task.discovery!.interests.length,maxPrice:budget?.amount??null})
+  if(!candidates.length){noSelection('The current search found no matching candidates under your retained preferences. There is no selected set to save. You can change the budget or describe the intended use another way.');return}
   activity('details',`Inspecting ${Math.min(candidates.length,8)} matching pick${candidates.length===1?'':'s'}`)
   catalog=await readVenusDetails(candidates.slice(0,8).map(p=>p.id),signal)
   activity('details',`Read details for ${catalog.length} matching pick${catalog.length===1?'':'s'}`,'complete')
@@ -145,10 +152,15 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
   const result=response.choices[0];if(result?.finish_reason==='length')throw new Error('Venus could not finish that response. Please try again.')
   if(selectionMode){
    const value=JSON.parse(result?.message?.content??'null')
-   if(value&&Array.isArray(value.products)&&value.products.length===0&&typeof value.message==='string'&&value.message.length<=1000&&!actionClaimWithoutReceipt(value.message)){send({type:'selection',selection:{label:'No current selection',products:[]}});activity('consider','Checked the candidates; no selection made','complete');done(value.message);return}
+   if(value&&Array.isArray(value.products)&&value.products.length===0){
+    if(!step){feedback.push('Recheck every supplied candidate, including its approved uses and interests. An empty set is allowed only if none supports the retained brief. Do not describe the whole catalog based on this bounded candidate set.');continue}
+    activity('consider','Checked the candidates; no selection made','complete');noSelection(`I reviewed ${catalog.length} matching candidate${catalog.length===1?'':'s'}, but could not verify a suitable selection for all your preferences. That does not mean the entire collection has no suitable products. There is no set ready to save; try changing a constraint or ask about a named pick.`);return
+   }
    const selection=validateSelection(catalog,groundSelectionEvidence(catalog,value),message,task)
    if(!selection||selection.products.length>8){feedback.push('Rejected: use distinct current inspected slugs, populated evidence, and obey the combined total budget. Return no products if the constraints cannot be supported.');continue}
-   selection.products=selection.products.map(p=>{const reason=value.products.find((v:{slug?:string})=>v.slug===p.slug)?.reason;return {...p,...(typeof reason==='string'&&reason.length<=400&&!actionClaimWithoutReceipt(reason)?{rationale:reason}:{})}})
+   // Generated fit claims can invent duration/compatibility even with a valid slug.
+   // Show only recorded editorial suitability; the model still selects the set.
+   selection.products=selection.products.map(p=>{const source=catalog.find(record=>record.id===p.id);const reason=source?.best_for||source?.why_victory;return {...p,...(reason?{rationale:reason.slice(0,1000)}:{})}})
    task={...task,selectionIds:selection.products.map(p=>p.id),discovery:{...task.discovery!,proposal:'offered'}}
    send({type:'task',task});send({type:'selection',selection});activity('consider',`Verified ${selection.products.length} pick${selection.products.length===1?'':'s'} against recorded details and prices`,'complete');done(task.discovery!.surprise?'Here is a small, broad selection. Tell me what appeals to you, or confirm these picks.':'Here are the considered options. Tell me what to change, or confirm the displayed set.');return
   }
