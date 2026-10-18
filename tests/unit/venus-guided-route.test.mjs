@@ -9,12 +9,12 @@ const require=createRequire(import.meta.url),Module=require('module')
 const dir=mkdtempSync(join(tmpdir(),'vesna-guided-'))
 for(const name of ['pricing','catalog-collections','venus-actions','venus-task','venus-discovery','venus-receipt','venus-catalog','venus-readings'])writeFileSync(join(dir,name+'.js'),ts.transpileModule(readFileSync(new URL('../../lib/'+name+'.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021,esModuleInterop:true}}).outputText)
 writeFileSync(join(dir,'route.js'),ts.transpileModule(readFileSync(new URL('../../app/api/venus/route.ts',import.meta.url),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2021,esModuleInterop:true}}).outputText)
-let replies=[],reads=0,detailReads=0,failSearch=false,ip=0,memberUser=null,memberSavedIds=[],lastSearch=null
+let replies=[],reads=0,detailReads=0,failSearch=false,ip=0,memberUser=null,memberSavedIds=[],lastSearch=null,searchResponses=[]
 const product={id:'11111111-1111-4111-8111-111111111111',slug:'coffee-dripper',name:'Coffee dripper',description:'A ceramic dripper for brewing coffee.',price:40,sale_price:null,item_type:'shop',is_featured:false,categories:{name:'Home'}}
 const oldLoad=Module._load
 Module._load=function(id,parent,main){
  if(id==='groq-sdk')return {Groq:class {chat={completions:{create:async()=>{const reply=replies.shift();if(reply instanceof Error)throw reply;assert.ok(reply,'unexpected model call');return {choices:[{finish_reason:'stop',message:{content:JSON.stringify(reply)}}]}}}}}}
- if(id==='@/lib/data')return {searchVenusCatalog:async(input)=>{lastSearch=input;reads++;if(failSearch)throw new Error('Database unavailable');return [product]},readVenusDetails:async()=>{detailReads++;return [product]}}
+ if(id==='@/lib/data')return {searchVenusCatalog:async(input)=>{lastSearch=input;reads++;if(failSearch)throw new Error('Database unavailable');return searchResponses.length?searchResponses.shift():[product]},readVenusDetails:async()=>{detailReads++;return [product]}}
  if(id==='@/lib/supabase/server')return {createClient:async()=>({auth:{getUser:async()=>({data:{user:memberUser}})},from:()=>{const filters={};const builder={select(){return this},eq(k,v){filters[k]=v;return this},limit(){return this},abortSignal(){return this},maybeSingle:async()=>({data:memberSavedIds.includes(filters.product_id)?{product_id:filters.product_id}:null,error:null}),then(resolve){return Promise.resolve({data:memberSavedIds.map(product_id=>({product_id})),error:null}).then(resolve)}};return builder}})}
  if(id==='@/lib/venus-readings')return {selectVenusReadings:()=>[]}
  if(id==='@/lib/journal-server')return {readPublishedStories:async()=>[]}
@@ -72,6 +72,16 @@ test('recorded suitability is capped to the stream rationale limit',async()=>{
  const selected=result.find(e=>e.type==='selection').selection.products[0]
  assert.equal(selected.rationale.length,400)
  product.best_for=previous
+})
+test('an empty planner search retries with meaningful words from the shopper request',async()=>{
+ const previous={...product};Object.assign(product,{slug:'smart-plant-pot',name:'Smart Plant Pot',description:'Self-watering with moisture sensors and app integration.',best_for:'A helpful addition for a small home garden.'})
+ searchResponses=[[],[{...product,price:95}]];reads=0
+ replies=[plan('search'),{label:'Garden pick',products:[{slug:product.slug}]}]
+ const result=await request('Find gardening tools under $100')
+ const selection=result.find(e=>e.type==='selection').selection
+ assert.equal(reads,2);assert.ok(lastSearch.queryTerms.includes('gardening'));assert.ok(lastSearch.queryTerms.includes('tools'))
+ assert.equal(selection.products[0].slug,'smart-plant-pot')
+ Object.assign(product,previous)
 })
 test('short clarification answer retains cap and yields inspected selection and exact confirmation',async()=>{
  const task={brief:'Find a gift under $500',refinements:[],selectionIds:[],updatedAt:Date.now(),discovery:mergeDiscovery(null,{purpose:'gift',budget:{amount:500,currency:'USD',mode:'per-item'}},'Who is it for?')}

@@ -118,7 +118,13 @@ async function respond(request:Request,send:(event:VenusEvent)=>void,signal:Abor
   const focusTerms=focusTermsForInterests(task.discovery!.interests)
   const excludedTerms=task.discovery!.exclusions.map(value=>value.replace(/^(?:no|without|exclude|avoid)\s+/i,'')).filter(Boolean)
   const queryTerms=plan.intent==='direct'?plan.queryTerms:[...new Set([...focusTerms,...plan.queryTerms])].slice(0,12)
-  const candidates=await searchVenusCatalog({queryTerms,focusTerms:plan.intent==='direct'?[]:focusTerms,excludedTerms:plan.intent==='direct'?[]:excludedTerms,boostTags:plan.boostTags,excludedTags:plan.excludedTags,maxPrice:budget?.amount??null,broad:task.discovery!.surprise},signal)
+  const searchInput={queryTerms,focusTerms:plan.intent==='direct'?[]:focusTerms,excludedTerms:plan.intent==='direct'?[]:excludedTerms,boostTags:plan.boostTags,excludedTags:plan.excludedTags,maxPrice:budget?.amount??null,broad:task.discovery!.surprise}
+  let candidates=await searchVenusCatalog(searchInput,signal)
+  if(!candidates.length&&plan.intent!=='direct'){
+   const fallbackTerms=focusTermsForInterests([message])
+   const expandedTerms=[...new Set([...focusTerms,...fallbackTerms])].slice(0,12)
+   if(expandedTerms.some(term=>!queryTerms.includes(term))){activity('search','Trying other words from your request');candidates=await searchVenusCatalog({...searchInput,queryTerms:expandedTerms},signal)}
+  }
   activity('search',`Found ${candidates.length} matching candidate${candidates.length===1?'':'s'}`,'complete')
   console.info('Venus retrieval',{candidateSlugs:candidates.map(p=>p.slug),interestCount:task.discovery!.interests.length,maxPrice:budget?.amount??null})
   if(!candidates.length){noSelection('The current search found no matching candidates under your retained preferences. There is no selected set to save. You can change the budget or describe the intended use another way.');return}

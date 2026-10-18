@@ -42,8 +42,8 @@ export function isOfferConfirmation(message:string,state:DiscoveryBrief|null):bo
 export function focusTermsForInterests(interests:string[]):string[] {
  // Extract open-ended concepts; editorial tags supply domain relationships.
  // No activity-specific dictionary: pottery and bird watching work like coffee.
- const generic=new Set('a an and or the for of to in on with my his her their likes loves enjoys interested interest related practical useful thoughtful gift gifts quality luxury things products items'.split(' '))
- return [...new Set(interests.flatMap(value=>value.normalize('NFKC').toLowerCase().match(/[\p{L}\p{N}]+/gu)??[]).filter(term=>term.length>1&&!generic.has(term)))].slice(0,12)
+ const generic=new Set('a an and or the for of to in on with my his her their likes loves enjoys interested interest related practical useful thoughtful gift gifts quality luxury things products product items picks pick find me good great best option options recommend recommendation show get need looking something anything use using under below less than up maximum max budget dollars dollar usd eur gbp per each item total combined overall price no without exclude avoid keep please what can it is are'.split(' '))
+ return [...new Set(interests.flatMap(value=>value.normalize('NFKC').toLowerCase().match(/[\p{L}\p{N}]+/gu)??[]).filter(term=>/[\p{L}]/u.test(term)&&term.length>1&&!generic.has(term)))].slice(0,12)
 }
 export const DISCOVERY_PLANNER_PROMPT=`You interpret a Vesna shopper request. Return JSON only:
 {"intent":"clarify|search|direct|journal|compare","queryTerms":["specific product uses or names"],"boostTags":[],"excludedTags":[],"patch":{},"question":null,"reset":false}.
