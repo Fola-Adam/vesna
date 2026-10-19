@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ArrowLeft, BookOpen, BarChart3, LayoutDashboard, Mail, ShoppingBag } from 'lucide-react'
+import { ArrowLeft, BookOpen, BarChart3, LayoutDashboard, Mail, ShoppingBag, UsersRound } from 'lucide-react'
 import VesnaWordmark from '@/components/VesnaWordmark'
 
 export default function AdminLayout({
@@ -58,6 +58,7 @@ function AdminSidebar() {
         <NavLink href="/admin/journal" icon={<BookOpen size={18} strokeWidth={1.5} />}>Journal</NavLink>
         <NavLink href="/admin/analytics" icon={<BarChart3 size={18} strokeWidth={1.5} />}>Analytics</NavLink>
         <NavLink href="/admin/subscribers" icon={<Mail size={18} strokeWidth={1.5} />}>Subscribers</NavLink>
+        <NavLink href="/admin/partners" icon={<UsersRound size={18} strokeWidth={1.5} />}>Partners</NavLink>
       </nav>
 
       <div className="border-t border-white/10 p-4">
@@ -79,12 +80,13 @@ function AdminHeader() {
       <div className="flex min-h-14 items-center justify-between px-4 sm:min-h-16 sm:px-6">
         <p className="font-section-header text-[0.65rem] tracking-[0.16em] text-ink-muted sm:text-xs sm:tracking-[0.2em]">VESNA / CURATOR STUDIO</p>
       </div>
-      <nav aria-label="Admin navigation" className="grid grid-cols-2 gap-1.5 px-3 pb-3 sm:grid-cols-4 sm:gap-2 sm:px-6 lg:hidden">
+      <nav aria-label="Admin navigation" className="grid grid-cols-2 gap-1.5 px-3 pb-3 min-[520px]:grid-cols-3 sm:gap-2 sm:px-6 lg:hidden">
         <NavLink lightSurface href="/admin/dashboard" icon={<LayoutDashboard size={18} strokeWidth={1.5} />}>Dashboard</NavLink>
         <NavLink lightSurface href="/admin/products" icon={<ShoppingBag size={18} strokeWidth={1.5} />}>Products</NavLink>
         <NavLink lightSurface href="/admin/journal" icon={<BookOpen size={18} strokeWidth={1.5} />}>Journal</NavLink>
         <NavLink lightSurface href="/admin/analytics" icon={<BarChart3 size={18} strokeWidth={1.5} />}>Analytics</NavLink>
         <NavLink lightSurface href="/admin/subscribers" icon={<Mail size={18} strokeWidth={1.5} />}>Subscribers</NavLink>
+        <NavLink lightSurface href="/admin/partners" icon={<UsersRound size={18} strokeWidth={1.5} />}>Partners</NavLink>
       </nav>
     </header>
   )

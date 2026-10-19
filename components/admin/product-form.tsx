@@ -11,10 +11,11 @@ import { ArrowLeft, ArrowRight, ImagePlus, Loader2, X } from 'lucide-react'
 import { SELECTION_BASES, validSpecifications, type SelectionBasis } from '@/lib/product-editorial'
 
 interface Category { id: string; name: string }
+interface PartnerOption { id: string; name: string; partner_type: 'vendor' | 'maker' }
 interface ProductFormData {
   brand?:string; uses?:string[]; interests?:string[]; occasions?:string[]; recipient_tags?:string[]
   name: string; slug: string; description: string | null; price: string; sale_price: string
-  affiliate_link: string | null; category_id: string | null; image_urls: string[]
+  affiliate_link: string | null; category_id: string | null; partner_id?: string | null; image_urls: string[]
   why_victory: string | null; item_type: 'curated' | 'shop' | 'archive'
   is_featured: boolean; is_active: boolean
   best_for: string; considerations: string; specifications: string; selection_basis: SelectionBasis
@@ -35,17 +36,27 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
   const supabase = createClient()
   const [metadataText,setMetadataText]=useState({uses:(initialData?.uses||[]).join(', '),interests:(initialData?.interests||[]).join(', '),occasions:(initialData?.occasions||[]).join(', '),recipient_tags:(initialData?.recipient_tags||[]).join(', ')})
   const [saving, setSaving] = useState(false)
+  const [partners, setPartners] = useState<PartnerOption[]>([])
+  const [partnersSchemaReady, setPartnersSchemaReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [manualSlug, setManualSlug] = useState(!!initialData)
   const [files, setFiles] = useState<File[]>([])
     const [imageOrder, setImageOrder] = useState<string[]>(initialData?.image_urls || [])
   const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files])
   useEffect(() => () => previews.forEach(URL.revokeObjectURL), [previews])
+  useEffect(() => {
+    if (!supabase) return
+    let active = true
+    void supabase.from('catalog_partners').select('id,name,partner_type').in('status', ['prospect', 'active']).order('name').then(({ data, error: partnerError }) => {
+      if (active && !partnerError) { setPartners(data ?? []); setPartnersSchemaReady(true) }
+    })
+    return () => { active = false }
+  }, [supabase])
   const [form, setForm] = useState<ProductFormData>({
     brand:initialData?.brand||'', uses:initialData?.uses||[],interests:initialData?.interests||[],occasions:initialData?.occasions||[],recipient_tags:initialData?.recipient_tags||[],
     name: initialData?.name || '', slug: initialData?.slug || '', description: initialData?.description || null,
     price: initialData?.price || '', sale_price: initialData?.sale_price || '', affiliate_link: initialData?.affiliate_link || null,
-    category_id: initialData?.category_id || null, image_urls: initialData?.image_urls || [],
+    category_id: initialData?.category_id || null, partner_id: initialData?.partner_id || null, image_urls: initialData?.image_urls || [],
     why_victory: initialData?.why_victory || null, item_type: initialData?.item_type || 'shop',
     is_featured: initialData?.is_featured || false, is_active: initialData?.is_active ?? false,
     best_for: initialData?.best_for || '', considerations: initialData?.considerations || '',
@@ -103,6 +114,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
         price: form.price ? Number.parseFloat(form.price) : null,
         sale_price: form.sale_price ? Number.parseFloat(form.sale_price) : null,
         affiliate_link: form.affiliate_link || null, category_id: form.category_id || null,
+        ...(partnersSchemaReady ? { partner_id: form.partner_id || null } : {}),
         image_urls: retainedUrls.filter(Boolean), why_victory: form.why_victory || null,
         item_type: form.item_type, is_featured: form.is_featured, is_active: form.is_active,
         best_for: form.best_for.trim() || null, considerations: form.considerations.trim() || null,
@@ -157,6 +169,7 @@ export default function ProductForm({ categories, initialData }: ProductFormProp
             <Field label="Category"><select value={form.category_id || ''} onChange={(e) => updateField('category_id', e.target.value || null)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="">No category</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></Field>
             <Field label="Affiliate link"><Input type="url" value={form.affiliate_link || ''} onChange={(e) => updateField('affiliate_link', e.target.value || null)} placeholder="https://…" /></Field>
           </div>
+          <Field label="Vendor or maker"><select value={form.partner_id || ''} onChange={(e) => updateField('partner_id', e.target.value || null)} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="">No linked partner</option>{partners.map((partner) => <option key={partner.id} value={partner.id}>{partner.name} · {partner.partner_type}</option>)}</select></Field>
           <Field label="Why Victory picked it"><Textarea value={form.why_victory || ''} onChange={(e) => updateField('why_victory', e.target.value || null)} rows={3} placeholder="A personal note from the curator." /></Field>
           <section className="space-y-5 border-t border-outline-variant pt-6">
             <div><h2 className="font-medium text-on-background">The editorial details</h2><p className="mt-1 text-sm text-on-surface-variant">Help readers choose with confidence. Add verified facts and honest limitations. Empty fields stay hidden.</p></div>

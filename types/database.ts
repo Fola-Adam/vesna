@@ -9,6 +9,44 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      catalog_partners: {
+        Row: {
+          id: string
+          partner_type: 'vendor' | 'maker'
+          name: string
+          status: 'prospect' | 'active' | 'paused' | 'archived'
+          contact_name: string | null
+          contact_email: string | null
+          website: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          partner_type: 'vendor' | 'maker'
+          name: string
+          status?: 'prospect' | 'active' | 'paused' | 'archived'
+          contact_name?: string | null
+          contact_email?: string | null
+          website?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          partner_type?: 'vendor' | 'maker'
+          name?: string
+          status?: 'prospect' | 'active' | 'paused' | 'archived'
+          contact_name?: string | null
+          contact_email?: string | null
+          website?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
       products: {
         Row: {
           id: string
@@ -19,6 +57,7 @@ export interface Database {
           sale_price: number | null
           affiliate_link: string | null
           category_id: string | null
+          partner_id: string | null
           image_urls: string[]
           why_victory: string | null
           item_type: 'curated' | 'shop' | 'archive'
@@ -37,6 +76,7 @@ export interface Database {
           sale_price?: number | null
           affiliate_link?: string | null
           category_id?: string | null
+          partner_id?: string | null
           image_urls?: string[]
           why_victory?: string | null
           item_type?: 'curated' | 'shop' | 'archive'
@@ -55,6 +95,7 @@ export interface Database {
           sale_price?: number | null
           affiliate_link?: string | null
           category_id?: string | null
+          partner_id?: string | null
           image_urls?: string[]
           why_victory?: string | null
           item_type?: 'curated' | 'shop' | 'archive'
@@ -237,6 +278,12 @@ export interface Database {
           unique_sessions: number | null
           products_clicked: number | null
         }
+      }
+      product_click_stats: {
+        Row: { click_date: string | null; product_id: string | null; total_clicks: number | null }
+      }
+      referrer_click_stats: {
+        Row: { click_date: string | null; referrer: string | null; total_clicks: number | null }
       }
     }
     Functions: {

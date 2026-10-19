@@ -44,6 +44,7 @@ export default async function EditProductPage({
           sale_price: product.sale_price?.toString() || '',
           affiliate_link: product.affiliate_link,
           category_id: product.category_id,
+          partner_id: product.partner_id,
           image_urls: product.image_urls || [],
           why_victory: product.why_victory,
           best_for: product.best_for || '',
