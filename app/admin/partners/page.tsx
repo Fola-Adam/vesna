@@ -43,7 +43,7 @@ export default function PartnersPage() {
     ])
     if (partnerError || productsError) {
       const message = [partnerError?.message, productsError?.message].filter(Boolean).join(' · ')
-      setError(/catalog_partners|partner_id|schema cache/i.test(message) ? 'The Partners data structure is not installed yet. Apply supabase/migrations/202610190001_admin_reporting_and_partners.sql to enable this module.' : message)
+      setError(/catalog_partners|partner_id|schema cache/i.test(message) ? 'The Partners data structure is not installed yet. Apply supabase/migrations/20261019143340_admin_reporting_and_partners.sql to enable this module.' : message)
     } else {
       setPartners((data ?? []) as Partner[])
       setProductCounts((products ?? []).reduce((counts: Record<string, number>, product: { partner_id: string | null }) => { if (product.partner_id) counts[product.partner_id] = (counts[product.partner_id] ?? 0) + 1; return counts }, {}))
