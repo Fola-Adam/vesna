@@ -1,0 +1,63 @@
+'use client'
+
+import { useId, useState } from 'react'
+import { Check } from 'lucide-react'
+
+export default function NewsletterForm({ source = 'website' }: { source?: 'website' | 'about' | 'journal' }) {
+  const id = useId()
+  const isDarkSurface = source === 'website'
+  const [email, setEmail] = useState('')
+  const [pending, setPending] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function subscribe(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (pending) return
+    setPending(true)
+    setError(null)
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), source }),
+      })
+      const result = await response.json().catch(() => null)
+      if (!response.ok || result?.ok !== true) {
+        throw new Error(result?.error ?? 'Signup failed. Please try again later.')
+      }
+      setSaved(true)
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : 'Signup failed. Please try again later.')
+    } finally {
+      setPending(false)
+    }
+  }
+
+  if (saved) return (
+    <p role="status" className={`flex items-center justify-center gap-2 font-body-main py-4 ${isDarkSurface ? 'text-paper' : 'text-primary-ink'}`}>
+      <Check aria-hidden="true" size={20} /> If confirmation is needed, a link is on its way. Check your inbox and spam folder.
+    </p>
+  )
+
+  return (
+    <form onSubmit={subscribe} className="max-w-xl mx-auto text-left" aria-busy={pending}>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1 min-w-0">
+          <label htmlFor={id} className="sr-only">Email address</label>
+          <input id={id} type="email" autoComplete="email" maxLength={254} required
+            value={email} onChange={event => setEmail(event.target.value)}
+            placeholder="Your email address" disabled={pending}
+            aria-invalid={!!error} aria-describedby={error ? `${id}-error` : undefined}
+            className={`w-full border px-4 py-4 font-body-main focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary ${isDarkSurface ? 'border-paper/35 bg-ink text-paper placeholder:text-paper/65' : 'border-ink/25 bg-paper-raised text-ink placeholder:text-ink-muted'}`}
+          />
+        </div>
+        <button type="submit" disabled={pending}
+          className="bg-primary-ink text-paper px-6 py-4 font-button-label text-xs font-semibold uppercase tracking-widest transition-colors hover:bg-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4 disabled:opacity-60">
+          {pending ? 'Joining…' : 'Join the Dispatch'}
+        </button>
+      </div>
+      <p className={`mt-3 text-xs leading-relaxed ${isDarkSurface ? 'text-paper/75' : 'text-ink-muted'}`}>We will ask you to confirm your email. Occasional letters, and an unsubscribe link in every one.</p>
+      {error && <p id={`${id}-error`} role="alert" className={`mt-3 text-sm font-body-main ${isDarkSurface ? 'text-error' : 'text-red-800'}`}>{error}</p>}
+    </form>
+  )
+}

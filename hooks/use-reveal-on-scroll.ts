@@ -22,6 +22,7 @@ export function useRevealOnScroll(options: UseRevealOnScrollOptions = {}) {
           if (entry.isIntersecting) {
             entry.target.classList.add("active");
             onReveal?.(entry);
+            observer.unobserve(entry.target);
           }
         });
       },

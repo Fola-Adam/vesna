@@ -1,39 +1,18 @@
-﻿import type { Metadata } from "next";
-import { Tenor_Sans, Audiowide, Spectral, Cinzel, Playfair_Display } from "next/font/google";
+import type { Metadata } from "next";
+import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const tenorSans = Tenor_Sans({
-  weight: "400",
+const dmSans = DM_Sans({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
-  variable: "--font-button-label",
+  variable: "--font-dm-sans",
   display: "swap",
 });
 
-const audiowide = Audiowide({
-  weight: "400",
+const cormorant = Cormorant_Garamond({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
-  variable: "--font-audiowide",
-  display: "swap",
-});
-
-const spectral = Spectral({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-spectral",
-  display: "swap",
-});
-
-const cinzel = Cinzel({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-cinzel",
-  display: "swap",
-});
-
-const playfairDisplay = Playfair_Display({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-playfair",
+  variable: "--font-cormorant",
   display: "swap",
 });
 
@@ -59,7 +38,7 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#131312",
+  themeColor: "#10382d",
 };
 
 export default function RootLayout({
@@ -70,7 +49,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${tenorSans.variable} ${audiowide.variable} ${spectral.variable} ${cinzel.variable} ${playfairDisplay.variable} antialiased`}
+        className={`${dmSans.variable} ${cormorant.variable} antialiased`}
       >
         {children}
       </body>

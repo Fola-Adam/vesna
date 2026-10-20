@@ -1,17 +1,13 @@
+# Dependencies
 node_modules/
-.next/
-.env
-.env.local
-.env.*.local
-*.tsbuildinfo
-next-env.d.ts
-.netlify
-.DS_Store
-Thumbs.db
-public/sw.js
 
-# Test artifacts
-.playwright-mcp/
-# Screenshots
-vesna-*.png
-vesna-*.jpg
+# Build artifacts
+tsconfig.tsbuildinfo
+.next
+.env.local
+dev.log
+tsconfig.tsbuildinfo
+
+# Local verification output
+test-results/
+playwright-report/
