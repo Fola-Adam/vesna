@@ -104,6 +104,63 @@ body {
   min-width: 320px;
 }
 
+/* The curator studio keeps Vesna's palette, with a paper-first working surface. */
+.admin-shell {
+  --background: #f1ece2;
+  --background-rgb: 241 236 226;
+  --foreground: #292720;
+  --foreground-rgb: 41 39 32;
+  --surface: #faf7f0;
+  --surface-dim: #ebe5d9;
+  --surface-container: #eee9df;
+  --surface-container-high: #e7e1d5;
+  --surface-container-low: #f5f1e9;
+  --surface-container-lowest: #fffdf8;
+  --on-surface: #292720;
+  --on-surface-variant: #625b50;
+  --outline: #81796c;
+  --outline-variant: #d5cdbf;
+  --card: #faf7f0;
+  --card-foreground: #292720;
+  --popover: #fffdf8;
+  --popover-foreground: #292720;
+  --muted: #eee9df;
+  --muted-foreground: #625b50;
+  --border: #d5cdbf;
+  --input: #c9c0b2;
+  color: #292720;
+}
+
+.admin-shell :is(input, select, textarea) {
+  color-scheme: light;
+}
+
+.admin-login {
+  background:
+    radial-gradient(ellipse at 80% 8%, rgba(35, 89, 67, .2), transparent 42%),
+    radial-gradient(ellipse at 8% 90%, rgba(195, 170, 123, .07), transparent 38%),
+    #171a17;
+}
+
+.admin-login-input {
+  border-color: rgba(241, 236, 226, .2);
+  background: rgba(255, 255, 255, .055);
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.admin-login-input:hover {
+  border-color: rgba(195, 170, 123, .58);
+}
+
+.admin-login-input:focus {
+  border-color: #79b89b;
+  background: rgba(255, 255, 255, .085);
+}
+
+.admin-login-orbit {
+  box-shadow: 0 0 0 36px rgba(195, 170, 123, .025), 0 0 0 78px rgba(195, 170, 123, .018);
+}
+
 /* Display/Hero Font */
 .font-display-hero {
   font-family: var(--font-cormorant), Georgia, serif;
